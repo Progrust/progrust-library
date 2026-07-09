@@ -15,7 +15,7 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 - [x] **T1-3: ★ctx.fileURL実ビルド検証（最優先リスク）** 〔Fable 5〕
   wikilinkプラグイン（[markdown-pipeline/wikilink.md](../markdown-pipeline/wikilink.md)の雛形）をContent Layer API経由の実ビルドに載せ、`ctx.fileURL`が実ファイルを指すかを確認する。NGの場合は代替案（公開状態の受け渡し方法の変更等）を検討・実装し、結果を`markdown-pipeline/wikilink.md`へ反映する。
   完了条件: コレクション経由のビルドでwikilinkがタイトル付き`<a href="/dict/[slug]">`に変換される。検証結果（OK/NGと対処）がwikilink.mdに追記されている。
-- [ ] **T1-4: ビルド時検証3種**
+- [x] **T1-4: ビルド時検証3種**
   辞書ファイル名一意性（dict-index.mjs）・章連番形式/重複・wikilinkリンク切れ/公開非対称を実装する。
   完了条件: content-model AC-2 / AC-5 / AC-9 / AC-10 を満たす（意図的な違反ファイルで各エラーを確認し、削除してビルド成功に戻す）。プラグインのvitestが通る。
 
@@ -84,6 +84,27 @@ T1-4向けの申し送り（特記事項）:
 - devサーバ実行中の辞書追加が再起動まで反映されない既知挙動を [markdown-notation/rule.md](../markdown-notation/rule.md) の辞書リンク節に注記
 
 ### T1-4
+
+対応概要:
+
+- **ビルド時検証3種をconfig評価時に実装**（`astro.config.mjs` トップレベルでthrow）。コレクション経由のvisitor throwはglob loaderに握り潰されexit 0になるため、レンダリング外の検証パスで確実にexit 1化する（方式の正は [markdown-pipeline/wikilink.md](../markdown-pipeline/wikilink.md) と [satteri-plugin-api.md](../markdown-pipeline/satteri-plugin-api.md)）。
+  - **辞書ファイル名一意性**（R-6 / **AC-2**）: `plugins/dict-index.mjs` に純関数 `assertUniqueDictSlugs` を追加し `loadDictIndex` 索引構築時に呼ぶ。重複時は衝突した全絶対パスをメッセージに含める。
+  - **章連番形式・重複**（R-9 / **AC-5**）: 新規 `plugins/chapter-order.mjs`。純関数 `findChapterOrderViolations`（連番なし／連番除去後重複を検出）+ fsラッパ `validateChapters`（`index.md`除外）。
+  - **wikilinkリンク切れ・公開非対称**（R-13/R-14 / **AC-9/AC-10**）: 新規 `plugins/validate-wikilinks.mjs`。全コンテンツmdを既存 `wikilink.mjs` で `markdownToHtml` 単体コンパイルし、既存throwをそのまま伝播させる（検証ロジック・エラーメッセージをDRYに再利用）。
+- **frontmatter扱いを実測で確定**: `markdownToHtml` は結果に `frontmatter` を返す＝自前抽出するため剥がさず全文を渡す（T1-3の「剥がせ」ノートは陳腐化）。全文渡しでエラー行番号が実ファイルと一致する。詳細は [wikilink.md](../markdown-pipeline/wikilink.md)。
+- **テスト**（`tests/plugins/` 3ファイル・計10件）: 純ロジックはinlineデータ、wikilink非対称は `tests/fixtures/public-*.md` を `fileURL` に渡して公開/非公開を出し分け（`ctx.fileURL` のディスク上frontmatterで判定されるため）。コンパイルヘルパは `tests/helpers/wikilink.ts`。
+
+検証結果:
+
+- `npm run check`（format:check / lint / typecheck / test **24件**）green・`npx astro build` 成功。
+- **意図的な違反で各AC確認 → 削除して復旧**（すべて実測）: AC-2=別フォルダ同名dict（両パス入りエラー）、AC-5=連番なし章/連番除去後重複、AC-9=存在しないslug（`astro build` exit 1・リンク元+slug入り）、AC-10=公開記事→非公開辞書でexit 1・非公開記事→非公開辞書はexit 0（非対称）。R-12過検出ケースは現ダミーに無くクリーンビルドが通ることも確認。
+
+特記事項（後続向け申し送り）:
+
+- config評価は dev/check/build すべてで走るため、壊れたwikilink等は `astro dev` 起動も落とす（ソロ執筆運用では許容）。将来重ければwikilink検証だけ `astro:build:start` へ寄せる余地あり。
+- **R-12伝播とwikilink非対称判定は未対応**（過検出側の既知制限）。詳細は [wikilink.md 制約・残課題](../markdown-pipeline/wikilink.md)。
+
+作成コミット: `737abec` feat: ビルド時検証3種を実装しconfig評価時に統合 / `7b2506b` test: ビルド時検証のAC-2/5/9/10テストを追加 / `36cc986` docs: T1-4のビルド時検証実装をwikilink.mdへ反映
 
 ## フェーズ完了条件
 
