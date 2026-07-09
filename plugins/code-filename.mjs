@@ -16,8 +16,9 @@ export const codeFilename = defineMdastPlugin({
     const idx = node.lang.indexOf(":");
     const realLang = node.lang.slice(0, idx);
     const filename = node.lang.slice(idx + 1);
-    // ファイル名部分が空（```rust:）ならラップせず素通りさせる
-    if (!filename) return;
+    // 言語部分が空（```:main.rs）・ファイル名部分が空（```rust:）はいずれも
+    // rule.md の記法（言語必須・ファイル名任意）から外れるためラップせず素通りさせる。
+    if (!realLang || !filename) return;
 
     // 補正済みcodeノード（新規生成）。langを実言語に直す。metaはそのまま引き継ぐ。
     // 新規codeノードでも生成時にlangをリテラルで持たせれば下流のハイライトが正常に効く。

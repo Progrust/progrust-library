@@ -46,7 +46,8 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - **スコープ外（P6へ繰り延べ）**: dual themeの `html.dark` 切替CSS（`.astro-code`）は入れていない。`defaultColor: false` によりビルド出力には `--shiki-light`/`--shiki-dark` 変数が両方含まれ完了条件「両テーマのハイライトがビルド結果に含まれる」を満たすが、実際の色付け・見た目切替は theme.md AC-4 = P6の範疇。**そのためP6まではコードが無彩色（色が付かない）**（記録済みの判断であり隠れた欠落ではない）。
 - 完了条件充足: ユニットテスト（ファイル名分離・パス区切り・コロン無し素通り・空ファイル名の4ケース）で mdast前処理を検証。ただしShikiは `markdownToHtml`（satteri直接）では走らないため、**3要件の核心は実 `astro build` の dist で確認**した（debug-render の `targetIds` を一時的に `axum-web-api-intro` 込みへ広げ→build→`dist/debug-render/index.html` を grep→revert）: ファイル名ブロックが `class="code-filename"` かつ `data-language="rust"`（plaintextフォールバックしていない）／diff の `has-diff`・`diff add`・`diff remove`／dual theme の `--shiki-light`・`--shiki-dark` 両方の出力を確認。これにより shiki.md の「コレクション経由実ビルドで `shikiConfig` が効くか未検証」の残課題も解消した（shiki.md反映済み）。
 - 補足: ` ```mermaid ` は未知langのため `data-language="plaintext"` にフォールバックする（除外は[mermaid.md](../markdown-pipeline/mermaid.md)のT2-4で対応）。CSS（コードブロックの見た目）はP6対象。
-- 検証結果: `npm run check`（format:check + lint + typecheck + test 40件）green / `npx astro build` 成功。
+- 検証結果: `npm run check`（format:check + lint + typecheck + test 41件）green / `npx astro build` 成功。
+- レビュー反映（[T2-2.md](../archive/review/T2-2.md)）: 軽微R-2（言語部分が空 ` ```:main.rs ` のエッジケースが未処理・空ファイル名ガードと非対称）に対応し、`!realLang` の素通りガードとテストを追加した（言語必須はrule.md準拠）。軽微R-1（ファイル名記法が既定ビルドで継続検証されない）は後続T2-5（全記法テスト用mdに ` ```rust:main.rs ` を含める）で恒常カバーするため本タスクでは変更なし。
 - コミットは `Task: T2-2` トレーラーで収集可能（`git log --grep 'Task: T2-2'`）。
 
 ### T2-3

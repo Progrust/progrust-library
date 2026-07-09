@@ -27,4 +27,10 @@ describe("code-filename（```lang:file のファイル名分離・docs/markdown-
     const html = compileWithCodeFilename("```rust:\nfn main() {}\n```");
     expect(html).not.toContain("code-filename");
   });
+
+  it("言語部分が空（```:main.rs）のときはラップしない", () => {
+    const html = compileWithCodeFilename("```:main.rs\nfn main() {}\n```");
+    expect(html).not.toContain("code-block");
+    expect(html).not.toContain("code-filename");
+  });
 });
