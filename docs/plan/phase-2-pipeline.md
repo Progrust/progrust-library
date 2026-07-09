@@ -78,6 +78,7 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - 完了条件充足: ユニット8ケース green（`namespaceSvgIds` の id積集合0・各参照形式追従・色指定非書換え／figure+light/dark2枚構造／非mermaid素通り／レンダ拒否throw／ファクトリ独立性）。**実 `astro build` の dist（debug-render に `axum-web-api-intro` を一時追加・Content Layerキャッシュ削除後にビルド→revert）で核心を確認**: mermaidブロックが `<figure class="mermaid-diagram">` + light/dark 2枚の `<svg>`（`&lt;svg` 0個）に変換され、light/dark間のid積集合が0、`dist/_astro/` にmermaidランタイム非配布。これにより mermaid.md の「コレクション経由実ビルド未検証」残課題も解消（反映済み）。
 - スコープ外: light/dark切替の実表示（`html.dark`トグル）・CSSはP6/UIフェーズ（[shiki.md](../markdown-pipeline/shiki.md) のdual theme CSSと同扱い）。CI（GitHub Actions）でのPlaywright/Chromium起動、flowchart/sequence以外の全図種は引き続き未検証（mermaid.md 残課題）。全プラグイン同時動作（wikilink×linkCard含む）はT2-5で確認。
 - 検証結果: `npm run check`（format:check + lint + typecheck + test 59件）green / `npx astro build` 成功。
+- レビュー反映（[T2-4.md](../archive/review/T2-4.md)）: **要修正R-1**（`namespaceSvgIds` がSVGルートidを再名前空間化する一方、mermaidの`<style>`が全テーマルールを`#<ルートid>`バセレクタでスコープするため、書き換え後セレクタが旧idを指し**全テーマスタイルが死にCSS化**＝light/dark配色差が消える）に対応。ルートidを`namespaceSvgIds`の書き換え対象から除外した（ルートidは`prefix`で既にper-SVG一意なので除外してもlight/dark間で衝突しない）。詳細・回避策は[mermaid.md](../markdown-pipeline/mermaid.md)落とし穴1へ反映。テストは`<style>`内バ`#id`セレクタの孤立ゼロ（死にCSS検出）を核に据え直し、light/dark別ルートidで誤衝突を防ぐ構成に改めた。軽微R-2（`[AC-mermaid]`独自タグ）は削除（T2-1〜T2-3のプレフィックス無し前例に合わせる）、軽微R-3（aria複数id非追従）はmermaid.md残課題へ追記。再検証: `npm run check`（test 60件）green / `npx astro build` の dist で**バ`#id`セレクタの孤立が両SVGで0**（修正前71→0）・ルートid不変でセレクタ一致・二重前置きはマーカー/グラデーションのみ（無害）を実測。
 - コミットは `Task: T2-4` トレーラーで収集可能（`git log --grep 'Task: T2-4'`）。
 
 ### T2-5
