@@ -1,0 +1,42 @@
+---
+// 辞書一覧（pages R-8/R-11 / AC-3）。dict-index モックを視覚の正とする。
+// カードグリッド（タイトル + タグ）+ 絞込 UI（静的配置・動作は P5）。全件表示・ページ送りなし。
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import DictCard from "../../components/DictCard.astro";
+import ListFilter from "../../components/ListFilter.astro";
+import { getPublicDict, sortByNewest, tagCounts } from "../../lib/content";
+
+// dict は getPublicDict では未ソートのため created_at 降順にする（pages R-4）
+const dict = sortByNewest(await getPublicDict());
+const tags = tagCounts(dict);
+---
+
+<BaseLayout title="辞書一覧">
+  <main class="mx-auto max-w-6xl px-4 sm:px-8 py-12 sm:py-16">
+    <section class="mb-8">
+      <p class="mb-2 font-mono text-xs text-accent">// dictionary</p>
+      <div class="flex items-baseline justify-between">
+        <h1
+          class="font-display text-2xl font-black tracking-tight text-strong sm:text-3xl"
+        >
+          辞書
+        </h1>
+        <p class="font-mono text-xs text-sub">{dict.length} entries</p>
+      </div>
+    </section>
+
+    <ListFilter tags={tags} total={dict.length} />
+
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        dict.map((entry) => (
+          <DictCard
+            href={`/dict/${entry.id}`}
+            title={entry.data.title}
+            tags={entry.data.tags}
+          />
+        ))
+      }
+    </div>
+  </main>
+</BaseLayout>

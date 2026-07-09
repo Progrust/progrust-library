@@ -1,0 +1,45 @@
+---
+// 本一覧（pages R-10/R-11 / AC-3）。概要 + ヘッダ画像の横並びカードを縦スタック。
+// 絞込 UI は静的配置（動作は P5）。全件表示・ページ送りなし。
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import EntryCard from "../../components/EntryCard.astro";
+import ListFilter from "../../components/ListFilter.astro";
+import { getPublicBooks, tagCounts } from "../../lib/content";
+
+// getPublicBooks は新着順ソート済み（pages R-4）。本の新着判定は index.md の created_at
+const books = await getPublicBooks();
+const tags = tagCounts(books);
+---
+
+<BaseLayout title="本一覧">
+  <main class="mx-auto max-w-6xl px-4 sm:px-8 py-12 sm:py-16">
+    <section class="mb-8">
+      <p class="mb-2 font-mono text-xs text-accent">// books</p>
+      <div class="flex items-baseline justify-between">
+        <h1
+          class="font-display text-2xl font-black tracking-tight text-strong sm:text-3xl"
+        >
+          本
+        </h1>
+        <p class="font-mono text-xs text-sub">{books.length} entries</p>
+      </div>
+    </section>
+
+    <ListFilter tags={tags} total={books.length} />
+
+    <div class="flex flex-col gap-4">
+      {
+        books.map((entry) => (
+          <EntryCard
+            href={`/books/${entry.id}`}
+            title={entry.data.title}
+            description={entry.data.description}
+            createdAt={entry.data.created_at}
+            tags={entry.data.tags}
+            image={entry.data.image}
+          />
+        ))
+      }
+    </div>
+  </main>
+</BaseLayout>
