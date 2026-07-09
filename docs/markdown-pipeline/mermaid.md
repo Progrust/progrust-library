@@ -76,7 +76,7 @@ const renderer = createMermaidRenderer();
 // 衝突する。→ SVG 文字列内の内部 id と参照（url(#..) / href="#.." / aria-*）を
 // 一意な ns で前置きして衝突を根絶する。
 // ★ルート id（<svg id>）は除外する。mermaid は <style> の全ルールを #<ルートid> の
-//   バセレクタでスコープしており、ルート id を書き換えるとセレクタが死にCSS化する
+//   #id セレクタでスコープしており、ルート id を書き換えるとセレクタが死にCSS化する
 //   （落とし穴1参照）。ルート id は prefix で既に per-SVG 一意なので除外して問題ない。
 function namespaceSvgIds(svg, ns) {
   const rootId = svg.match(/<svg\b[^>]*?\bid="([^"]+)"/)?.[1];
@@ -186,8 +186,8 @@ element tagName='pre' properties={}
 1. **`prefix`だけではlight/darkのidが衝突する（本機能の本丸）**
    - `prefix`はsvgルートid・矢印マーカー（`${id}_flowchart-v2-pointEnd`）・グラデーション（`${id}-gradient`）には効くが、**フローチャートのエッジid（`L_A_B_0`等）、シーケンス図のparticipant id（`actor0`/`S`/`U`/`i0`）、`root-0`等は無名前空間のまま**。同一図をlight/darkで2回レンダして同一ページに並べると重複する
    - 回避策: `namespaceSvgIds`（上記コード）で**内部**`id="..."`と参照（`url(#..)` / `href="#.."` / `aria-labelledby`/`aria-describedby`）にper-SVG一意なnsを前置き。id属性は`"`、`url(#..)`は`)`、`href`は`"`でアンカーされるため部分一致の誤置換は起きない（`fill="#333"`のような色指定は無傷）
-   - **★ルートid（`<svg id="…">`）は書き換え対象から除外する（T2-4レビューR-1）**: mermaidは`<style>`の全テーマルールを**`#<ルートid>{…}` / `#<ルートid> .node{…}`のバセレクタ**でスコープする。このバ`#id`セレクタは`url()`/`href`/`aria`のいずれでもなく本関数の書き換え対象外なので、ルートidだけ書き換えるとセレクタが旧idを指し**全テーマルールが死にCSS化**する（配色差が消える。実レンダで取り残しセレクタ71箇所を実測）。ルートidは`prefix`（`mmd{index}l`/`mmd{index}d`）で既にper-SVG一意（light=`mmd0l-0`/dark=`mmd0d-0`）なので、除外してもlight/dark間で衝突しない。以前の「部分一致の誤置換は起きない」注記は*偽陽性*（色値の無傷）のみを論じ、この*偽陰性*（バ`#id`セレクタの取り残し）を見落としていた
-   - マーカー/グラデーション等`prefix`が既に名前空間化済みのidは、本関数がさらに二重前置き（`mmd0l-mmd0l-0_…`）するが、定義（`id=`）と参照（`url(#..)`）を揃えて書き換えるため**無害**（ルートidと違い`<style>`のバセレクタに現れないため死にCSS化しない）
+   - **★ルートid（`<svg id="…">`）は書き換え対象から除外する（T2-4レビューR-1）**: mermaidは`<style>`の全テーマルールを**`#<ルートid>{…}` / `#<ルートid> .node{…}`の`#id`セレクタ**でスコープする。この`#id`セレクタは`url()`/`href`/`aria`のいずれでもなく本関数の書き換え対象外なので、ルートidだけ書き換えるとセレクタが旧idを指し**全テーマルールが死にCSS化**する（配色差が消える。実レンダで取り残しセレクタ71箇所を実測）。ルートidは`prefix`（`mmd{index}l`/`mmd{index}d`）で既にper-SVG一意（light=`mmd0l-0`/dark=`mmd0d-0`）なので、除外してもlight/dark間で衝突しない。以前の「部分一致の誤置換は起きない」注記は*偽陽性*（色値の無傷）のみを論じ、この*偽陰性*（`#id`セレクタの取り残し）を見落としていた
+   - マーカー/グラデーション等`prefix`が既に名前空間化済みのidは、本関数がさらに二重前置き（`mmd0l-mmd0l-0_…`）するが、定義（`id=`）と参照（`url(#..)`）を揃えて書き換えるため**無害**（ルートidと違い`<style>`の`#id`セレクタに現れないため死にCSS化しない）
 2. **ChromiumのOS依存不足でビルドが落ちる**
    - WSL2（Ubuntu 24.04）素の状態では`libnspr4.so`不足でブラウザ起動に失敗しexit 1（＝レンダ失敗がちゃんとビルドを止められることの裏取りにもなった）
    - 回避策: `sudo env "PATH=$PATH" npx playwright install-deps chromium`を**一度だけ**実行（sudoはPATHをリセットするため`env "PATH=$PATH"`が必要）。`--with-deps`ではなく`install-deps`サブコマンドで足りる。**CI（GitHub Actions）でも同等のdepsインストールステップが必要**（`npx playwright install --with-deps chromium`等。Pages組み込みビルドを使わずGitHub Actionsを採る理由がこれ）
@@ -200,6 +200,6 @@ element tagName='pre' properties={}
 - CI環境（GitHub Actions）でのPlaywright/Chromium起動は未検証（ローカルWSL2のみ）
 - mermaidの全図種（gantt / class / state / ER / pie等）での動作は未検証（flowchart・sequenceの2種のみ）。`iconPacks`やカスタムフォント（`css`オプション）も未使用
 - `namespaceSvgIds`の参照書き換えは`url(#..)` / `href="#.."` / `aria-labelledby|describedby`のみ対応。`begin="foo.end"`（SMILアニメ参照）等の他形式は本アプリのmermaid出力に現れなかったため未対応（必要になれば追加）。**`aria-labelledby="a b"`のようなスペース区切り複数idも完全一致アンカーのため未追従**（flowchart/sequenceの実測出力にaria複数idは現れず実害なし。T2-4レビューR-3）
-- **`namespaceSvgIds`のルートid除外は「`<style>`のバ`#id`セレクタはルートidのみ」という前提に依存**（flowchart/sequenceで実測。全セレクタが`#<ルートid>`スコープ）。gantt/class/state等の未検証図種が**非ルートのバ`#id`セレクタ**を`<style>`に持つ場合、そのセレクタは死にCSS化しうる（同R-1が図種依存で再発）。図種を広げる際は`<style>`内バ`#id`セレクタの孤立ゼロを再確認する
+- **`namespaceSvgIds`のルートid除外は「`<style>`の`#id`セレクタはルートidのみ」という前提に依存**（flowchart/sequenceで実測。全セレクタが`#<ルートid>`スコープ）。gantt/class/state等の未検証図種が**非ルートの`#id`セレクタ**を`<style>`に持つ場合、そのセレクタは死にCSS化しうる（同R-1が図種依存で再発）。図種を広げる際は`<style>`内`#id`セレクタの孤立ゼロを再確認する
 - 巨大図・多数図ページでのビルド時間/メモリ、およびレンダの並列度（現状は図ごとにlight/darkを`Promise.all`、図間はvisitor逐次）のチューニングは未検証
-- ~~コンテンツコレクション経由の実ビルドは未検証~~ → **T2-4で検証済み**: 実 `astro build` の dist（debug-render に `axum-web-api-intro` を一時追加、Content Layerキャッシュ削除後にビルド→revert）で、mermaidブロックが `<figure class="mermaid-diagram">` + light/dark 2枚の `<svg>`（`&lt;svg` 0個）に変換され、light/dark間のid積集合が0、`dist/_astro/` にmermaidランタイム非配布であることを実測。R-1修正後は**`<style>`内バ`#id`セレクタの孤立（死にCSS）が両SVGで0**（修正前71→0）、ルートid（`mmd1l-0`/`mmd1d-0`）不変で`#<ルートid>`セレクタと一致することも実測（残る`url(#…-gradient)`のdanglingは落とし穴3の既知無害分のみ）。
+- ~~コンテンツコレクション経由の実ビルドは未検証~~ → **T2-4で検証済み**: 実 `astro build` の dist（debug-render に `axum-web-api-intro` を一時追加、Content Layerキャッシュ削除後にビルド→revert）で、mermaidブロックが `<figure class="mermaid-diagram">` + light/dark 2枚の `<svg>`（`&lt;svg` 0個）に変換され、light/dark間のid積集合が0、`dist/_astro/` にmermaidランタイム非配布であることを実測。R-1修正後は**`<style>`内`#id`セレクタの孤立（死にCSS）が両SVGで0**（修正前71→0）、ルートid（`mmd1l-0`/`mmd1d-0`）不変で`#<ルートid>`セレクタと一致することも実測（残る`url(#…-gradient)`のdanglingは落とし穴3の既知無害分のみ）。

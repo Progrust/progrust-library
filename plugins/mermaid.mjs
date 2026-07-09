@@ -27,7 +27,7 @@ const defaultRenderer = createMermaidRenderer();
 //
 // ★ルート id（<svg id="…">）は書き換え対象から除外する。理由:
 //   1. mermaid は <style> の全テーマルールを「#<ルートid>{…}」「#<ルートid> .node{…}」の
-//      バセレクタでスコープする。このバ #id セレクタは url()/href/aria のいずれでもないため
+//      #id セレクタでスコープする。この #id セレクタは url()/href/aria のいずれでもないため
 //      本関数の書き換え対象外で、ルート id だけ書き換えるとセレクタが旧 id を指し全ルールが
 //      死にCSS化する（light/dark の配色差が消える）。
 //   2. ルート id は mermaid の prefix（mmd{index}l / mmd{index}d）で既に per-SVG 一意
@@ -35,7 +35,7 @@ const defaultRenderer = createMermaidRenderer();
 /**
  * SVG文字列中の内部 id 定義と参照を ns で前置きして一意化する（ルート id は不変）。
  * id属性は `"`、url(#..) は `)`、href は `"` でアンカーされるため部分一致の誤置換は起きない
- * （fill="#333" のような色指定は無傷）。バ #id セレクタ（style内）はルート id 用のみ想定し、
+ * （fill="#333" のような色指定は無傷）。#id セレクタ（style内）はルート id 用のみ想定し、
  * ルート id を不変に保つことで一致を維持する。
  * @param {string} svg
  * @param {string} ns
