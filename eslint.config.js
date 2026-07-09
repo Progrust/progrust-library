@@ -1,3 +1,4 @@
+import { defineConfig } from "eslint/config";
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import astro from "eslint-plugin-astro";
@@ -5,7 +6,8 @@ import globals from "globals";
 
 // 型検査は `astro check` が担うため、typescript-eslint は非 type-aware の recommended のみを使う
 // （type-checked 版は parserOptions.project 配線が必要で冗長・設定ミスの温床になる）。
-export default tseslint.config(
+// 設定ヘルパは ESLint 標準の defineConfig を使う（tseslint.config はシグネチャが deprecated）。
+export default defineConfig([
   {
     // lint 対象外。生成物・依存・執筆済みコンテンツを除外する。
     ignores: ["dist/", ".astro/", "node_modules/", "content/"],
@@ -22,4 +24,4 @@ export default tseslint.config(
       globals: globals.node,
     },
   },
-);
+]);
