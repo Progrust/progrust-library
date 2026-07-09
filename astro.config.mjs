@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 import { loadDictIndex } from "./plugins/dict-index.mjs";
 import { wikilink } from "./plugins/wikilink.mjs";
+import { directives } from "./plugins/directives.mjs";
 import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
 
@@ -20,12 +21,15 @@ validateChapters(new URL("./content/books/", import.meta.url));
 // wikilinkのリンク切れ・公開非対称（R-13/R-14）を全コンテンツで検証する。
 validateWikilinks(dictIndex, new URL("./content/", import.meta.url));
 
-// Sätteriの残りプラグイン（directives / link-card / mermaid / shiki設定）は P2 で追加する。
+// Sätteriの残りプラグイン（link-card / mermaid / shiki設定）は P2 の後続タスクで追加する。
+// directive: true は本文中の「x:y」等をtextDirective化して消す副作用があるため、
+// directivesプラグインに同梱した復元visitorとセットで有効化する（directives.md）。
 export default defineConfig({
   site: "https://progrust.com",
   markdown: {
     processor: satteri({
-      mdastPlugins: [wikilink(dictIndex)],
+      features: { directive: true },
+      mdastPlugins: [wikilink(dictIndex), directives],
     }),
   },
   vite: {
