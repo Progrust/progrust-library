@@ -15,7 +15,7 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 - [x] **T2-3: link-card**
   単独ベアURLのOGPカード化+ビルド跨ぎキャッシュ+失敗時フォールバックを組み込む（[link-card.md](../markdown-pipeline/link-card.md)）。内部リンク除外ガードを入れる。
   完了条件: ダミーコンテンツのベアURLがカード化され、キャッシュファイルが生成され、fetch失敗時もビルドが成功して簡易カードになる。
-- [ ] **T2-4: mermaid**
+- [x] **T2-4: mermaid**
   mermaid-isomorphicによるビルド時SVG化（ライト/ダーク2枚・id名前空間化）を組み込む（[mermaid.md](../markdown-pipeline/mermaid.md)）。
   完了条件: mermaidコードブロックが2枚のSVGに変換され、id重複がなく、クライアントにmermaid.jsが配布されない。
 - [ ] **T2-5: 全プラグイン同時動作確認** 〔Fable 5〕
@@ -69,6 +69,16 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - コミットは `Task: T2-3` トレーラーで収集可能（`git log --grep 'Task: T2-3'`）。
 
 ### T2-4
+
+`language-mermaid` のコードブロックをビルド時に `mermaid-isomorphic`（Playwright/Chromium）で light/dark 2枚のSVGへ変換する hast プラグイン `plugins/mermaid.mjs`（export `mermaid` / `namespaceSvgIds`）を[mermaid.md](../markdown-pipeline/mermaid.md)の検証済み雛形をベースに本番化し、`astro.config.mjs` に `syntaxHighlight.excludeLangs: ['mermaid']`（Shiki除外＝素の`<pre><code data.lang=mermaid>`でhastに届かせる）と `hastPlugins: [mermaid()]` を登録した。SVG全idを `namespaceSvgIds` で名前空間化し light/dark 間のid衝突を根絶、クライアントに mermaid.js は配布しない。レンダ失敗はthrowでビルドを止める（link-cardのフォールバックと方針が逆）。
+
+- 変更ファイル: `plugins/mermaid.mjs`（新規）/ `astro.config.mjs`（excludeLangs追加 + `hastPlugins` 登録）/ `package.json`・`package-lock.json`（`mermaid-isomorphic@^3.1.0` + `playwright@^1.61.1` を dependencies 追加。playwrightは mermaid-isomorphic の optional peer）/ `tests/plugins/mermaid.test.ts`・`tests/helpers/mermaid.ts`（新規）/ `docs/markdown-pipeline/mermaid.md`（本番化での確定事項・残課題解消を反映）。
+- **雛形からの逸脱・本番化での確定事項**（先に [mermaid.md](../markdown-pipeline/mermaid.md)「本番化（T2-4）での確定事項」へ反映）: ①命名 `e-mermaid`/`eMermaid` → `mermaid`/`mermaid.mjs` ②レンダラDI `mermaid({ renderer })`（既定はモジュールレベル `createMermaidRenderer()`。Chromiumは初回レンダ時に遅延起動するためfake注入テストではブラウザ非起動）③`namespaceSvgIds` を named export し純関数テスト ④`@ts-check` の型対応（`getLang` ヘルパ・`instanceof Error` 分岐・`{ cause }`）。
+- 事前確認: `markdownToHtml` 経路（Shiki非経由）でも `code.data.lang === 'mermaid'` が再現することをノードダンプで確認し、本番述語を弱めずに fake レンダラ回帰テストを組んだ（[satteri-plugin-api.md](../markdown-pipeline/satteri-plugin-api.md) の Shiki除外→素のelement到達）。
+- 完了条件充足: ユニット8ケース green（`namespaceSvgIds` の id積集合0・各参照形式追従・色指定非書換え／figure+light/dark2枚構造／非mermaid素通り／レンダ拒否throw／ファクトリ独立性）。**実 `astro build` の dist（debug-render に `axum-web-api-intro` を一時追加・Content Layerキャッシュ削除後にビルド→revert）で核心を確認**: mermaidブロックが `<figure class="mermaid-diagram">` + light/dark 2枚の `<svg>`（`&lt;svg` 0個）に変換され、light/dark間のid積集合が0、`dist/_astro/` にmermaidランタイム非配布。これにより mermaid.md の「コレクション経由実ビルド未検証」残課題も解消（反映済み）。
+- スコープ外: light/dark切替の実表示（`html.dark`トグル）・CSSはP6/UIフェーズ（[shiki.md](../markdown-pipeline/shiki.md) のdual theme CSSと同扱い）。CI（GitHub Actions）でのPlaywright/Chromium起動、flowchart/sequence以外の全図種は引き続き未検証（mermaid.md 残課題）。全プラグイン同時動作（wikilink×linkCard含む）はT2-5で確認。
+- 検証結果: `npm run check`（format:check + lint + typecheck + test 59件）green / `npx astro build` 成功。
+- コミットは `Task: T2-4` トレーラーで収集可能（`git log --grep 'Task: T2-4'`）。
 
 ### T2-5
 

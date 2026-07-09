@@ -17,6 +17,16 @@
 5. **埋め込み**: `ctx.replaceNode(node, { type: 'raw', value: wrapper })`でエスケープなし出力。ラッパは`<figure>` + light/dark 2つの`<div>`（Tailwindの`dark:`クラスで出し分け）
 6. **プラグイン本体はファクトリ形式**（文書ごとの図カウンタを持つため）
 
+## 本番化（T2-4）での確定事項
+
+以下は本タスクで本番実装（`plugins/mermaid.mjs`）に反映済み。**実コードが正**で、下の雛形は方式・落とし穴の参照用。
+
+- **命名**: 雛形の `e-mermaid.mjs` / `eMermaid` → `mermaid.mjs` / `mermaid`（architecture.md §1既定名 + T2-2/T2-3 の descriptive-name 規約）。
+- **レンダラDI**: `mermaid({ renderer } = {})` にし既定はモジュールレベル `createMermaidRenderer()`（`link-card.mjs` の `linkCard({ cacheDir })` 前例）。テストは fake レンダラを注入し実ブラウザ起動・実SVG生成を避ける（[implementation-rules.md](../implementation-rules.md) §5）。
+- **`namespaceSvgIds` を named export**して純関数として単体テスト（AC「id重複がなく」の本丸検証）。
+- **`@ts-check` 対応**: `code.data.lang`（hast標準 `Element.data` に `lang` 無し）は `getLang` ヘルパで型橋渡し、`catch (err)`/`result.reason` は `instanceof Error` 分岐（`any`不使用・§3）。throwは `{ cause: err }` 付き（lint `preserve-caught-error`）。
+- **カウンタは実質ビルド全体で単調増加**（`hastPlugins: [mermaid()]` は config時に1回だけ生成＝インスタンス共有。かつAstroはContentコンポーネントを複数回レンダするため、出力に現れるns indexは0始まりとは限らない）。**ページ内での一意性は保たれる**（下記実ビルドで light/dark 2枚のid積集合0を実測）ので問題ない。
+
 ## 雛形コード（動作確認済み）
 
 ### astro.config.mjs
@@ -183,4 +193,4 @@ element tagName='pre' properties={}
 - mermaidの全図種（gantt / class / state / ER / pie等）での動作は未検証（flowchart・sequenceの2種のみ）。`iconPacks`やカスタムフォント（`css`オプション）も未使用
 - `namespaceSvgIds`の参照書き換えは`url(#..)` / `href="#.."` / `aria-labelledby|describedby`のみ対応。`begin="foo.end"`（SMILアニメ参照）等の他形式は本アプリのmermaid出力に現れなかったため未対応（必要になれば追加）
 - 巨大図・多数図ページでのビルド時間/メモリ、およびレンダの並列度（現状は図ごとにlight/darkを`Promise.all`、図間はvisitor逐次）のチューニングは未検証
-- コンテンツコレクション経由の実ビルドは未検証（全機能共通）
+- ~~コンテンツコレクション経由の実ビルドは未検証~~ → **T2-4で検証済み**: 実 `astro build` の dist（debug-render に `axum-web-api-intro` を一時追加、Content Layerキャッシュ削除後にビルド→revert）で、mermaidブロックが `<figure class="mermaid-diagram">` + light/dark 2枚の `<svg>`（`&lt;svg` 0個）に変換され、light/dark間のid積集合が0、`dist/_astro/` にmermaidランタイム非配布であることを実測。
