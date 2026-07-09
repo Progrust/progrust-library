@@ -60,6 +60,18 @@ https://doc.rust-lang.org/cargo/
 ![幅指定付きダミー画像](https://picsum.photos/600/400?random=97)
 :::
 
+キャプションを省略する（width指定のみ）:
+
+:::figure{width=320}
+![キャプション省略のダミー画像](https://picsum.photos/600/400?random=96)
+:::
+
+widthを省略する（キャプションのみ）:
+
+:::figure[width省略のキャプション]
+![width省略のダミー画像](https://picsum.photos/600/400?random=95)
+:::
+
 ## テーブル
 
 | Head | Head | Head |

@@ -92,6 +92,7 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - HTMLコメント（`<!-- -->`）は実HTMLコメントとしてdistへそのまま出力される（エスケープされず、レンダリング上は不可視）。rule.mdは出力からの除去を要求していないため許容挙動とした。
 - **P6ダミー整理への申し送り**: テスト記事は全プラグイン同時動作の恒常検証フィクスチャなので、P6「ダミーコンテンツの削除or非公開化」の際は削除せず**非公開化で残す**ことを推奨（ただし非公開化するとdebug-render＝`getPublicArticles`経由では出なくなる点に注意。debug-render自体がP3で撤去予定のため、撤去時に検証経路をどう残すかは P3/P6 で判断）。
 - 検証結果: `npm run check`（format:check + lint + typecheck + test 66件）green / `npx astro build` 成功。
+- レビュー反映（[T2-5.md](../archive/review/T2-5.md)。承認・要修正なし）: 軽微R-1（figureの省略バリアントがテスト記事に未収載）に対応し、キャプション省略（widthのみ）とwidth省略（キャプションのみ）の2バリアントをテスト記事へ追加。distでfigcaptionなし+`width="320"`／figcaptionあり+width属性なしの出力を確認。修正後 `npm run check` green / `astro build` 成功。
 - コミットは `Task: T2-5` トレーラーで収集可能（`git log --grep 'Task: T2-5'`）。
 
 ## フェーズ完了条件
