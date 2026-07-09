@@ -12,7 +12,7 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 - [x] **T1-2: 4コレクション定義と公開フィルタ**
   `src/content.config.ts`（4コレクション・zodスキーマ・generateIdカスタマイズ）と `src/lib/content.ts`（公開フィルタ・dev判定・並び順）を実装する。確認用の仮ページで全エントリを列挙する。
   完了条件: content-model AC-1 / AC-3 / AC-4（ID・URL規則）を満たし、公開フィルタのvitestが通る（AC-6〜AC-8相当のロジックテスト）。
-- [ ] **T1-3: ★ctx.fileURL実ビルド検証（最優先リスク）** 〔Fable 5〕
+- [x] **T1-3: ★ctx.fileURL実ビルド検証（最優先リスク）** 〔Fable 5〕
   wikilinkプラグイン（[markdown-pipeline/wikilink.md](../markdown-pipeline/wikilink.md)の雛形）をContent Layer API経由の実ビルドに載せ、`ctx.fileURL`が実ファイルを指すかを確認する。NGの場合は代替案（公開状態の受け渡し方法の変更等）を検討・実装し、結果を`markdown-pipeline/wikilink.md`へ反映する。
   完了条件: コレクション経由のビルドでwikilinkがタイトル付き`<a href="/dict/[slug]">`に変換される。検証結果（OK/NGと対処）がwikilink.mdに追記されている。
 - [ ] **T1-4: ビルド時検証3種**
@@ -59,6 +59,23 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 - `getCollection`エントリは`filePath`を保持しており、これが章連番ソートのソース（`sortChapters`）。
 
 ### T1-3
+
+対応概要:
+
+- **wikilinkプラグインを本実装**: `plugins/dict-index.mjs`（再帰探索版`loadDictIndex`。一意性検証はT1-4）・`plugins/wikilink.mjs`（公開判定を文書単位でメモ化する二段ファクトリ）を作成し、`astro.config.mjs`にSätteri processorとして登録。`js-yaml`を依存に追加（v5はnamed importが必要）。確認用の仮ページ`src/pages/debug-render.astro`（P3で撤去）で代表4エントリを`render()`。
+- **検証結果（完了条件のコア）**: コレクション経由の実ビルドで wikilink が `<a href="/dict/[slug]" class="wikilink" data-dict-link=…>タイトル</a>` に変換されることを`dist/`で確認。**`ctx.fileURL`は実ファイルを指しOK**（全31文書で実測）。一方、**visitor内throwはコレクション経由ではビルドを失敗させない**（glob loaderが握りつぶしexit 0・本文空出力・キャッシュで恒久不可視化）というNGを発見し、対処方式（`markdownToHtml`直呼びの検証パス）をPoCで実証して決定。検証結果・対処の詳細は [markdown-pipeline/wikilink.md](../markdown-pipeline/wikilink.md)「コンテンツコレクション実ビルド検証の結果」を正とする（[satteri-plugin-api.md](../markdown-pipeline/satteri-plugin-api.md)・[architecture.md 3章](../architecture.md)にも還流済み）。
+- 非対称ルールの実ビルド確認は一時的なコンテンツ改変で実施（公開→非公開`[[mutex]]`がrenderエラーになること、エラーメッセージにリンク元実ファイルパスが入ることを確認後に復元）。
+
+検証結果: `npm run check`（format:check / lint / typecheck / test 14件）green・`npx astro build` 成功（キャッシュ削除後のクリーンビルドでも確認）。テスト追加なし: 完了条件にAC参照がなく、プラグインのvitest整備はT1-4の完了条件のため（AC-9/AC-10のエラー系テスト含む）。
+
+T1-4向けの申し送り（特記事項）:
+
+- **★wikilinkリンク切れ/公開非対称のビルドエラー化は「config評価時の検証パス」で実装する**（visitor throwは不成立）。方式・PoC結果・`markdownToHtml`のAPI注意（frontmatterを剥がして渡す等）は [wikilink.md](../markdown-pipeline/wikilink.md) と [satteri-plugin-api.md](../markdown-pipeline/satteri-plugin-api.md) を参照
+- **意図的な違反ファイルでの確認時はContent Layerキャッシュに注意**: プラグイン変更はキャッシュを破棄しないため、挙動確認は `.astro/`・`node_modules/.astro/` を削除してから行う
+- `@types/node`をdevDependenciesに追加済み（`// @ts-check`付き.mjsを`astro check`が検査するため）。`eslint.config.js`のNode globals対象に`astro.config.mjs`を追加済み
+- 新規生成mdastノード配列には `/** @type {import('satteri').MdastContent[]} */` 注釈が必要（typecheckで型が合わない）
+
+作成コミット: `636a666` feat: wikilinkプラグインを実装しコレクション実ビルドへ統合 / docs: ctx.fileURL実ビルド検証の結果を文書へ反映（本記録を含むコミット）
 
 ### T1-4
 

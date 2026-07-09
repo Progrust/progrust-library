@@ -23,6 +23,7 @@
 以下のバージョンで動作確認済み（2026-07-07〜08）。メジャーアップデート時は挙動の再確認を推奨。
 
 - astro: 7.0.6 / @astrojs/markdown-satteri: 0.3.3 / satteri: 0.9.4
+  - wikilinkの実ビルド（T1-3）は astro 7.0.7 / satteri 0.9.5 / js-yaml 5.2.1 で再検証済み
 - @shikijs/transformers: 4.3.1
 - mermaid-isomorphic: 3.1.0 / mermaid: 11.16.0 / playwright: 1.61.1（Chromium: chromium-headless-shell v1228）
 
@@ -71,6 +72,6 @@ export default defineConfig({
 
 ## 全機能共通の前提
 
-- **ビルドエラー化はvisitor内`throw`のみ有効**（`ctx.report`はAstroが読まない）。詳細: [satteri-plugin-api.md](satteri-plugin-api.md)
+- **ビルドエラー化はvisitor内`throw`のみ有効**（`ctx.report`はAstroが読まない）。**ただしコレクション経由ではthrowもビルドを失敗させない**ため、確実なエラー化は`markdownToHtml`直呼びの検証パスで行う。詳細: [satteri-plugin-api.md](satteri-plugin-api.md)
 - **文書ごとの状態を持つプラグインは必ずファクトリ形式**にする。同上
-- コンテンツコレクション（Content Layer API）経由の実ビルドは全機能で未検証（検証はすべて`src/pages/*.md`で実施）。特に`ctx.fileURL`が実ファイルを指すかはwikilinkの前提であり、**本番実装フェーズで最初に確認すべき事項**
+- コンテンツコレクション（Content Layer API）経由の実ビルドはwikilinkで検証済み（T1-3）: **`ctx.fileURL`は実ファイルを指す（OK）**。プラグイン変更時はContent Layerキャッシュ（`.astro/`・`node_modules/.astro/`）の削除が必要。詳細: [satteri-plugin-api.md](satteri-plugin-api.md) / [wikilink.md](wikilink.md)。directives / link-card / mermaidのコレクション経由動作はP2で各々確認する

@@ -63,10 +63,10 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | frontmatterスキーマ | content-model R-2 | zodスキーマ | Astro標準 |
 | 辞書ファイル名一意性 | content-model R-6 | `plugins/dict-index.mjs`（config時にcontent/dict/を直読みして索引構築。[wikilink.md](markdown-pipeline/wikilink.md)） | 重複検出でthrow |
 | 章連番形式・重複 | content-model R-9 | `content.config.ts`（ローダー/generateId） | throw |
-| wikilinkリンク切れ・公開非対称 | content-model R-13〜R-15 | `plugins/wikilink.mjs`のvisitor内 | throw（`ctx.report`は使わない。[satteri-plugin-api.md](markdown-pipeline/satteri-plugin-api.md)） |
+| wikilinkリンク切れ・公開非対称 | content-model R-13〜R-15 | config評価時の検証パス（`markdownToHtml`直呼びで全コンテンツを`plugins/wikilink.mjs`に通す。T1-4で実装） | 検証パス内でthrow（visitor内throwはコレクション経由ではビルドを失敗させないため。[wikilink.md](markdown-pipeline/wikilink.md)） |
 
-> [!warning] 既知リスク（P1で最初に検証する）
-> Content Layer API経由の実ビルドは全プラグイン未検証。特に`ctx.fileURL`が実ファイルを指すことがwikilinkの公開非対称判定の前提（[markdown-pipeline/README.md](markdown-pipeline/README.md)）。NGの場合の代替（frontmatter経由での公開状態受け渡し等）はP1で検討し、結果を`markdown-pipeline/wikilink.md`へ反映する。
+> [!note] 既知リスクの検証結果（T1-3で解消）
+> `ctx.fileURL`はContent Layer API経由の実ビルドでも実ファイルを指す（OK・公開非対称判定の前提成立）。一方、**visitor内throwによるビルドエラー化はコレクション経由では不成立**（glob loaderが握りつぶしexit 0・本文空出力・キャッシュで不可視化）と判明したため、ビルド時検証は上表のとおり「レンダリング外の検証パス」方式に変更した。詳細: [markdown-pipeline/wikilink.md](markdown-pipeline/wikilink.md)。
 
 ## 4. Markdownパイプライン構成
 

@@ -70,11 +70,28 @@ pieces.push({
 
 既存ノード（ツリーから読み込まれたノード）への属性追加は`setProperty`でよい（[directives.md](directives.md)の変換方式）。この区別を必ず意識すること。
 
-## ビルドエラー化は throw 方式（`ctx.report`は不可）
+## ビルドエラー化は throw 方式（`ctx.report`は不可）— ただしコレクション経由は不成立
 
 - **`ctx.report({ severity: "error" })`ではビルドが失敗しない**（exit 0、メッセージも一切出ない）。satteriはdiagnosticsを収集するが、**Astro側がそれを一切参照せず黙って捨てる**（`@astrojs/markdown-satteri/dist/`と`astro/dist/vite-plugin-markdown/`にdiagnosticsを読むコードが存在しないことを実読で確認）
-- **visitor内で`throw new Error(...)`するとexit 1**で失敗し、メッセージも表示される
+- **visitor内で`throw new Error(...)`するとexit 1**で失敗し、メッセージも表示される — **ただし`src/pages/*.md`直置きの場合のみ**
+- **★コンテンツコレクション（Content Layer / glob loader）経由ではthrowがビルドを失敗させない**（T1-3実測）: glob loaderがrenderエラーを捕捉して`[ERROR] [glob-loader] Error rendering …`をログに出すだけで、**buildはexit 0で成功し該当エントリの本文が空で出力される**。さらにキャッシュにより2回目以降はログすら出ない（下記「Content Layerキャッシュ」参照）。**コレクション本文に対する確実なビルドエラー化は、レンダリングパイプライン外の検証パス（`markdownToHtml`直呼び。下記）で行う**（[wikilink.md](wikilink.md)の検証結果・対処を正とする）
 - ただしthrowだけだとエラー表示のLocationがsatteri内部（`satteri/dist/mdast/mdast-visitor.js`）を指す。**メッセージに`(絶対パス:行:列)`形式を含めると、AstroのLocation表示も対象mdファイルを指す**
+
+### 単体コンパイルAPI `markdownToHtml`（検証パス用・実測済み）
+
+satteriは`markdownToHtml(source, { mdastPlugins, hastPlugins, features, fileURL })`を直接exportしており、Astroを介さずプラグインを実行できる（T1-3のPoCで動作確認済み）:
+
+- `fileURL`オプション（`URL`型。`pathToFileURL()`で変換）がvisitorの`ctx.fileURL`として渡る
+- visitor内のthrowは呼び出し元へそのまま伝播する（config評価時に呼べば確実にexit 1）
+- **frontmatterは事前に剥がして渡すこと**（Astro経由と違い剥がされない）
+- 戻り値は`{ html, data, … }`
+
+### Content Layerキャッシュの罠
+
+コレクション本文のコンパイル結果は`.astro/`・`node_modules/.astro/`にキャッシュされ、**mdファイルが未変更なら次ビルドでは再コンパイルされない（visitorも走らない）**。つまり:
+
+- **プラグインコードの変更はキャッシュを破棄しない** → プラグインの挙動確認時は両ディレクトリを削除してからビルドする
+- renderエラーになったエントリも「同期済み」として記録され、次ビルドではエラーログすら出ない
 
 雛形:
 
@@ -134,8 +151,8 @@ export const counterPlugin = () => {
 
 ## 制約・残課題
 
-- `ctx.report(error)`が効かないのはAstroが診断を読まないため。satteri単体（`compile()`直呼び）での挙動は未検証（本プロジェクトはAstro経由でしか使わないため実用上は不問）
+- `ctx.report(error)`が効かないのはAstroが診断を読まないため
 - throw方式のエラーが`astro dev`（開発サーバー）でどう表示されるかは未検証（`astro build`のexit 1のみ確認）
 - `structuredClone(node)`によるノード保持は未実測（型定義・ドキュメント記載のみ）
 - `ctx.data`のmdast→hast間共有は型定義での確認のみ（実測は必要になった時点で行う）
-- コンテンツコレクション（Content Layer API）経由の実ビルドは未検証（検証はすべて`src/pages/*.md`。`ctx.fileURL`の解決を含め、本番実装フェーズで最初に確認する）
+- コンテンツコレクション（Content Layer API）経由の実ビルドは**wikilinkで検証済み**（T1-3）: `ctx.fileURL`は実ファイルを指す（OK）・visitor内throwはビルドを失敗させない（NG・上記）・非公開エントリもsync時に全件コンパイルされる。結果の詳細は[wikilink.md](wikilink.md)。他プラグイン（directives / link-card / mermaid）のコレクション経由動作はP2で各々確認する
