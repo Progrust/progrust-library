@@ -15,9 +15,13 @@ const visible = tags.slice(0, VISIBLE_TAGS);
 const hidden = tags.length - visible.length;
 ---
 
-<div class="mb-8 flex flex-col gap-4" data-list-filter data-total={total}>
+<div
+  class="mb-8 flex flex-col gap-4 border-b border-line pb-8"
+  data-list-filter
+  data-total={total}
+>
   <div class="flex flex-wrap items-center gap-4">
-    <label class="relative max-w-sm flex-1">
+    <label class="relative flex-1 sm:max-w-xs">
       <span
         class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sub"
       >
@@ -41,11 +45,13 @@ const hidden = tags.length - visible.length;
         disabled
         aria-label="一覧内をキーワードで絞り込み（準備中）"
         data-filter-keyword
-        class="h-9 w-full rounded border border-line bg-card pl-9 pr-3 text-sm text-ink placeholder:text-sub focus:border-accent focus:outline-none"
+        class="h-10 w-full rounded border border-line bg-card pl-9 pr-3 text-sm text-ink placeholder:text-sub focus:border-accent focus:outline-none"
       />
     </label>
     <p class="font-mono text-xs text-sub" data-filter-count>
-      {total} / {total}
+      <span class="font-semibold text-strong" data-filter-hits>{total}</span> / {
+        total
+      } entries
     </p>
   </div>
 
@@ -58,15 +64,20 @@ const hidden = tags.length - visible.length;
             disabled
             aria-pressed="false"
             data-filter-tag={tag}
-            class="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+            class="rounded border border-line bg-card px-2.5 py-1 font-mono text-[11px] text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
           >
-            {tag} <span class="text-sub">{count}</span>
+            #{tag} <span class="text-sub">{count}</span>
           </button>
         ))}
         {hidden > 0 && (
-          <span class="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-sub">
+          <button
+            type="button"
+            disabled
+            data-filter-more
+            class="px-2.5 py-1 font-mono text-[11px] text-accent transition-colors hover:underline motion-reduce:transition-none"
+          >
             + {hidden} tags
-          </span>
+          </button>
         )}
       </div>
     )

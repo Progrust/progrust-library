@@ -17,12 +17,13 @@ const { href, title, tags } = Astro.props;
   data-tags={tags.join("|")}
   class="dict-card group flex flex-col gap-3 rounded border border-line bg-card p-5 transition-colors hover:border-accent motion-reduce:transition-none"
 >
-  <span class="font-display font-bold text-strong group-hover:text-accent"
+  <span
+    class="font-display font-bold leading-snug text-strong group-hover:text-accent"
     >{title}</span
   >
   {
     tags.length > 0 && (
-      <span class="flex flex-wrap gap-2 font-mono text-[11px] text-sub">
+      <span class="mt-auto flex flex-wrap gap-x-2 gap-y-1 font-mono text-[11px] text-sub">
         {tags.map((tag) => (
           <span>#{tag}</span>
         ))}

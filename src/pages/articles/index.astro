@@ -14,15 +14,20 @@ const tags = tagCounts(articles);
 <BaseLayout title="記事一覧">
   <main class="mx-auto max-w-6xl px-4 sm:px-8 py-12 sm:py-16">
     <section class="mb-8">
-      <p class="mb-2 font-mono text-xs text-accent">// articles</p>
-      <div class="flex items-baseline justify-between">
+      <p class="mb-3 font-mono text-xs text-accent">// articles</p>
+      <div class="flex flex-wrap items-baseline gap-x-4">
         <h1
-          class="font-display text-2xl font-black tracking-tight text-strong sm:text-3xl"
+          class="font-display text-4xl font-black leading-none tracking-tighter text-strong sm:text-5xl"
         >
-          記事
+          記事<span class="text-accent">.</span>
         </h1>
-        <p class="font-mono text-xs text-sub">{articles.length} entries</p>
+        <p class="font-mono text-xs text-sub">
+          {articles.length} entries / created_at desc
+        </p>
       </div>
+      <p class="mt-4 max-w-lg text-sm leading-relaxed text-sub">
+        Rustで学んだことを1ページにまとめた技術記事。
+      </p>
     </section>
 
     <ListFilter tags={tags} total={articles.length} />

@@ -103,7 +103,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 主要コンポーネント（ui-design-spec.mdのコンポーネント仕様と1:1対応）:
 
-`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `ArticleCard`（本一覧と共用可）/ `TagChip` / `TagFilter`（絞込UI）/ `Toc` / `ChapterNav` / `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileFloatingButtons`（目次・辞書ボトムシート）
+`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterNav` / `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileFloatingButtons`（目次・辞書ボトムシート）
 
 ## 7. 検索インデックス生成
 
