@@ -23,6 +23,7 @@ argument-hint: <タスクID 例: T1-3>
 - 完了条件が参照している `docs/spec/` の該当spec（特に受入基準の章）
 - `docs/implementation-rules.md`（全章。特に §2〜§5 の言語・コーディング・テスト規約）
 - 必要に応じて `docs/architecture.md`・`docs/markdown-pipeline/`（Sätteriプラグイン関連タスクの場合は必読）
+- `docs/plan/`配下の過去の完了タスクの実施履歴から今回対応内容に関連した申し送り事項や考慮事項がないかどうか確認
 
 ## 4. モデルタグ確認
 
