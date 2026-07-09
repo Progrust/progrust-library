@@ -25,7 +25,7 @@
 import { defineConfig } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
 import { transformerNotationDiff } from '@shikijs/transformers';
-import { f3CodeFilename } from './plugins/f3-codefilename.mjs';
+import { codeFilename } from './plugins/code-filename.mjs';
 
 export default defineConfig({
   markdown: {
@@ -37,14 +37,14 @@ export default defineConfig({
     },
     processor: satteri({
       features: { directive: true },
-      mdastPlugins: [f3CodeFilename], // ファイル名記法の前処理（他プラグインより前に置く）
+      mdastPlugins: [codeFilename], // ファイル名記法の前処理（他プラグインより前に置く）
       hastPlugins: [],
     }),
   },
 });
 ```
 
-### ファイル名前処理プラグイン（`plugins/f3-codefilename.mjs`）
+### ファイル名前処理プラグイン（`plugins/code-filename.mjs`）
 
 ```js
 import { defineMdastPlugin } from 'satteri';
@@ -53,8 +53,8 @@ import { defineMdastPlugin } from 'satteri';
 // 情報文字列に空白がないとSätteriは lang="rust:index.rs" のまま code ノードにするため、
 // そのままだとShikiが未知言語→plaintextにフォールバックする。
 // mdast段階でlangを分割し、ファイル名ラベル + 補正済みcodeノードにラップする。
-export const f3CodeFilename = defineMdastPlugin({
-  name: 'f3-codefilename',
+export const codeFilename = defineMdastPlugin({
+  name: 'code-filename',
   code(node, ctx) {
     if (typeof node.lang !== 'string' || !node.lang.includes(':')) return;
 
@@ -140,4 +140,4 @@ langの渡り方（実測）:
 - dual themeのCSS切替レシピは出力構造から導出したもので、実ブラウザでの`html.dark`トグル時の見た目切替は未目視（標準的手法のため確度は高いが、本実装でスタイルを組んだ時点で1度ブラウザ確認する）
 - `transformerNotationDiff`以外の`@shikijs/transformers`（highlight/focus/error-level、`transformerMetaHighlight`等）は未検証。同じ経路で使える見込みだが、必要になった機能ごとに追加確認する
 - `<div class="code-block">`直下に`<pre>`が来る構造は確認済みだが、`shikiConfig.wrap`やコピーボタン等との相互作用、ファイル名記法とdiff以外のtransformerの同時利用は未検証
-- コンテンツコレクション経由の実ビルドは未検証（`shikiConfig`は同じ`createRenderer`経路のため効くと考えられるが未確認。全機能共通）
+- ~~コンテンツコレクション経由の実ビルドは未検証~~ → **T2-2で検証済み**。コレクション経由の`astro build`（`render()`）でも`shikiConfig`（`createRenderer`経路）が効き、`dist`に3要件（`code-filename`ラベル+`data-language="rust"`／`has-diff`・`diff add`/`diff remove`／`--shiki-light`・`--shiki-dark`両方）が出力されることをdist grepで確認。なお`mermaid`等の未知langは`data-language="plaintext"`にフォールバックする（除外は[mermaid.md](mermaid.md)のT2-4で対応）

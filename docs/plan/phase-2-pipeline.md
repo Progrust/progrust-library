@@ -9,7 +9,7 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 - [x] **T2-1: directives + textDirective復元**
   `:::message` / `:::details` / `:::figure` のHTML変換と、directive有効化の副作用（`x:y`消失）を復元するプラグインを組み込む（[directives.md](../markdown-pipeline/directives.md)）。
   完了条件: rule.mdの全directive記法がダミーコンテンツ上で正しいHTML（aside/details/figure）に変換され、本文中の`x:y`が消えない。vitestが通る。
-- [ ] **T2-2: shiki（diff・ファイル名・dual theme）**
+- [x] **T2-2: shiki（diff・ファイル名・dual theme）**
   `shikiConfig`（markdown直下）+ transformerNotationDiff + codeFilename前処理を組み込む（[shiki.md](../markdown-pipeline/shiki.md)）。テーマは暫定の既成dual themeでよい（確定配色対応はP6のフォント/テーマタスクで）。
   完了条件: ` ```rust:main.rs `のファイル名タブ、`[!code ++/--]`のdiffクラス付与、light/dark両テーマのハイライトがビルド結果に含まれる。
 - [ ] **T2-3: link-card**
@@ -37,6 +37,17 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 - コミットは `Task: T2-1` トレーラーで収集可能（`git log --grep 'Task: T2-1'`）。
 
 ### T2-2
+
+Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdown-pipeline/shiki.md)の検証済み方式で本番化した。`shikiConfig`（`markdown`直下）に dual theme（`github-light`/`github-dark` + `defaultColor: false`）と `transformerNotationDiff()` を設定し、` ```lang:file ` のファイル名を分離する `plugins/code-filename.mjs`（export `codeFilename`）を追加して `mdastPlugins` の先頭に登録した。`@shikijs/transformers@^4.3.1`（同梱shiki 4.3.1に一致）を dependencies に追加。
+
+- 変更ファイル: `plugins/code-filename.mjs`（新規）/ `astro.config.mjs`（shikiConfig追加 + codeFilename登録）/ `package.json`・`package-lock.json`（依存追加）/ `tests/plugins/code-filename.test.ts`・`tests/helpers/code-filename.ts`（新規）/ `docs/markdown-pipeline/shiki.md`（雛形名を本番名 `codeFilename`/`code-filename.mjs` に更新、コレクション経由実ビルド未検証の残課題を検証済みへ更新）。
+- 命名: 雛形の `f3CodeFilename`/`f3-codefilename.mjs` は既存プラグインの descriptive-name 規約（directives/wikilink/dict-index）に合わせ `codeFilename`/`code-filename.mjs` に変更した。
+- 型対応: `data.hName` で任意要素へ化かす方式・paragraphにcodeを子として持たせる構造は実行時には成立するが、satteriのノード別Data型は `hName`/ブロック子を許容しないため、`ctx.replaceNode` へ渡す直前に `unknown` 経由で `MdastContent` へ橋渡しした（`any`は使わない、implementation-rules §3）。
+- **スコープ外（P6へ繰り延べ）**: dual themeの `html.dark` 切替CSS（`.astro-code`）は入れていない。`defaultColor: false` によりビルド出力には `--shiki-light`/`--shiki-dark` 変数が両方含まれ完了条件「両テーマのハイライトがビルド結果に含まれる」を満たすが、実際の色付け・見た目切替は theme.md AC-4 = P6の範疇。**そのためP6まではコードが無彩色（色が付かない）**（記録済みの判断であり隠れた欠落ではない）。
+- 完了条件充足: ユニットテスト（ファイル名分離・パス区切り・コロン無し素通り・空ファイル名の4ケース）で mdast前処理を検証。ただしShikiは `markdownToHtml`（satteri直接）では走らないため、**3要件の核心は実 `astro build` の dist で確認**した（debug-render の `targetIds` を一時的に `axum-web-api-intro` 込みへ広げ→build→`dist/debug-render/index.html` を grep→revert）: ファイル名ブロックが `class="code-filename"` かつ `data-language="rust"`（plaintextフォールバックしていない）／diff の `has-diff`・`diff add`・`diff remove`／dual theme の `--shiki-light`・`--shiki-dark` 両方の出力を確認。これにより shiki.md の「コレクション経由実ビルドで `shikiConfig` が効くか未検証」の残課題も解消した（shiki.md反映済み）。
+- 補足: ` ```mermaid ` は未知langのため `data-language="plaintext"` にフォールバックする（除外は[mermaid.md](../markdown-pipeline/mermaid.md)のT2-4で対応）。CSS（コードブロックの見た目）はP6対象。
+- 検証結果: `npm run check`（format:check + lint + typecheck + test 40件）green / `npx astro build` 成功。
+- コミットは `Task: T2-2` トレーラーで収集可能（`git log --grep 'Task: T2-2'`）。
 
 ### T2-3
 
