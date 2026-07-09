@@ -1,0 +1,74 @@
+---
+// 一覧の絞込 UI（ui-design-spec「タグチップ（絞込UI）」search R-9〜R-11）。
+// T3-3 では静的シェルのみ（動作なし）。実際の絞込は P5 で配線する。
+// キーワード入力 + 件数（N / 総数）+ タグチップ（出現件数降順・上位12個 + 超過分の静的表示）。
+// data-* 属性は P5 の絞込 JS が参照できるよう予約する。
+interface Props {
+  tags: Array<{ tag: string; count: number }>;
+  total: number;
+}
+
+const { tags, total } = Astro.props;
+
+const VISIBLE_TAGS = 12;
+const visible = tags.slice(0, VISIBLE_TAGS);
+const hidden = tags.length - visible.length;
+---
+
+<div class="mb-8 flex flex-col gap-4" data-list-filter data-total={total}>
+  <div class="flex flex-wrap items-center gap-4">
+    <label class="relative max-w-sm flex-1">
+      <span
+        class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sub"
+      >
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+      </span>
+      <input
+        type="search"
+        placeholder="キーワードで絞り込み"
+        disabled
+        aria-label="一覧内をキーワードで絞り込み（準備中）"
+        data-filter-keyword
+        class="h-9 w-full rounded border border-line bg-card pl-9 pr-3 text-sm text-ink placeholder:text-sub focus:border-accent focus:outline-none"
+      />
+    </label>
+    <p class="font-mono text-xs text-sub" data-filter-count>
+      {total} / {total}
+    </p>
+  </div>
+
+  {
+    tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {visible.map(({ tag, count }) => (
+          <button
+            type="button"
+            disabled
+            aria-pressed="false"
+            data-filter-tag={tag}
+            class="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+          >
+            {tag} <span class="text-sub">{count}</span>
+          </button>
+        ))}
+        {hidden > 0 && (
+          <span class="rounded border border-line px-2.5 py-1 font-mono text-[11px] text-sub">
+            + {hidden} tags
+          </span>
+        )}
+      </div>
+    )
+  }
+</div>
