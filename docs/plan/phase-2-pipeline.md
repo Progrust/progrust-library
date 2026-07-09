@@ -6,7 +6,7 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 
 ## タスク
 
-- [ ] **T2-1: directives + textDirective復元**
+- [x] **T2-1: directives + textDirective復元**
   `:::message` / `:::details` / `:::figure` のHTML変換と、directive有効化の副作用（`x:y`消失）を復元するプラグインを組み込む（[directives.md](../markdown-pipeline/directives.md)）。
   完了条件: rule.mdの全directive記法がダミーコンテンツ上で正しいHTML（aside/details/figure）に変換され、本文中の`x:y`が消えない。vitestが通る。
 - [ ] **T2-2: shiki（diff・ファイル名・dual theme）**
@@ -25,6 +25,15 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 ## 実施履歴
 
 ### T2-1
+
+`:::message` / `:::details` / `:::figure` を `<aside>` / `<details><summary>` / `<figure><figcaption>` へ変換するmdastプラグイン `plugins/directives.mjs` を追加し、`astro.config.mjs` で `features: { directive: true }` と共に登録した（順序: wikilink → directives）。実装方式・落とし穴は [directives.md](../markdown-pipeline/directives.md) に従い、検証済み雛形を本番化（message種別を rule.md の info/tip/question/success/warning/danger + `[タイトル]` 対応へ拡張、雛形の `alert` 分岐は不採用）。details/figure はlabel必須とし、labelが無ければthrow。未知のディレクティブ名もthrow。`directive: true` の副作用で本文中の `x:y`・`12:30`・`キー:値` 等がtextDirective化して消えるため、`ctx.source` をUTF-8バイトオフセットでスライスして原文復元する textDirective/leafDirective visitor を同梱した。
+
+- 変更ファイル: `plugins/directives.mjs`（新規）/ `astro.config.mjs`（feature有効化 + plugin登録）/ `tests/plugins/directives.test.ts`・`tests/helpers/directives.ts`（新規）/ `docs/markdown-pipeline/directives.md`（未実測だった `:::message[タイトル]{info}` のダンプ確認結果を反映）。
+- 実装前の早期検証で `markdownToHtml` が `features` オプションを受けること・`ctx.source` が埋まることをダンプで確認（これが無いと `x:y` テストが誤ってgreenになる）。未実測だったmessageのlabel+属性併用パターンも実測し directives.md へ反映済み。
+- 完了条件充足: rule.mdの全directive記法が正しいHTML（aside/details/figure）に変換され、`x:y` 等が消えないことをvitest 10ケースで確認。実 `astro build` の `dist/` にも message/details/figure が出力されることを確認。
+- 補足: throwによる不正directive検出は **dev/テスト時のセーフティネット**。architecture §3 のとおりコレクション経由のvisitor throwはglob loaderに握り潰され実 `astro build` を失敗させない（テストは直接 `markdownToHtml` を呼ぶため検出できる）。T2-1は別途の検証パスを要求しないため追加していない。CSS（`message-*` 等の見た目）は本タスク対象外（後続のページ/UIフェーズ）。
+- 検証結果: `npm run check`（format:check + lint + typecheck + test 34件）green / `npx astro build` 成功。
+- コミットは `Task: T2-1` トレーラーで収集可能（`git log --grep 'Task: T2-1'`）。
 
 ### T2-2
 

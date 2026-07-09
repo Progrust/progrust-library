@@ -257,4 +257,4 @@ if (node.name === 'message') {
 - `\:`によるコロンのエスケープが可能かは未検証（復元プラグインで実害がないため不要と判断）
 - `:::message{.alert}`（class shorthand）は`attributes: { class: 'alert' }`に入ることまで確認済みだが、変換プラグインは`{alert}`方式のみ対応（class方式は採用しない）
 - messageのタイトル省略時にデフォルトタイトル（「Info」「Warning」等）を表示するかは未決定。表示する場合はCSSの`::before`か、labelが無いときに`prependChild`でタイトル段落を挿入する（detailsの`attrs.title`分岐と同じパターン）のどちらでも実現できる
-- `:::message[タイトル]{info}`のlabel+属性併用パターンは、figureでの実測結果からの類推であり**message単体では未実測**。実装時に最初のダンプ確認だけ行うこと
+- `:::message[タイトル]{info}`のlabel+属性併用パターンは、figureでの実測結果からの類推だったが、**T2-1実装時にダンプ確認済み**: `containerDirective name=message attrs={ info: '' }` かつ先頭childが `paragraph data={ directiveLabel: true }` になり、figureと同じパース結果（属性に種別・先頭childにlabel）であることを確認した。出力は `<aside class="message message-info"><p class="message-title">…</p>…</aside>`
