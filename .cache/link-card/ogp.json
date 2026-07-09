@@ -1,0 +1,26 @@
+{
+  "https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html": {
+    "ok": true,
+    "title": "What is Ownership? - The Rust Programming Language",
+    "description": null,
+    "image": null
+  },
+  "https://doc.rust-lang.org/cargo/": {
+    "ok": true,
+    "title": "Introduction - The Cargo Book",
+    "description": null,
+    "image": null
+  },
+  "https://docs.rs/axum/latest/axum/": {
+    "ok": true,
+    "title": "axum - Rust",
+    "description": null,
+    "image": null
+  },
+  "https://github.com/tokio-rs/axum": {
+    "ok": true,
+    "title": "GitHub - tokio-rs/axum: HTTP routing and request-handling library for Rust that focuses on ergonomics and modularity",
+    "description": "HTTP routing and request-handling library for Rust that focuses on ergonomics and modularity - tokio-rs/axum",
+    "image": "https://opengraph.githubassets.com/7787d61120016336aa25a5b061d4d5b99295919eeee03a5d654fb33ef9a9f3cf/tokio-rs/axum"
+  }
+}

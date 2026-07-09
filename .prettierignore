@@ -2,6 +2,8 @@ node_modules
 dist
 .astro
 package-lock.json
+# リンクカードのOGPキャッシュ（生成物・コミット対象だがフォーマット対象外。link-card.md / deploy.md R-4）
+.cache
 
 # 既存の執筆済みプローズは Prettier の対象外にする。
 # `check` は `prettier --check .`（全ツリー）なので、ユーザーが手で書いたドキュメント
