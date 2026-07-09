@@ -1,0 +1,13 @@
+node_modules
+dist
+.astro
+package-lock.json
+
+# 既存の執筆済みプローズは Prettier の対象外にする。
+# `check` は `prettier --check .`（全ツリー）なので、ユーザーが手で書いたドキュメント
+# （docs/**/*.md やエスケープ済みコードフェンスを含む rule.md 等）を対象にすると
+# format:check が失敗する。Prettier の対象は本プロジェクトが所有するコードに限定する。
+content
+docs
+CLAUDE.md
+.claude

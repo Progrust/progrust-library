@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+/* class ベースのダークモード（architecture.md 9章: darkMode: 'class'）。
+   `.dark` を祖先に持つ要素で dark: バリアントが有効になる。
+   カラートークン・デザインシステムの定義は P3 で追加する。 */
+@custom-variant dark (&:where(.dark, .dark *));
