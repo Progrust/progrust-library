@@ -6,6 +6,7 @@ import {
   sortByNewest,
   sortChapters,
   mergeRecent,
+  tagCounts,
 } from "../../src/lib/content";
 
 // 純関数テスト。fixture は各関数が要求する最小構造だけを手組みで用意する。
@@ -155,5 +156,35 @@ describe("sortChapters（章順・content-model R-7）", () => {
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({}); // 連番0が先頭
+  });
+});
+
+describe("tagCounts（タグ出現件数の集計・一覧の絞込チップ）", () => {
+  const tagged = (...tags: string[]) => ({ data: { tags } });
+
+  it("タグごとの出現件数を数え、件数降順で返す", () => {
+    const entries = [
+      tagged("Rust基礎", "所有権"),
+      tagged("Rust基礎", "並行性"),
+      tagged("Rust基礎"),
+    ];
+
+    const result = tagCounts(entries);
+
+    expect(result[0]).toMatchObject({ tag: "Rust基礎", count: 3 });
+    expect(result.map((t) => t.tag)).toContain("所有権");
+    expect(result.map((t) => t.tag)).toContain("並行性");
+  });
+
+  it("同数のタグはタグ名の昇順でタイブレークする", () => {
+    const entries = [tagged("beta"), tagged("alpha")];
+
+    const result = tagCounts(entries);
+
+    expect(result.map((t) => t.tag)).toEqual(["alpha", "beta"]);
+  });
+
+  it("空配列では空を返す", () => {
+    expect(tagCounts([])).toEqual([]);
   });
 });

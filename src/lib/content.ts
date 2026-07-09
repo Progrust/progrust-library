@@ -107,6 +107,29 @@ export function mergeRecent<
   return sortByNewest(merged).slice(0, limit);
 }
 
+/** タグ集計に必要な最小構造 */
+interface Tagged {
+  data: { tags: string[] };
+}
+
+/**
+ * タグ出現件数の集計。エントリ配列からタグごとの件数を数え、件数降順・
+ * 同数はタグ名昇順で返す（一覧の絞込チップ表示用。search R-9〜R-11）。
+ */
+export function tagCounts<T extends Tagged>(
+  entries: T[],
+): Array<{ tag: string; count: number }> {
+  const counts = new Map<string, number>();
+  for (const entry of entries) {
+    for (const tag of entry.data.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([tag, count]) => ({ tag, count }))
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+}
+
 /** 元ファイル名先頭のゼロ埋め2桁連番を取り出す（欠落時は 0） */
 function chapterOrder(entry: FilePathed): number {
   const fileName = entry.filePath?.split("/").pop() ?? "";
