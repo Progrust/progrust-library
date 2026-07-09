@@ -1,14 +1,33 @@
 ---
 // ヘッダーの検索ボックス（ui-design-spec「ヘッダー」）。
-// T3-1 では見た目のみのプレースホルダ。検索機能の実装は P5（search.md）。
+// T3-1 では見た目のみのプレースホルダ（disabled）。検索機能の実装は P5（search.md）。
+// レイアウトは top-b-sharp モック準拠: ロゴとテーマ切替の間で右寄せ（ml-auto）+ max-w-sm、
+// 先頭に虫めがねアイコンを重ねる。
 ---
 
-<div class="min-w-0 flex-1">
+<label class="relative ml-auto max-w-sm flex-1">
+  <span
+    class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-sub"
+  >
+    <svg
+      width="15"
+      height="15"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7"></circle>
+      <path d="m20 20-3.5-3.5"></path>
+    </svg>
+  </span>
   <input
     type="search"
-    placeholder="検索"
+    placeholder="キーワード or #タグ"
     disabled
     aria-label="サイト内検索（準備中）"
-    class="h-9 w-full max-w-md rounded border border-line bg-card px-3 font-mono text-sm text-ink placeholder:text-sub focus:border-accent focus:outline-none"
+    class="h-9 w-full rounded border border-line bg-card pl-9 pr-3 text-sm text-ink placeholder:text-sub focus:border-accent focus:outline-none"
   />
-</div>
+</label>
