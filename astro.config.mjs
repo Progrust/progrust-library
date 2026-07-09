@@ -11,6 +11,7 @@ import { codeFilename } from "./plugins/code-filename.mjs";
 import { linkCard } from "./plugins/link-card.mjs";
 import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
+import { mermaid } from "./plugins/mermaid.mjs";
 
 // ビルド時検証3種はconfig評価時に実行する（content-model AC-2/AC-5/AC-9/AC-10）。
 // コレクション経由のvisitor throwはglob loaderに握り潰されexit 0になるため、
@@ -24,12 +25,15 @@ validateChapters(new URL("./content/books/", import.meta.url));
 // wikilinkのリンク切れ・公開非対称（R-13/R-14）を全コンテンツで検証する。
 validateWikilinks(dictIndex, new URL("./content/", import.meta.url));
 
-// Sätteriの残りプラグイン（mermaid）は P2 の後続タスク（T2-4）で追加する。
 // directive: true は本文中の「x:y」等をtextDirective化して消す副作用があるため、
 // directivesプラグインに同梱した復元visitorとセットで有効化する（directives.md）。
 export default defineConfig({
   site: "https://progrust.com",
   markdown: {
+    // mermaid は Shiki除外する（★satteri()引数ではなく markdown 直下）。除外しないと
+    // mermaid が Shiki でハイライトされ raw ノード化し、mermaidプラグインの element visitor に
+    // 届かない（未知langで data-language=plaintext フォールバックする）。詳細は mermaid.md。
+    syntaxHighlight: { type: "shiki", excludeLangs: ["mermaid"] },
     // Shiki設定は satteri() の引数ではなく markdown 直下に置く（satteri()は shikiConfig を
     // 黙って無視し、Astroが createRenderer 経由で別途Sätteriへ渡すため）。詳細は shiki.md。
     shikiConfig: {
@@ -45,6 +49,9 @@ export default defineConfig({
       // codeFilename は ```lang:file のlang補正のため他プラグインより前に置く（shiki.md）。
       // linkCard は末尾（順序: codeFilename → wikilink → directives → linkCard。architecture.md §4）。
       mdastPlugins: [codeFilename, wikilink(dictIndex), directives, linkCard()],
+      // mermaid はビルド時SVG化のhastプラグイン（ファクトリ形式・文書ごとの図カウンタを持つ）。
+      // Shiki実行後のhast段階で素の <pre><code data.lang=mermaid> を捕捉する（mermaid.md）。
+      hastPlugins: [mermaid()],
     }),
   },
   vite: {
