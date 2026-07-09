@@ -7,7 +7,7 @@
 | フェーズ | 内容 | 依存 | 状態 |
 | --- | --- | --- | --- |
 | [P1 基盤構築とリスク検証](phase-1-foundation.md) | Astro初期化・4コレクション・★ctx.fileURL実ビルド検証・ビルド時検証 | — | 完了 |
-| [P2 Markdownパイプライン統合](phase-2-pipeline.md) | 残りプラグイン統合（directives / link-card / mermaid / shiki） | P1 | 未着手 |
+| [P2 Markdownパイプライン統合](phase-2-pipeline.md) | 残りプラグイン統合（directives / link-card / mermaid / shiki） | P1 | 完了 |
 | [P3 ページ・レイアウト](phase-3-pages.md) | 全画面の静的表示 + テーマ切替 | P2 | 未着手 |
 | [P4 wikilink UI](phase-4-wikilink-ui.md) | embedパーシャル・プレビュー・サイドペイン・逆リンク | P3 | 未着手 |
 | [P5 検索](phase-5-search.md) | インデックス生成・クエリパーサ・検索UI・一覧絞込 | P3（P4と並行可） | 未着手 |

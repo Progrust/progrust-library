@@ -235,7 +235,7 @@ paragraph
 
 - キャッシュキーのURL正規化は未実装（落とし穴2）
 - ~~失敗キャッシュのTTL等の方針は未決定（落とし穴3）~~ → T2-3で**成功のみキャッシュ**に決定（失敗は保存せず次ビルドで再取得）。落とし穴3は解消
-- **wikilinkとの相互作用**: wikilink生成の`link`（`/dict/…`、テキスト=title）は`text !== url`なのでカード化されない（論理的に確認）が、**同一パイプラインでの同時動作は未検証**（T2-5で確認）。順序は wikilink→…→linkCard（[architecture.md](../architecture.md) §4）。内部リンク（`http(s)`以外）をfetch対象から除外するガードはT2-3で追加済み（`text === url`かつ内部パスの`[/about](/about)`のようなケースを塞ぐdefense-in-depth）
+- **wikilinkとの相互作用**: wikilink生成の`link`（`/dict/…`、テキスト=title）は`text !== url`なのでカード化されない。~~同一パイプラインでの同時動作は未検証~~ → **T2-5で検証済み**（統合テスト `tests/plugins/pipeline.test.ts` でカード化されず`/dict/…`へのfetchも発生しないこと、実ビルドdistで`/dict/`アンカーの`link-card`クラス0件・`ogp.json`に`/dict/`キー0件を確認）。順序は wikilink→…→linkCard（[architecture.md](../architecture.md) §4）。内部リンク（`http(s)`以外）をfetch対象から除外するガードはT2-3で追加済み（`text === url`かつ内部パスの`[/about](/about)`のようなケースを塞ぐdefense-in-depth）
 - OGPパーサ（正規表現）は最小実装。非UTF-8文字コード・リダイレクト・`<meta>`属性バリエーション・巨大HTML等のエッジケースは本番で強化する。**取得値のHTML実体参照デコードも未対応**（T2-3レビューR-2: ソース側でエスケープ済みの`&amp;`等を`escapeHtml`に通すと二重エスケープ`&amp;amp;`になる。パーサ強化時に合わせてデコードを入れる）
 - fetchタイムアウトはT2-3で対応済み（`AbortSignal.timeout`。応答を保持するサーバによるビルドハングを防ぐ。T2-3レビューR-1）。OGP値の連続改行はfetch時に単一スペースへ正規化しrawHtmlブロック分断を防ぐ（同R-4）
 - 並行fetch時のキャッシュJSON書き込み競合は未検証（現状はvisitor逐次のため実害なし。将来並列化する場合はread-modify-writeの原子性を要検討）

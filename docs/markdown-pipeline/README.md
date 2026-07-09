@@ -67,11 +67,11 @@ export default defineConfig({
 
 - プラグインは**登録順の直列パイプライン**。前段が生成したノードを後段は訪問できる
 - **ファイル名前処理（codeFilename）はmdastの早い位置**に置く（hast段階ではShiki実行後で手遅れ。詳細: [shiki.md](shiki.md)）
-- **wikilink → linkCard の順**を推奨。wikilinkが生成する`link`（`/dict/…`、テキスト=title）は「テキスト===URL」条件を満たさないためカード化されないが、同一パイプラインでの同時動作は未検証（各々単独構成で検証済み）。内部リンク（`/`始まり）をfetch対象から除外するガードも入れること（詳細: [link-card.md](link-card.md)）
+- **wikilink → linkCard の順**を推奨。wikilinkが生成する`link`（`/dict/…`、テキスト=title）は「テキスト===URL」条件を満たさないためカード化されない。同一パイプラインでの同時動作はT2-5で検証済み（統合テスト `tests/plugins/pipeline.test.ts` + 実ビルドdist。wikilinkはカード化されず、`/dict/…`へのfetchも発生しない）。内部リンク（`/`始まり）をfetch対象から除外するガードも入れること（詳細: [link-card.md](link-card.md)）
 - Astro側のShikiハイライトはユーザーhastPluginsより**前**に実行される。ハイライト済みコードブロックはhastでは`element`ではなく`raw`ノードになる
 
 ## 全機能共通の前提
 
 - **ビルドエラー化はvisitor内`throw`のみ有効**（`ctx.report`はAstroが読まない）。**ただしコレクション経由ではthrowもビルドを失敗させない**ため、確実なエラー化は`markdownToHtml`直呼びの検証パスで行う。詳細: [satteri-plugin-api.md](satteri-plugin-api.md)
 - **文書ごとの状態を持つプラグインは必ずファクトリ形式**にする。同上
-- コンテンツコレクション（Content Layer API）経由の実ビルドはwikilinkで検証済み（T1-3）: **`ctx.fileURL`は実ファイルを指す（OK）**。プラグイン変更時はContent Layerキャッシュ（`.astro/`・`node_modules/.astro/`）の削除が必要。詳細: [satteri-plugin-api.md](satteri-plugin-api.md) / [wikilink.md](wikilink.md)。directives / link-card / mermaidのコレクション経由動作はP2で各々確認する
+- コンテンツコレクション（Content Layer API）経由の実ビルドはwikilinkで検証済み（T1-3）: **`ctx.fileURL`は実ファイルを指す（OK）**。プラグイン変更時はContent Layerキャッシュ（`.astro/`・`node_modules/.astro/`）の削除が必要。詳細: [satteri-plugin-api.md](satteri-plugin-api.md) / [wikilink.md](wikilink.md)。directives / link-card / mermaidのコレクション経由動作はT2-1/T2-3/T2-4で各々確認済み。全プラグイン同時のコレクション経由実ビルドは、rule.md全記法を網羅した恒常テスト記事 `content/articles/markdown-notation-test.md`（debug-render経由で既定ビルドに含まれる）でT2-5で確認済み

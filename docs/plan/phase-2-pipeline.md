@@ -18,7 +18,7 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 - [x] **T2-4: mermaid**
   mermaid-isomorphicによるビルド時SVG化（ライト/ダーク2枚・id名前空間化）を組み込む（[mermaid.md](../markdown-pipeline/mermaid.md)）。
   完了条件: mermaidコードブロックが2枚のSVGに変換され、id重複がなく、クライアントにmermaid.jsが配布されない。
-- [ ] **T2-5: 全プラグイン同時動作確認** 〔Fable 5〕
+- [x] **T2-5: 全プラグイン同時動作確認** 〔Fable 5〕
   全プラグインを同一パイプラインに登録し（順序: [markdown-pipeline/README.md](../markdown-pipeline/README.md)）、未検証だったwikilink×linkCard併存を含めて確認する。結果をmarkdown-pipeline/README.mdの残課題へ反映する。
   完了条件: rule.mdの全記法を含むテスト用mdが1ページで正しくレンダリングされる。wikilinkがカード化されないことを確認済み。
 
@@ -82,6 +82,17 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - コミットは `Task: T2-4` トレーラーで収集可能（`git log --grep 'Task: T2-4'`）。
 
 ### T2-5
+
+全プラグインは`astro.config.mjs`にREADME推奨順で登録済み（T2-1〜T2-4）だったため、本タスクの実体は「同時動作の検証＋全記法テスト用mdの恒常整備＋文書反映」。rule.mdの全記法を1ページに網羅した恒常テスト記事 `content/articles/markdown-notation-test.md`（`public: true`）を追加し、`src/pages/debug-render.astro` の `targetIds` に加えて既定ビルドのdistで常時検証可能にした。加えて本番と同一登録順で全mdast/hastプラグインを同時登録する統合テスト（`tests/helpers/pipeline.ts` + `tests/plugins/pipeline.test.ts`、5ケース）を追加した。
+
+- 変更ファイル: `content/articles/markdown-notation-test.md`（新規）/ `src/pages/debug-render.astro`（targetIds追加）/ `tests/helpers/pipeline.ts`・`tests/plugins/pipeline.test.ts`（新規）/ `docs/markdown-pipeline/README.md`・`link-card.md`・`wikilink.md`（残課題の検証済み化）/ 本文書・`docs/plan/README.md`（P2完了）。
+- **wikilink×linkCard併存（完了条件の核心）**: 統合テストで単独段落の`[[ownership]]`がカード化されず**fetchが一度も呼ばれない**こと、wikilink＋ベアURL併存文書でカード化がベアURLの1件だけであることを検証。実ビルドdistでも`/dict/`アンカーの`link-card`クラス0件・`.cache/link-card/ogp.json`に`/dict/`キー0件を確認。詳細は[link-card.md](../markdown-pipeline/link-card.md)制約・残課題（検証済みへ更新）。
+- **実 `astro build` のdist検証**（Content Layerキャッシュ削除後にビルド、テスト記事セクションを構造抽出して照合）: wikilink 3件変換 / link-card 1件（キャッシュ済みURL使用でネットワーク非依存・fallbackなし）/ `code-filename`＋`data-language="rust"`（T2-2申し送りR-1「ファイル名記法の恒常カバー」を解消）/ `has-diff`・`diff add`・`diff remove` / `--shiki-light`・`--shiki-dark` 両方 / mermaid figure 1つにSVG2枚（`&lt;svg`0件・distにmermaidランタイム非配布）/ aside 9（message通常＋6種＋タイトル付き＋ネスト内）/ details 2＝md内記法数（label黙殺なし）/ figureのwidth=480反映・figcaption 1 / canary `12:30` 残存 / 脚注出力あり。glob loaderのthrow握り潰しを踏まえ「ビルド成功」でなく件数照合で確認した。
+- Shikiはsatteri外（Astro側）のため統合テストでは走らない。Shiki絡み（ファイル名タブ・diff・dual theme）はdist検証で担保する分担（`tests/helpers/code-filename.ts`と同方針）。統合テストはarchitecture §10の「plugins/のmdast/hast in/outテスト」の範疇（プラグイン間相互作用の回帰ガード）であり、E2E/ページテストには当たらない。
+- HTMLコメント（`<!-- -->`）は実HTMLコメントとしてdistへそのまま出力される（エスケープされず、レンダリング上は不可視）。rule.mdは出力からの除去を要求していないため許容挙動とした。
+- **P6ダミー整理への申し送り**: テスト記事は全プラグイン同時動作の恒常検証フィクスチャなので、P6「ダミーコンテンツの削除or非公開化」の際は削除せず**非公開化で残す**ことを推奨（ただし非公開化するとdebug-render＝`getPublicArticles`経由では出なくなる点に注意。debug-render自体がP3で撤去予定のため、撤去時に検証経路をどう残すかは P3/P6 で判断）。
+- 検証結果: `npm run check`（format:check + lint + typecheck + test 66件）green / `npx astro build` 成功。
+- コミットは `Task: T2-5` トレーラーで収集可能（`git log --grep 'Task: T2-5'`）。
 
 ## フェーズ完了条件
 
