@@ -137,7 +137,7 @@ langの渡り方（実測）:
 
 - ラップコンテナは`type: 'paragraph'` + `data.hName: 'div'`で`<div>`化する方式（任意のブロックノード型 + `data.hName`でラップ要素を作れる）。新規codeノードの`lang`は生成時にリテラルで持たせればハイライトが効く（`setProperty`不可の件とは別問題）
 - CSSセレクタは`.astro-code`基準で書く（`.shiki`ではない）
-- dual themeのCSS切替レシピは出力構造から導出したもので、実ブラウザでの`html.dark`トグル時の見た目切替は未目視（標準的手法のため確度は高いが、本実装でスタイルを組んだ時点で1度ブラウザ確認する）
+- ~~dual themeのCSS切替レシピは出力構造から導出したもので、実ブラウザでの`html.dark`トグル時の見た目切替は未目視~~ → **T3-1で検証済み**。切替CSSを`src/styles/global.css`に実装し、Playwrightで`html.dark`トグル時にShiki spanの配色が切り替わること（theme.md AC-4）を実ブラウザ確認した
 - `transformerNotationDiff`以外の`@shikijs/transformers`（highlight/focus/error-level、`transformerMetaHighlight`等）は未検証。同じ経路で使える見込みだが、必要になった機能ごとに追加確認する
 - `<div class="code-block">`直下に`<pre>`が来る構造は確認済みだが、`shikiConfig.wrap`やコピーボタン等との相互作用、ファイル名記法とdiff以外のtransformerの同時利用は未検証
 - ~~コンテンツコレクション経由の実ビルドは未検証~~ → **T2-2で検証済み**。コレクション経由の`astro build`（`render()`）でも`shikiConfig`（`createRenderer`経路）が効き、`dist`に3要件（`code-filename`ラベル+`data-language="rust"`／`has-diff`・`diff add`/`diff remove`／`--shiki-light`・`--shiki-dark`両方）が出力されることをdist grepで確認。なお`mermaid`等の未知langは`data-language="plaintext"`にフォールバックする（除外は[mermaid.md](mermaid.md)のT2-4で対応）

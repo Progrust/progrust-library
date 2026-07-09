@@ -31,7 +31,7 @@
 
 ### T3-1
 
-BaseLayout・Header/Footer・ThemeToggle と、カラートークン/フォントのデザインシステム、FOUC 防止のテーマ初期化スクリプトを導入した。設計方針の詳細は [`.claude/plans/t3-1-pure-mccarthy.md`] を参照（要点のみ以下に記す）。
+BaseLayout・Header/Footer・ThemeToggle と、カラートークン/フォントのデザインシステム、FOUC 防止のテーマ初期化スクリプトを導入した。
 
 **実装内容（変更・新規ファイル）**
 
