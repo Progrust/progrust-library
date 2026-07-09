@@ -12,7 +12,7 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
 - [x] **T2-2: shiki（diff・ファイル名・dual theme）**
   `shikiConfig`（markdown直下）+ transformerNotationDiff + codeFilename前処理を組み込む（[shiki.md](../markdown-pipeline/shiki.md)）。テーマは暫定の既成dual themeでよい（確定配色対応はP6のフォント/テーマタスクで）。
   完了条件: ` ```rust:main.rs `のファイル名タブ、`[!code ++/--]`のdiffクラス付与、light/dark両テーマのハイライトがビルド結果に含まれる。
-- [ ] **T2-3: link-card**
+- [x] **T2-3: link-card**
   単独ベアURLのOGPカード化+ビルド跨ぎキャッシュ+失敗時フォールバックを組み込む（[link-card.md](../markdown-pipeline/link-card.md)）。内部リンク除外ガードを入れる。
   完了条件: ダミーコンテンツのベアURLがカード化され、キャッシュファイルが生成され、fetch失敗時もビルドが成功して簡易カードになる。
 - [ ] **T2-4: mermaid**
@@ -51,6 +51,21 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - コミットは `Task: T2-2` トレーラーで収集可能（`git log --grep 'Task: T2-2'`）。
 
 ### T2-3
+
+段落に単独で置かれたベアURLをビルド時にOGP取得してリンクカード化するmdastプラグイン `plugins/link-card.mjs`（export `linkCard`）を[link-card.md](../markdown-pipeline/link-card.md)の検証済み雛形をベースに本番化し、`astro.config.mjs` の `mdastPlugins` 末尾に `linkCard()` を登録した（順序: codeFilename → wikilink → directives → linkCard。[architecture.md](../architecture.md) §4）。fetch失敗/非200はthrowせず簡易カード（`link-card--fallback`）へフォールバックしビルドを落とさない。カードHTMLはblock要素 `<div>` 開始（mdastの`{rawHtml}`再パース対策・落とし穴1）。
+
+- 変更ファイル: `plugins/link-card.mjs`（新規）/ `astro.config.mjs`（import + `linkCard()` 登録・冒頭コメント更新）/ `.prettierignore`（生成物 `.cache` を対象外に追加）/ `tests/plugins/link-card.test.ts`・`tests/helpers/link-card.ts`（新規）/ `docs/markdown-pipeline/link-card.md`（下記逸脱3点と実ビルド検証結果を反映）/ `.cache/link-card/ogp.json`（生成・コミット）。
+- **雛形からの逸脱3点**（優先順位 spec > markdown-pipeline に基づき先にlink-card.md更新）:
+  1. 命名 `dLinkCard`/`d-linkcard.mjs` → `linkCard`/`link-card.mjs`（[architecture.md](../architecture.md) §1既定名 + T2-2 code-filename前例のdescriptive-name規約）
+  2. キャッシュ先 `node_modules/.cache/`（非コミット）→ `.cache/link-card/ogp.json`（gitignore対象外＝コミット可）。spec [deploy.md](../spec/deploy.md) R-4「キャッシュはリポジトリにコミットしてビルド間で再利用」に対応。CIの`actions/cache`配管はP6/deployの範疇で本タスク対象外
+  3. 失敗結果を保存しない（**成功のみキャッシュ**）。コミット運用で失敗が永続化＝恒久フォールバック化するのを回避（[link-card.md](../markdown-pipeline/link-card.md) 落とし穴3を解消）。ユーザー確認済みの決定
+- **内部リンク除外ガード**（完了条件の必須要件）: fetch直前に `/^https?:\/\//` を満たさないURLは素通り。wikilink出力（text≠url）は `soleBareUrl` 時点で既に除外されるため、`[/about](/about)` のような text===url かつ内部パスを塞ぐdefense-in-depth（テストで fetch非呼び出しを検証）。
+- 設計: キャッシュを**ファクトリ閉包**に持たせ（`plugins/wikilink.mjs` の状態保持パターン）、`linkCard({ cacheDir })` で差し替え可能に。テストは scratch dir を渡し実キャッシュ汚染・実ディスク書き込み・テスト間Map共有を回避。fetchは `vi.stubGlobal` でスタブ（[implementation-rules.md](../implementation-rules.md) §5）。
+- 型対応: `plugins/*.mjs` の `@ts-check` で `escapeHtml`/`nonEmpty` の引数に JSDoc 型注釈を付与（`any`禁止・§3）。
+- 完了条件充足: ユニット8ケース（検出・文中/通常/内部リンク除外・fetch失敗/非200フォールバック・キャッシュHIT・失敗非保存）green。**実 `astro build` の dist（debug-render）で核心を確認**: 到達可能URLが `class="link-card"`（実OGP title/host付き）にカード化され `.cache/link-card/ogp.json` が生成／到達不能URL（一時投入→revert）が `link-card--fallback` かつ build exit 0／失敗URLが未キャッシュ。これにより link-card.md の「コレクション経由実ビルド未検証」残課題も解消（反映済み）。
+- スコープ外: カードのCSS（見た目）はP6/UIフェーズ。URL正規化・失敗TTLは引き続き将来課題（link-card.md 制約参照）。wikilink×linkCard同時動作はT2-5で確認。
+- 検証結果: `npm run check`（format:check + lint + typecheck + test 49件）green / `npx astro build` 成功。
+- コミットは `Task: T2-3` トレーラーで収集可能（`git log --grep 'Task: T2-3'`）。
 
 ### T2-4
 

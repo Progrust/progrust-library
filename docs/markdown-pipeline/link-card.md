@@ -16,10 +16,14 @@
    - `inlineCode`/`code`内は元々`link`にならない → 誤検出なし
 2. **取得**: async `paragraph` visitor内で`fetch`し、OGP（`og:title`/`og:description`/`og:image`、無ければ`<title>`）を正規表現抽出
 3. **埋め込み**: `ctx.replaceNode(node, { rawHtml })`。**カードHTMLは必ずblock要素（`<div>`）で開始する**（最重要。下記「落とし穴」1参照）
-4. **キャッシュ**: `node_modules/.cache/link-card/ogp.json`にビルドを跨いで保存。モジュールレベルの`Map`にロードし、fetchのたびにディスクへ書き出す
-5. **失敗時**: try/catchで捕捉し、throwせず簡易カード（`link-card--fallback`）へフォールバック。非200も同様
+4. **キャッシュ**: `.cache/link-card/ogp.json`（リポジトリ直下・**gitignore対象外＝コミット可**）にビルドを跨いで保存。ファクトリ呼び出し時に`Map`へロードし、成功fetchのたびにディスクへ書き出す。コミット運用は spec [deploy.md](../spec/deploy.md) R-4（T2-3で本番化）
+5. **失敗時**: try/catchで捕捉し、throwせず簡易カード（`link-card--fallback`）へフォールバック。非200も同様。**失敗結果はキャッシュに書かない**（成功のみ保存。コミット運用で失敗が永続化＝恒久フォールバックになるのを避ける。T2-3の決定）
+6. **内部リンク除外ガード**: fetch直前に`/^https?:\/\//`を満たさないURLはカード化せず素通り（内部パス`/…`を除外。T2-3で追加）
 
 ## 雛形コード（動作確認済み）
+
+> **本番実装との差分（T2-3で確定）**: 雛形は `dLinkCard`/`d-linkcard.mjs`・キャッシュ `node_modules/.cache/`・失敗もキャッシュだが、本番は
+> **`linkCard`/`plugins/link-card.mjs`**（既定名は [architecture.md](../architecture.md) §1）・キャッシュ **`.cache/link-card/`（コミット可）**・**成功のみキャッシュ**・**内部リンク除外ガード**・**キャッシュを`Map`ではなくファクトリ閉包に保持**（テスト隔離のため `cacheDir` を受ける）に変更している。実装は `plugins/link-card.mjs` を正とする。
 
 ### astro.config.mjs
 
@@ -27,20 +31,20 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
-import { dLinkCard } from './plugins/d-linkcard.mjs';
+import { linkCard } from './plugins/link-card.mjs';
 
 export default defineConfig({
   markdown: {
     processor: satteri({
       features: { directive: true },
-      mdastPlugins: [dLinkCard()], // ★ ファクトリ形式（キャッシュ自体はモジュールレベルで共有）
+      mdastPlugins: [linkCard()], // ★ ファクトリ形式（キャッシュはファクトリ閉包に保持）
       hastPlugins: [],
     }),
   },
 });
 ```
 
-### 変換プラグイン（`plugins/d-linkcard.mjs`）
+### 変換プラグイン（`plugins/link-card.mjs`）
 
 ```js
 // リンクカード（段落に単独で置かれたベアURL → OGPカード化）
@@ -230,9 +234,9 @@ paragraph
 ## 制約・残課題
 
 - キャッシュキーのURL正規化は未実装（落とし穴2）
-- 失敗キャッシュのTTL等の方針は未決定（落とし穴3）
-- **wikilinkとの相互作用**: wikilink生成の`link`（`/dict/…`、テキスト=title）は`text !== url`なのでカード化されない（論理的に確認）が、**同一パイプラインでの同時動作は未検証**。本番ではwikilink→linkCardの順序と、内部リンク（`/`始まり）をfetch対象から除外するガードを入れることを推奨
+- ~~失敗キャッシュのTTL等の方針は未決定（落とし穴3）~~ → T2-3で**成功のみキャッシュ**に決定（失敗は保存せず次ビルドで再取得）。落とし穴3は解消
+- **wikilinkとの相互作用**: wikilink生成の`link`（`/dict/…`、テキスト=title）は`text !== url`なのでカード化されない（論理的に確認）が、**同一パイプラインでの同時動作は未検証**（T2-5で確認）。順序は wikilink→…→linkCard（[architecture.md](../architecture.md) §4）。内部リンク（`http(s)`以外）をfetch対象から除外するガードはT2-3で追加済み（`text === url`かつ内部パスの`[/about](/about)`のようなケースを塞ぐdefense-in-depth）
 - OGPパーサ（正規表現）は最小実装。非UTF-8文字コード・リダイレクト・`<meta>`属性バリエーション・巨大HTML等のエッジケースは本番で強化する
 - 並行fetch時のキャッシュJSON書き込み競合は未検証（現状はvisitor逐次のため実害なし。将来並列化する場合はread-modify-writeの原子性を要検討）
 - 多数のカードがある場合の並列度チューニングは本番で（現状はvisitor逐次＋URLごとに1 fetch）
-- コンテンツコレクション経由の実ビルドは未検証（全機能共通）
+- ~~コンテンツコレクション経由の実ビルドは未検証~~ → T2-3で解消。実 `astro build` の dist（debug-render）で、到達可能URLが `class="link-card"`（実OGP title/host付き）にカード化され `.cache/link-card/ogp.json` が生成されること、到達不能URLが `link-card--fallback` かつ build exit 0（＝ビルドを落とさない）になること、失敗URLがキャッシュに書かれないことを確認済み
