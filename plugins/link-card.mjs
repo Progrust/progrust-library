@@ -13,6 +13,11 @@ import { defineMdastPlugin } from "satteri";
 // spec deploy.md R-4「キャッシュはリポジトリにコミットしてビルド間で再利用」に従う。
 const DEFAULT_CACHE_DIR = new URL("../.cache/link-card/", import.meta.url);
 
+// fetchのタイムアウト（ミリ秒）。応答を返さずコネクションを保持するサーバに当たると
+// visitorがawaitのまま進まずビルドがハング（フォールバック経路にも入らない）するため上限を設ける。
+// タイムアウトはAbortErrorとしてthrowされ、既存のcatch→フォールバックがそのまま効く。
+const FETCH_TIMEOUT_MS = 10_000;
+
 // mdast段階の {rawHtml} は生markdownとして再パースされるためHTML属性値はエスケープ必須。
 /** @param {unknown} s */
 const escapeHtml = (s) =>
@@ -44,11 +49,19 @@ function extractMeta(html, prop) {
  * @returns {Promise<{ ok: true, title: string | null, description: string | null, image: string | null }>}
  */
 async function fetchOgp(url) {
-  const res = await fetch(url, { redirect: "follow" });
+  const res = await fetch(url, {
+    redirect: "follow",
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const html = await res.text();
+  // trim + 内部空白（改行含む）を単一スペースへ正規化する。og:content内の空行（連続改行）が
+  // rawHtml再パース時にHTMLブロックを分断しカード後半が生markdown化するのを防ぐ（落とし穴1の防御）。
   /** @param {string | null | undefined} s */
-  const nonEmpty = (s) => (s && s.trim() ? s.trim() : null);
+  const nonEmpty = (s) => {
+    const v = s?.replace(/\s+/g, " ").trim();
+    return v ? v : null;
+  };
   const title =
     nonEmpty(extractMeta(html, "og:title")) ??
     nonEmpty(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]);
@@ -155,7 +168,8 @@ export function linkCard({ cacheDir = DEFAULT_CACHE_DIR } = {}) {
       // 内部リンク除外ガード: fetch対象は絶対http(s)のみ。内部パス（/dict/… 等）は素通り。
       // wikilink出力は text!==url で既に soleBareUrl 時点で除外されるため、これは
       // [/about](/about) のような text===url かつ内部パスを塞ぐ defense-in-depth。
-      if (!/^https?:\/\//.test(url)) return;
+      // スキームは大文字（HTTPS://。URLとして有効）も外部リンクなので i フラグで拾う。
+      if (!/^https?:\/\//i.test(url)) return;
 
       let ogp = cache.get(url);
       if (!ogp) {

@@ -89,6 +89,27 @@ describe("link-card（単独ベアURLのOGPカード化・docs/markdown-pipeline
     expect(fetchFn).not.toHaveBeenCalled();
   });
 
+  it("大文字スキーム（HTTPS://）の外部URLもガードを通過してカード化する", async () => {
+    const fetchFn = stubFetchOk(ogpHtml({ title: "大文字スキーム" }));
+    // text===url で soleBareUrl を通した上で内部リンク除外ガードのスキーム判定を検証する。
+    const html = await compileWithLinkCard(
+      "[HTTPS://EXAMPLE.COM/](HTTPS://EXAMPLE.COM/)",
+      cacheDir,
+    );
+    expect(fetchFn).toHaveBeenCalledTimes(1);
+    expect(html).toContain('class="link-card"');
+    expect(html).toContain("大文字スキーム");
+  });
+
+  it("OGP値の連続改行を単一スペースへ正規化しHTMLブロック分断を防ぐ", async () => {
+    stubFetchOk(ogpHtml({ title: "タイトル", description: "前半\n\n後半" }));
+    const html = await compileWithLinkCard("https://example.com/", cacheDir);
+    // 空行が残るとrawHtml再パースでカード後半が生markdown化する。単一スペースに畳まれること。
+    expect(html).toContain("前半 後半");
+    expect(html).not.toContain("前半\n\n後半");
+    expect(html).not.toContain("&lt;a");
+  });
+
   it("fetchが失敗してもthrowせず簡易カード（link-card--fallback）にフォールバックする", async () => {
     vi.stubGlobal(
       "fetch",
