@@ -32,7 +32,7 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 後続タスク向けの申し送り（特記事項）:
 
 - **インストール版**: `astro@7.0.7` / `typescript@5.9.3`。※npm の `typescript` 最新は 7.x 系だが、`typescript-eslint` / `@astrojs/check` との互換のため `^5.9` に固定している。バージョン更新時は要再確認。
-- **Prettier のスコープ**: `.prettierignore` で既存の執筆済みプローズ（`content/` `docs/` `CLAUDE.md` `.claude/`）を対象外にしている。`npm run check` の `format:check` は**プロジェクトが所有するコード（`src/` `plugins/` `tests/` `astro.config.mjs` 等）のみ**を整形対象とする。既存ドキュメントを Prettier で書き換えないこと。
+- **Prettier のスコープ**: 整形対象をプロジェクト所有コードに限定し、既存プローズ（`content/` `docs/` 等）を `.prettierignore` で除外する方針を [implementation-rules.md](../implementation-rules.md) §1 に反映済み（方針の正は §1）。
 - **ESLint の `.mjs` 対応済み**: `plugins/**/*.mjs` に `globals.node` を付与済み。T1-3 以降で `plugins/*.mjs` を追加しても Node global（`URL`/`process` 等）が `no-undef` にならない。
 - **★ wikilink 検証はコードフェンスを除外すること（T1-3 / T1-4 で重要）**: `content/articles/rust-performance-tuning.md` の ```` ```toml ```` ブロックに Cargo 設定の `[[bench]]`（array-of-tables）がある。これは wikilink **ではない**。リンク切れ検証（[content-model AC-9](../spec/content-model.md)）や逆リンクグラフ（[architecture.md 5章](../architecture.md)）を raw 正規表現で走査すると誤検出するため、**mdast の text ノードのみを対象にする**（code ノードは対象外）。この前提が崩れると `[[bench]]` が偽のリンク切れとしてビルドを落とす。コードフェンス外の `[[...]]` は全て dict エントリに解決済み（リンク切れ0件）。
 - **移植は「コピー」**: 原本は `docs/ui-design/dummy-contents/` に残置（デザイン参照用）。将来 `content/` を正とする場合は原本の扱いを別途決める。

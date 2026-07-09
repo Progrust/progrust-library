@@ -14,7 +14,7 @@
 
 | 役割 | ツール | 方針 |
 | --- | --- | --- |
-| フォーマッタ | Prettier + prettier-plugin-astro | 設定はデフォルトを基本とし、オーバーライドは `.prettierrc` に列挙したもののみ（増やす場合は理由をコミットメッセージに書く） |
+| フォーマッタ | Prettier + prettier-plugin-astro | 設定はデフォルトを基本とし、オーバーライドは `.prettierrc` に列挙したもののみ（増やす場合は理由をコミットメッセージに書く）。**整形対象はプロジェクトが所有するコード（`src/` `plugins/` `tests/` `astro.config.mjs` 等）に限定し、執筆済みプローズ（`content/` `docs/` `CLAUDE.md` `.claude/`）は `.prettierignore` で対象外とする**（`npm run check` の `format:check` が既存ドキュメントを不整合扱いしないため） |
 | リンタ | ESLint（flat config: `eslint.config.js`）+ eslint-plugin-astro + typescript-eslint | 各 recommended 構成を採用。`plugins/*.mjs` も lint 対象に含める |
 | 型チェック | `astro check` | `tsconfig.json` は `astro/tsconfigs/strict` を extends し、追加の緩和オプションは入れない |
 | テスト | vitest | 対象範囲は [architecture.md 10章](architecture.md) を正とする |
