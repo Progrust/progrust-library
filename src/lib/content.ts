@@ -70,6 +70,43 @@ export function sortByNewest<T extends Datable>(entries: T[]): T[] {
   });
 }
 
+/** 新着一覧・種別バッジの種別ラベル（辞書・記事・本。章は新着に含めない。pages R-5） */
+export type ContentKind = "dict" | "article" | "book";
+
+/** エントリ配列に種別ラベルを付与する（新着一覧のマージ用） */
+export function withKind<T>(
+  entries: T[],
+  kind: ContentKind,
+): Array<T & { kind: ContentKind }> {
+  return entries.map((entry) => ({ ...entry, kind }));
+}
+
+/**
+ * トップの新着一覧。辞書・記事・本を種別ラベル付きで結合し、新着順（sortByNewest）で
+ * 上位 limit 件を返す。章は引数に取らない設計で除外を保証する（pages R-5/AC-2）。
+ */
+export function mergeRecent<
+  D extends Datable,
+  A extends Datable,
+  B extends Datable,
+>(
+  dict: D[],
+  articles: A[],
+  books: B[],
+  limit = 10,
+): Array<
+  | (D & { kind: ContentKind })
+  | (A & { kind: ContentKind })
+  | (B & { kind: ContentKind })
+> {
+  const merged = [
+    ...withKind(dict, "dict"),
+    ...withKind(articles, "article"),
+    ...withKind(books, "book"),
+  ];
+  return sortByNewest(merged).slice(0, limit);
+}
+
 /** 元ファイル名先頭のゼロ埋め2桁連番を取り出す（欠落時は 0） */
 function chapterOrder(entry: FilePathed): number {
   const fileName = entry.filePath?.split("/").pop() ?? "";

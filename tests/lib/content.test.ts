@@ -5,6 +5,7 @@ import {
   filterPublicChapters,
   sortByNewest,
   sortChapters,
+  mergeRecent,
 } from "../../src/lib/content";
 
 // 純関数テスト。fixture は各関数が要求する最小構造だけを手組みで用意する。
@@ -74,6 +75,59 @@ describe("sortByNewest（新着順・pages R-4）", () => {
     expect(result.map((e) => e.data.title)).toEqual(["A", "A", "B"]);
     expect(result[0].data.created_at.getFullYear()).toBe(2024);
     expect(result[0].data.created_at.getMonth()).toBe(4); // 5月（0始まり）
+  });
+});
+
+describe("mergeRecent（トップ新着一覧・pages R-5/AC-2）", () => {
+  const dated = (title: string, iso: string) => ({
+    data: { created_at: new Date(iso), title },
+  });
+
+  it("[AC-2] 辞書・記事・本が created_at 降順で混在し種別ラベルが付く", () => {
+    const dict = [dated("D", "2024-04-01")];
+    const articles = [dated("A", "2024-06-01")];
+    const books = [dated("B", "2024-05-01")];
+
+    const result = mergeRecent(dict, articles, books);
+
+    expect(result.map((e) => e.data.title)).toEqual(["A", "B", "D"]);
+    expect(result.map((e) => e.kind)).toEqual(["article", "book", "dict"]);
+  });
+
+  it("[AC-2] 章は引数に取らない設計で、kind は辞書・記事・本のみになる", () => {
+    const result = mergeRecent(
+      [dated("D", "2024-01-01")],
+      [dated("A", "2024-02-01")],
+      [dated("B", "2024-03-01")],
+    );
+
+    // 章を渡していないため件数は入力3件そのまま、kind も3種のみ（新着に章は混ざらない）
+    expect(result).toHaveLength(3);
+    expect(new Set(result.map((e) => e.kind))).toEqual(
+      new Set(["dict", "article", "book"]),
+    );
+  });
+
+  it("[AC-2] 同日はタイトル昇順でタイブレークする", () => {
+    const result = mergeRecent(
+      [dated("Z", "2024-05-01")],
+      [dated("A", "2024-05-01")],
+      [],
+    );
+
+    expect(result.map((e) => e.data.title)).toEqual(["A", "Z"]);
+  });
+
+  it("11件以上でも先頭 limit 件（既定10件）に絞られる", () => {
+    const dict = Array.from({ length: 15 }, (_, i) =>
+      dated(`d${i}`, `2024-01-${String(i + 1).padStart(2, "0")}`),
+    );
+
+    const result = mergeRecent(dict, [], []);
+
+    expect(result).toHaveLength(10);
+    // 最新（2024-01-15）が先頭
+    expect(result[0].data.title).toBe("d14");
   });
 });
 
