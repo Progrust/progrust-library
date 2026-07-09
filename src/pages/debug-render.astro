@@ -12,7 +12,13 @@ import {
 } from "../lib/content";
 
 // wikilink を含む代表エントリ（辞書・記事・本index）を種別横断でレンダリングする。
-const targetIds = new Set(["ownership", "rc", "rust-ownership-deep-dive"]);
+// markdown-notation-test は rule.md 全記法の恒常検証用（T2-5）。
+const targetIds = new Set([
+  "ownership",
+  "rc",
+  "rust-ownership-deep-dive",
+  "markdown-notation-test",
+]);
 const entries = [
   ...(await getPublicDict()),
   ...(await getPublicArticles()),
