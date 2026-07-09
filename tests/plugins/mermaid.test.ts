@@ -15,20 +15,23 @@ function idsOf(svg: string): Set<string> {
 }
 
 /**
- * `<style>` 内のバセレクタ `#<id>` で参照されているが、対応する `id="<id>"` 定義が
+ * `<style>` 内の `#<id>` セレクタで参照されているが、対応する `id="<id>"` 定義が
  * 存在しない「孤立セレクタ（死にCSS）」の集合を返す。R-1の真の不変条件はこれが空であること。
+ *
+ * `#...` は id セレクタと宣言値（`fill:#333` / `border:1px solid #aaaa33` / `url(#x)`）の
+ * 両方に現れる。宣言値は必ずルール本体（`{ … }` の内側）にあるので、各ルールの **`{` の手前
+ * ＝セレクタリスト部分**に現れる `#id` だけを対象にする（`:` 直前判定ではショートハンド値を
+ * 除外できない。T2-4再レビューN-2）。
  */
 function orphanStyleSelectors(svg: string): string[] {
   const defined = idsOf(svg);
   const orphans: string[] = [];
   for (const style of svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
-    const css = style[1];
-    for (const sel of css.matchAll(/#([\w-]+)/g)) {
-      // `#...` は id セレクタと色値（fill:#fff 等）の両方に現れる。色値は必ず宣言の
-      // プロパティ値（直前が `:`）なので除外し、id セレクタ参照だけを孤立判定する。
-      const before = css.slice(0, sel.index).trimEnd();
-      if (before.endsWith(":")) continue;
-      if (!defined.has(sel[1])) orphans.push(sel[1]);
+    // mermaidの<style>はフラットなルール列。各 `セレクタリスト { 宣言 }` のセレクタ部分のみ走査。
+    for (const rule of style[1].matchAll(/([^{}]*)\{[^{}]*\}/g)) {
+      for (const sel of rule[1].matchAll(/#([\w-]+)/g)) {
+        if (!defined.has(sel[1])) orphans.push(sel[1]);
+      }
     }
   }
   return orphans;
@@ -62,7 +65,7 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
       );
     });
 
-    it("style内のバ #id セレクタが孤立しない（R-1回帰＝死にCSSを作らない）", () => {
+    it("style内の #id セレクタが孤立しない（R-1回帰＝死にCSSを作らない）", () => {
       const out = namespaceSvgIds(svgWithStyle("mmd0l-0"), "mmd0l-");
       // ルートidを書き換えないため #mmd0l-0 セレクタは id="mmd0l-0" と一致し続ける。
       expect(orphanStyleSelectors(out)).toEqual([]);
@@ -81,6 +84,16 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
       expect(out).toContain('id="ns-arrow"');
       // ルートidを指す aria-labelledby はルート不変につき書き換えない。
       expect(out).toContain('aria-labelledby="mmd0l-0"');
+    });
+
+    it("孤立判定は宣言値中の色（border:1px solid #aaaa33 等）を誤検知しない（N-2）", () => {
+      // 実mermaid flowchart CSS に現れるショートハンド色値。ルール本体内なのでセレクタ扱いしない。
+      const svg =
+        '<svg id="mmd0l-0">' +
+        "<style>#mmd0l-0 .node{border:1px solid #aaaa33;fill:#fff;}</style>" +
+        '<rect id="r0"></rect></svg>';
+      const out = namespaceSvgIds(svg, "mmd0l-");
+      expect(orphanStyleSelectors(out)).toEqual([]);
     });
 
     it('id値でない色指定（fill="#333"）は書き換えない', () => {
