@@ -196,6 +196,8 @@ function restoreText(node, ctx) {
 ```
 
 > 補足: 上記雛形はmessageの種別として`alert`のみ扱う（検証時点の記法）。本番では`rule.md`のmessage種別（`info`/`tip`/`question`/`success`/`warning`/`danger`）に合わせて属性→クラスのマッピングを拡張する。
+>
+> 補足（figureのキャプション）: 上記雛形はキャプション（label）が無いとthrowするが、**`rule.md`ではキャプションは省略可能**（「画像サイズやキャプションは省略可能」）。本番実装（T2-1）ではlabelが無い場合はfigcaptionを付けず`<figure>`のみにする（throwしない）。widthはlabel有無に関わらず適用する。detailsのタイトルは`rule.md`で必須（label記法必須）のためlabelが無ければthrowする、という非対称に注意。
 
 ### 本番でのmessage分岐の拡張（種別マッピング + タイトル）
 

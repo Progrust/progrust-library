@@ -31,6 +31,12 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       expect(html).toContain('<aside class="message message-info">');
       expect(html).toContain('<p class="message-title">大事な話</p>');
     });
+
+    it("種別なし+[タイトル]のmessageもタイトル要素を持つ（種別クラスは付かない）", () => {
+      const html = compileWithDirectives(":::message[お知らせ]\n本文。\n:::");
+      expect(html).toContain('<aside class="message">');
+      expect(html).toContain('<p class="message-title">お知らせ</p>');
+    });
   });
 
   describe("details", () => {
@@ -61,10 +67,13 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       expect(html).toContain('alt="alt"');
     });
 
-    it("キャプションなしのfigureはビルドエラーになる", () => {
-      const call = () =>
-        compileWithDirectives(":::figure\n![alt](/img.png)\n:::");
-      expect(call).toThrow(/キャプションがありません/);
+    it("キャプションなしのfigureはfigcaptionなしのfigureになる（rule.md: キャプション省略可）", () => {
+      const html = compileWithDirectives(
+        ":::figure{width=480}\n![alt](/img.png)\n:::",
+      );
+      expect(html).toContain("<figure>");
+      expect(html).not.toContain("<figcaption>");
+      expect(html).toContain('width="480"');
     });
   });
 
@@ -76,6 +85,15 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       expect(html).toContain('<aside class="message">');
       expect(html).toContain("<details>");
       expect(html).toContain("<summary>中</summary>");
+    });
+
+    it("details内にネストしたmessage（rule.mdのネスト例）を正しく入れ子で変換する", () => {
+      const html = compileWithDirectives(
+        "::::details[外]\n:::message\nネストされた要素。\n:::\n::::",
+      );
+      expect(html).toContain("<details>");
+      expect(html).toContain("<summary>外</summary>");
+      expect(html).toContain('<aside class="message">');
     });
   });
 

@@ -108,17 +108,16 @@ export const directives = defineMdastPlugin({
     }
 
     if (node.name === "figure") {
+      // キャプションは省略可（rule.md「画像サイズやキャプションは省略可能」）。
+      // labelがあればfigcaption化し、無ければfigcaptionなしのfigureにする。
       const label = labelChild(node);
-      if (!label) {
-        throw new Error(
-          `:::figure にキャプションがありません（:::figure[キャプション] と書く） (${posOf(node, ctx)})`,
-        );
-      }
       ctx.setProperty(node, "data", { hName: "figure" });
-      ctx.setProperty(label, "data", {
-        directiveLabel: true,
-        hName: "figcaption",
-      });
+      if (label) {
+        ctx.setProperty(label, "data", {
+          directiveLabel: true,
+          hName: "figcaption",
+        });
+      }
       // width属性を中のimgへ反映する
       if (attrs.width) {
         for (const child of node.children) {
