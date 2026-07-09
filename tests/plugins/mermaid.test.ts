@@ -14,56 +14,92 @@ function idsOf(svg: string): Set<string> {
   return ids;
 }
 
+/**
+ * `<style>` 内のバセレクタ `#<id>` で参照されているが、対応する `id="<id>"` 定義が
+ * 存在しない「孤立セレクタ（死にCSS）」の集合を返す。R-1の真の不変条件はこれが空であること。
+ */
+function orphanStyleSelectors(svg: string): string[] {
+  const defined = idsOf(svg);
+  const orphans: string[] = [];
+  for (const style of svg.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
+    const css = style[1];
+    for (const sel of css.matchAll(/#([\w-]+)/g)) {
+      // `#...` は id セレクタと色値（fill:#fff 等）の両方に現れる。色値は必ず宣言の
+      // プロパティ値（直前が `:`）なので除外し、id セレクタ参照だけを孤立判定する。
+      const before = css.slice(0, sel.index).trimEnd();
+      if (before.endsWith(":")) continue;
+      if (!defined.has(sel[1])) orphans.push(sel[1]);
+    }
+  }
+  return orphans;
+}
+
 describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", () => {
   describe("namespaceSvgIds（id名前空間化・落とし穴1＝本機能の本丸）", () => {
-    // mermaidがlight/darkで同一の内部id（エッジid・participant id等）を吐くのを模した断片。
-    // 定義（id=）と各参照形式（url(#..) / href="#.." / aria-labelledby）を1つずつ含める。
-    const svg =
-      '<svg id="root">' +
-      '<path id="L_A_B_0" marker-end="url(#arrow)" fill="#333"></path>' +
-      '<marker id="arrow"></marker>' +
-      '<use href="#L_A_B_0"></use>' +
-      '<g aria-labelledby="root"></g>' +
+    // mermaid出力を模した断片。<style> は全ルールをルートid（<svg id>）でスコープし、
+    // 内部id（エッジid/participant id等）を定義（id=）・各参照形式で1つずつ含む。
+    // ★ルートidは呼び出し側の prefix で既に一意（light=mmd0l-0 / dark=mmd0d-0）。
+    // 同一 id="root" を両テーマに食わせるとルート除外で衝突しテストが嘘になるため、
+    // 本番同型に light/dark で別ルートidを与える。
+    const svgWithStyle = (root: string) =>
+      `<svg id="${root}">` +
+      `<style>#${root}{font-family:sans-serif;fill:#333;}#${root} .node{fill:#552222;}</style>` +
+      `<path id="L_A_B_0" marker-end="url(#arrow)" fill="#333"></path>` +
+      `<marker id="arrow"></marker>` +
+      `<use href="#L_A_B_0"></use>` +
+      `<g aria-labelledby="${root}"></g>` +
       "</svg>";
 
-    it("[AC-mermaid] light/darkを別nsで前置きするとid積集合がゼロになる", () => {
-      const light = namespaceSvgIds(svg, "mmd0l-");
-      const dark = namespaceSvgIds(svg, "mmd0d-");
+    it("light/darkで内部idの積集合がゼロになる（ルートはprefixで別idのため衝突しない）", () => {
+      const light = namespaceSvgIds(svgWithStyle("mmd0l-0"), "mmd0l-");
+      const dark = namespaceSvgIds(svgWithStyle("mmd0d-0"), "mmd0d-");
 
-      const lightIds = idsOf(light);
-      const darkIds = idsOf(dark);
-      // 元は root/L_A_B_0/arrow の3つを共有していた。名前空間化後は共有ゼロ。
-      const shared = [...lightIds].filter((id) => darkIds.has(id));
+      const shared = [...idsOf(light)].filter((id) => idsOf(dark).has(id));
       expect(shared).toEqual([]);
-      // 全idが期待どおり前置きされている。
-      expect(lightIds).toEqual(
-        new Set(["mmd0l-root", "mmd0l-L_A_B_0", "mmd0l-arrow"]),
+      // 内部idは ns 前置き、ルートidは不変。
+      expect(idsOf(light)).toEqual(
+        new Set(["mmd0l-0", "mmd0l-L_A_B_0", "mmd0l-arrow"]),
       );
     });
 
-    it('id定義・url(#..)・href="#.."・aria-labelledby の参照をすべて追従して書き換える', () => {
-      const out = namespaceSvgIds(svg, "ns-");
+    it("style内のバ #id セレクタが孤立しない（R-1回帰＝死にCSSを作らない）", () => {
+      const out = namespaceSvgIds(svgWithStyle("mmd0l-0"), "mmd0l-");
+      // ルートidを書き換えないため #mmd0l-0 セレクタは id="mmd0l-0" と一致し続ける。
+      expect(orphanStyleSelectors(out)).toEqual([]);
+      expect(out).toContain('id="mmd0l-0"');
+      expect(out).toContain("#mmd0l-0{");
+      expect(out).toContain("#mmd0l-0 .node{");
+      // 二重前置き（旧バグの症状）が発生していない。
+      expect(out).not.toContain("mmd0l-mmd0l-0");
+    });
+
+    it('内部idの id定義・url(#..)・href="#.."・aria-labelledby 参照をすべて追従して書き換える', () => {
+      const out = namespaceSvgIds(svgWithStyle("mmd0l-0"), "ns-");
       expect(out).toContain('id="ns-L_A_B_0"');
       expect(out).toContain('marker-end="url(#ns-arrow)"');
       expect(out).toContain('href="#ns-L_A_B_0"');
-      expect(out).toContain('aria-labelledby="ns-root"');
-      // id定義とその参照が食い違わない（dangling参照を作らない）。
       expect(out).toContain('id="ns-arrow"');
+      // ルートidを指す aria-labelledby はルート不変につき書き換えない。
+      expect(out).toContain('aria-labelledby="mmd0l-0"');
     });
 
     it('id値でない色指定（fill="#333"）は書き換えない', () => {
-      const out = namespaceSvgIds(svg, "ns-");
+      const out = namespaceSvgIds(svgWithStyle("mmd0l-0"), "ns-");
       expect(out).toContain('fill="#333"');
       expect(out).not.toContain('fill="#ns-333"');
     });
   });
 
   describe("検出と埋め込み構造（fakeレンダラ・実ブラウザ非起動）", () => {
-    // theme と prefix を反映したSVGを返す（namespaceSvgIds に prefix由来のidを食わせる）。
+    // theme と prefix を反映したSVGを返す。ルートid（=prefix由来）を <style> でスコープし、
+    // 内部id r0 も持たせて namespaceSvgIds を実際に働かせる。
     const svgFor = (theme: string, prefix: string) =>
-      `<svg id="${prefix}"><rect fill="${theme === "dark" ? "#000" : "#fff"}" id="r0"></rect></svg>`;
+      `<svg id="${prefix}">` +
+      `<style>#${prefix} rect{fill:${theme === "dark" ? "#000" : "#fff"};}</style>` +
+      `<rect fill="${theme === "dark" ? "#000" : "#fff"}" id="r0"></rect>` +
+      "</svg>";
 
-    it("[AC-mermaid] mermaidブロックが figure + light/dark 2枚のSVG（<div>）に変換される", async () => {
+    it("mermaidブロックが figure + light/dark 2枚のSVG（<div>）に変換される", async () => {
       const html = await compileWithMermaid(
         "```mermaid\nflowchart TD\n  A --> B\n```\n",
         fakeRenderer(svgFor),
@@ -81,16 +117,19 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
       expect(html).not.toContain("language-mermaid");
     });
 
-    it("light/darkのSVG間で id が衝突しない（プラグイン経由でも名前空間化される）", async () => {
+    it("light/darkのSVG間で id が衝突せず、かつ style に孤立セレクタが無い", async () => {
       const html = await compileWithMermaid(
         "```mermaid\nflowchart TD\n  A --> B\n```\n",
         fakeRenderer(svgFor),
       );
-      // 2枚のSVGを分離してid積集合を確認する。
+      // 2枚のSVGを分離してid積集合と孤立セレクタを確認する。
       const svgs = [...html.matchAll(/<svg[\s\S]*?<\/svg>/g)].map((m) => m[0]);
       expect(svgs).toHaveLength(2);
       const shared = [...idsOf(svgs[0])].filter((id) => idsOf(svgs[1]).has(id));
       expect(shared).toEqual([]);
+      // 各SVGの <style> セレクタが自SVGの id と一致し続ける（R-1回帰）。
+      expect(orphanStyleSelectors(svgs[0])).toEqual([]);
+      expect(orphanStyleSelectors(svgs[1])).toEqual([]);
     });
 
     it("非mermaidの <pre>（通常コードブロック）は素通りする", async () => {
@@ -106,7 +145,7 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
   });
 
   describe("レンダ失敗時はthrowでビルドを止める（link-cardと方針が逆）", () => {
-    it("[AC-mermaid] レンダ拒否（rejected）は figure を出さずに throw する", async () => {
+    it("レンダ拒否（rejected）は figure を出さずに throw する", async () => {
       await expect(
         compileWithMermaid(
           "```mermaid\nbroken\n```\n",

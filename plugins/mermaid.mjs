@@ -22,19 +22,32 @@ const defaultRenderer = createMermaidRenderer();
 
 // mermaid の prefix は svg ルート id とマーカー/グラデーション id しか名前空間化しない。
 // フローチャートのエッジ id（L_A_B_0）やシーケンス図の actor0 / S / U 等の内部 id は
-// 無名前空間のままで、同一図の light/dark 2枚で衝突する。→ SVG 文字列内の全 id と参照
+// 無名前空間のままで、同一図の light/dark 2枚で衝突する。→ SVG 文字列内の内部 id と参照
 // （url(#..) / href="#.." / aria-*）を一意な ns で前置きして衝突を根絶する。
+//
+// ★ルート id（<svg id="…">）は書き換え対象から除外する。理由:
+//   1. mermaid は <style> の全テーマルールを「#<ルートid>{…}」「#<ルートid> .node{…}」の
+//      バセレクタでスコープする。このバ #id セレクタは url()/href/aria のいずれでもないため
+//      本関数の書き換え対象外で、ルート id だけ書き換えるとセレクタが旧 id を指し全ルールが
+//      死にCSS化する（light/dark の配色差が消える）。
+//   2. ルート id は mermaid の prefix（mmd{index}l / mmd{index}d）で既に per-SVG 一意
+//      （light=mmd0l-0 / dark=mmd0d-0）なので、書き換えずとも light/dark 間で衝突しない。
 /**
- * SVG文字列中の全 id 定義と参照を ns で前置きして一意化する。
+ * SVG文字列中の内部 id 定義と参照を ns で前置きして一意化する（ルート id は不変）。
  * id属性は `"`、url(#..) は `)`、href は `"` でアンカーされるため部分一致の誤置換は起きない
- * （fill="#333" のような色指定は無傷）。
+ * （fill="#333" のような色指定は無傷）。バ #id セレクタ（style内）はルート id 用のみ想定し、
+ * ルート id を不変に保つことで一致を維持する。
  * @param {string} svg
  * @param {string} ns
  * @returns {string}
  */
 export function namespaceSvgIds(svg, ns) {
+  // ルート id（<svg 開始タグ内の最初の id）を検出して除外する。非貪欲で最初の id を拾う。
+  const rootId = svg.match(/<svg\b[^>]*?\bid="([^"]+)"/)?.[1];
   const ids = new Set();
-  for (const m of svg.matchAll(/\bid="([^"]+)"/g)) ids.add(m[1]);
+  for (const m of svg.matchAll(/\bid="([^"]+)"/g)) {
+    if (m[1] !== rootId) ids.add(m[1]);
+  }
   for (const id of ids) {
     const esc = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     svg = svg
