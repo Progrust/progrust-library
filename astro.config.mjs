@@ -38,7 +38,8 @@ export default defineConfig({
     // 黙って無視し、Astroが createRenderer 経由で別途Sätteriへ渡すため）。詳細は shiki.md。
     shikiConfig: {
       // dual theme。defaultColor:false でトークンは実colorを持たず
-      // --shiki-light / --shiki-dark のCSS変数のみ出力する（html.dark切替CSSはP6で入れる）。
+      // --shiki-light / --shiki-dark のCSS変数のみ出力する。
+      // html.dark切替CSSは T3-1 で src/styles/global.css に実装済み（theme.md AC-4）。
       themes: { light: "github-light", dark: "github-dark" },
       defaultColor: false,
       // diff表示: // [!code ++] / [!code --] を除去し diff add/remove クラスを付与する。

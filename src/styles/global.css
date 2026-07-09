@@ -1,6 +1,51 @@
 @import "tailwindcss";
 
 /* class ベースのダークモード（architecture.md 9章: darkMode: 'class'）。
-   `.dark` を祖先に持つ要素で dark: バリアントが有効になる。
-   カラートークン・デザインシステムの定義は P3 で追加する。 */
+   `.dark` を祖先に持つ要素で dark: バリアントが有効になる。 */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* カラートークン（ui-design-spec.md「カラートークン」）とフォント（同「タイポグラフィ」）。
+   architecture.md 9章の方針に従い、ロール名を light 値で登録し、ダークは
+   `.dark` で同名 CSS 変数の値だけを差し替える（`dark:` 併記を減らす）。
+   `@theme inline` は使わない（値を直接埋め込むと `.dark` の runtime override が効かなくなる）。 */
+@theme {
+  --color-paper: #f2f0ec;
+  --color-card: #fbf9f6;
+  --color-line: #d9d3ca;
+  --color-strong: #29241f;
+  --color-ink: #3a342d;
+  --color-sub: #847a6e;
+  --color-accent: #c63d22;
+
+  --font-display: "Zen Kaku Gothic New", sans-serif;
+  --font-maru: "Zen Maru Gothic", sans-serif;
+  --font-mono: "JetBrains Mono", "Zen Kaku Gothic New", monospace;
+}
+
+/* ダークテーマ: 同名トークンの値のみ差し替える（bg-paper 等がそのまま追従する）。 */
+.dark {
+  --color-paper: #1e1b18;
+  --color-card: #26221e;
+  --color-line: #3e3831;
+  --color-strong: #f1eae1;
+  --color-ink: #e4dcd1;
+  --color-sub: #9c9186;
+  --color-accent: #f0684a;
+}
+
+/* Shiki dual theme（defaultColor:false）を html.dark で出し分ける（shiki.md のレシピ / theme.md AC-4）。
+   トークンは実 color を持たず --shiki-light / --shiki-dark の CSS 変数のみ出力されるため、
+   この切替 CSS がないと配色が付かない。セレクタは .shiki ではなく .astro-code（Astro helper 由来）。
+   コードブロックの E 案フル配色・ファイル名タブ・diff 等の詳細スタイルは T3-4 で扱う。 */
+.astro-code {
+  background-color: var(--shiki-light-bg);
+}
+.astro-code span {
+  color: var(--shiki-light);
+}
+html.dark .astro-code {
+  background-color: var(--shiki-dark-bg);
+}
+html.dark .astro-code span {
+  color: var(--shiki-dark);
+}
