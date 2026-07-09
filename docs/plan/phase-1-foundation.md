@@ -75,7 +75,13 @@ T1-4向けの申し送り（特記事項）:
 - `@types/node`をdevDependenciesに追加済み（`// @ts-check`付き.mjsを`astro check`が検査するため）。`eslint.config.js`のNode globals対象に`astro.config.mjs`を追加済み
 - 新規生成mdastノード配列には `/** @type {import('satteri').MdastContent[]} */` 注釈が必要（typecheckで型が合わない）
 
-作成コミット: `636a666` feat: wikilinkプラグインを実装しコレクション実ビルドへ統合 / docs: ctx.fileURL実ビルド検証の結果を文書へ反映（本記録を含むコミット）
+作成コミット: `636a666` feat: wikilinkプラグインを実装しコレクション実ビルドへ統合 / `a06269f` docs: ctx.fileURL実ビルド検証の結果を文書へ反映
+
+レビュー対応（[レビュー結果](../archive/review/T1-3.md)・軽微3件にすべて対応）:
+
+- frontmatter抽出の改行を`\r?\n`で許容（CRLF mdの`public: false`見逃し防止。dict-index / wikilink両方）
+- `title`フォールバックを拡張子除去済みslugに変更
+- devサーバ実行中の辞書追加が再起動まで反映されない既知挙動を [markdown-notation/rule.md](../markdown-notation/rule.md) の辞書リンク節に注記
 
 ### T1-4
 

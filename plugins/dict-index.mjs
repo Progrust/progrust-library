@@ -26,13 +26,15 @@ export function loadDictIndex(dictDirURL) {
     .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
     .map((entry) => {
       const raw = readFileSync(join(entry.parentPath, entry.name), "utf8");
-      const m = raw.match(/^---\n([\s\S]*?)\n---/);
+      // CRLFで保存されたmdでもfrontmatterを取りこぼさないよう改行は \r?\n で許容する
+      const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
       const fm = m
         ? /** @type {Record<string, unknown>} */ (loadYaml(m[1]))
         : {};
+      const slug = entry.name.replace(/\.md$/, "");
       return {
-        slug: entry.name.replace(/\.md$/, ""),
-        title: typeof fm.title === "string" ? fm.title : entry.name,
+        slug,
+        title: typeof fm.title === "string" ? fm.title : slug,
         public: fm.public !== false,
       };
     });

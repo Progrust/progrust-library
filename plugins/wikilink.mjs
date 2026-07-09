@@ -20,7 +20,8 @@ import { load as loadYaml } from "js-yaml";
 function isSourcePagePublic(ctx) {
   if (!ctx.fileURL) return true; // fileURL不明時は判定できないので公開扱い（フォールバック）
   const raw = readFileSync(fileURLToPath(ctx.fileURL), "utf8");
-  const m = raw.match(/^---\n([\s\S]*?)\n---/);
+  // CRLFで保存されたmdでもfrontmatterを取りこぼさないよう改行は \r?\n で許容する
+  const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   const fm = m ? /** @type {Record<string, unknown>} */ (loadYaml(m[1])) : {};
   return fm.public !== false;
 }
