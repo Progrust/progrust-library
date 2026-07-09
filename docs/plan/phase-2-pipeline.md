@@ -65,6 +65,7 @@ Shikiの3要件（ファイル名・diff・dual theme）を[shiki.md](../markdow
 - 完了条件充足: ユニット8ケース（検出・文中/通常/内部リンク除外・fetch失敗/非200フォールバック・キャッシュHIT・失敗非保存）green。**実 `astro build` の dist（debug-render）で核心を確認**: 到達可能URLが `class="link-card"`（実OGP title/host付き）にカード化され `.cache/link-card/ogp.json` が生成／到達不能URL（一時投入→revert）が `link-card--fallback` かつ build exit 0／失敗URLが未キャッシュ。これにより link-card.md の「コレクション経由実ビルド未検証」残課題も解消（反映済み）。
 - スコープ外: カードのCSS（見た目）はP6/UIフェーズ。URL正規化・失敗TTLは引き続き将来課題（link-card.md 制約参照）。wikilink×linkCard同時動作はT2-5で確認。
 - 検証結果: `npm run check`（format:check + lint + typecheck + test 49件）green / `npx astro build` 成功。
+- レビュー反映（[T2-3.md](../archive/review/T2-3.md)。要修正なし・承認）: 推奨R-1（fetchタイムアウト欠如でハングしうる）を `AbortSignal.timeout(10s)` で、軽微R-3（スキーム判定が小文字限定）を `i` フラグで、軽微R-4（OGP値の連続改行がrawHtmlブロックを分断しうる）を取得値の空白正規化で対応（テスト計10件に増）。軽微R-2（実体参照の二重エスケープ）はOGPパーサ強化の残課題として link-card.md に追記（本タスクでは変更なし）。修正後 `npm run check`（test 51件）green / `astro build` 成功。
 - コミットは `Task: T2-3` トレーラーで収集可能（`git log --grep 'Task: T2-3'`）。
 
 ### T2-4
