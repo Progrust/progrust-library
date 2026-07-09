@@ -54,7 +54,7 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 
 特記事項（後続向け申し送り）:
 
-- **zodの`z`は`astro/zod`からimportする**: `astro:content`の`z`再エクスポートは`@deprecated`（`node_modules/astro/types/content.d.ts`、"will be removed in Astro 7. Use `import { z } from 'astro/zod'` instead."）。案内どおり`astro/zod`から取ると`astro check`の`ts(6385)`hintが完全に消える（0 errors/warnings/hints）。※`astro:schema`エイリアスも`astro/zod`を指すが型解決上hintが残り、かつ`// TODO: remove in Astro 7`付きなので使わない。**T1-3/T1-4で新規にzodスキーマを書く際も`astro/zod`を使うこと**。
+- **zodの`z`は`astro/zod`からimportする**（本タスクで確立）: `astro:content`の`z`再エクスポートは`@deprecated`（`node_modules/astro/types/content.d.ts`）で、`astro/zod`にすると`astro check`のdeprecation hintも消える。全タスク共通のコーディング規約なので正は [implementation-rules.md §3](../implementation-rules.md) に置いた。T1-3/T1-4のスキーマも同様。
 - **章順の並びは本単位で`sortChapters`を通す前提**（グローバルソートは複数本で混在するため、P3の本ページで本ごとにグルーピングして適用する）。
 - `getCollection`エントリは`filePath`を保持しており、これが章連番ソートのソース（`sortChapters`）。
 

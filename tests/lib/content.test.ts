@@ -78,7 +78,7 @@ describe("sortByNewest（新着順・pages R-4）", () => {
 });
 
 describe("sortChapters（章順・content-model R-7）", () => {
-  it("元ファイル名先頭の連番昇順に並べる", () => {
+  it("[AC-4] 元ファイル名先頭の連番昇順に並べる（章目次の並び）", () => {
     const chapters = [
       { filePath: "content/books/x/03-third.md" },
       { filePath: "content/books/x/01-first.md" },
