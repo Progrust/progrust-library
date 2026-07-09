@@ -9,7 +9,7 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 - [x] **T1-1: プロジェクト初期化**
   Astro（検証済みバージョン系: [markdown-pipeline/README.md](../markdown-pipeline/README.md)参照）+ Tailwind + TypeScript + vitest をセットアップし、git管理を開始する。Prettier・ESLint・`astro/tsconfigs/strict` のセットアップと npm scripts（`check` 含む）の整備を含む（[implementation-rules.md](../implementation-rules.md) 1章）。`docs/ui-design/dummy-contents/` のダミーコンテンツを `content/` の正規構成（[content-model R-3](../spec/content-model.md)）へ移植する（記法・frontmatterが仕様と異なる箇所は仕様に合わせて修正）。
   完了条件: `astro dev` / `astro build` が成功し、`npm run check` が通る（vitestは空テストで可）。
-- [ ] **T1-2: 4コレクション定義と公開フィルタ**
+- [x] **T1-2: 4コレクション定義と公開フィルタ**
   `src/content.config.ts`（4コレクション・zodスキーマ・generateIdカスタマイズ）と `src/lib/content.ts`（公開フィルタ・dev判定・並び順）を実装する。確認用の仮ページで全エントリを列挙する。
   完了条件: content-model AC-1 / AC-3 / AC-4（ID・URL規則）を満たし、公開フィルタのvitestが通る（AC-6〜AC-8相当のロジックテスト）。
 - [ ] **T1-3: ★ctx.fileURL実ビルド検証（最優先リスク）** 〔Fable 5〕
@@ -38,6 +38,25 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 - **移植は「コピー」**: 原本は `docs/ui-design/dummy-contents/` に残置（デザイン参照用）。将来 `content/` を正とする場合は原本の扱いを別途決める。
 
 ### T1-2
+
+対応概要:
+
+- **4コレクション定義**（`src/content.config.ts`）: dict / articles / books / chapters を glob loader で定義。共通frontmatterを`commonFields`に一元化しzod検証（[content-model R-2](../spec/content-model.md)）。記事・本のみ`image`（remote URL想定で`z.string()`。画像最適化 R-16/R-17 は後続）。`image`・`public`はrequired。
+- **ID導出を純モジュール化**（`src/lib/collection-id.ts`）: `dictId`/`articleId`/`bookId`/`chapterId`。`astro:content`非依存にしてconfig評価時のload-orderリスク回避 + vitest直接検証を両立。dict/articlesはファイル名のみ（R-5）、章は連番除去+`本slug/slug`（R-7/R-8）。連番検証(R-9)・辞書名一意性(R-6)のthrowは**T1-4スコープ**として未実装。
+- **公開フィルタ一元化**（`src/lib/content.ts`）: `isPreview`/`filterPublic`/`filterPublicChapters`（本index非公開伝播 R-12）/`sortByNewest`（[pages R-4](../spec/pages.md)）/`sortChapters`（連番昇順）の純関数と、`getPublic*`ラッパ（`getCollection`合成）。設計配置は[architecture §2](../architecture.md)に準拠。
+- **確認用の仮ページ**（`src/pages/debug-entries.astro`・P3で撤去）: `getPublic*`経由で全エントリ列挙。
+
+検証結果:
+
+- `npm run check`（format:check / lint / typecheck / test 14件）green・`npx astro build` 成功。
+- テスト: `tests/lib/collection-id.test.ts`（**[AC-3]/[AC-4]**）・`tests/lib/content.test.ts`（**[AC-6]/[AC-7]/[AC-8]**相当 + 並び順）。
+- 目視/ビルド確認: chapters=3件・`.../index`幽霊混入なし（`!*/index.md`除外が有効）、dict IDはフォルダ階層を捨てフラット、章は`01→02→03`順で連番除去済みURL。**AC-1**は`title`を一時削除してビルドがファイル名付き（`dict → borrowing ... title: Required`）で失敗することを確認し復元。本番ビルドで非公開2件（dict）が除外され公開32件になることも確認（AC-6のビルド時裏付け）。
+
+特記事項（後続向け申し送り）:
+
+- **`z`のdeprecation hint**: `astro:content`の`z`再エクスポートはAstroが非推奨化済みのため`astro:schema`から`import { z }`に変更。ただし残る`ts(6385) 'z' is deprecated`はAstroバンドルのzod名前空間自体に付くhintで、別途`zod`依存を足さない限り解消不可（[implementation-rules §1](../implementation-rules.md)のstrict維持方針下で許容。errors/warningsは0）。
+- **章順の並びは本単位で`sortChapters`を通す前提**（グローバルソートは複数本で混在するため、P3の本ページで本ごとにグルーピングして適用する）。
+- `getCollection`エントリは`filePath`を保持しており、これが章連番ソートのソース（`sortChapters`）。
 
 ### T1-3
 
