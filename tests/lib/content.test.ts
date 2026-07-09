@@ -94,7 +94,7 @@ describe("mergeRecent（トップ新着一覧・pages R-5/AC-2）", () => {
     expect(result.map((e) => e.kind)).toEqual(["article", "book", "dict"]);
   });
 
-  it("[AC-2] 章は引数に取らない設計で、kind は辞書・記事・本のみになる", () => {
+  it("[AC-2] kind は辞書・記事・本の3種のみで、章は結合対象に含まれない", () => {
     const result = mergeRecent(
       [dated("D", "2024-01-01")],
       [dated("A", "2024-02-01")],
@@ -118,7 +118,7 @@ describe("mergeRecent（トップ新着一覧・pages R-5/AC-2）", () => {
     expect(result.map((e) => e.data.title)).toEqual(["A", "Z"]);
   });
 
-  it("11件以上でも先頭 limit 件（既定10件）に絞られる", () => {
+  it("[AC-2] 11件以上でも先頭 limit 件（既定10件）に絞られる", () => {
     const dict = Array.from({ length: 15 }, (_, i) =>
       dated(`d${i}`, `2024-01-${String(i + 1).padStart(2, "0")}`),
     );

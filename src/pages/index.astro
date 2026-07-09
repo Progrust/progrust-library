@@ -158,9 +158,10 @@ const collections = [
           <a
             href={c.href}
             class:list={[
-              "group px-1 py-6 transition hover:bg-card motion-reduce:transition-none sm:px-4",
-              // 最終列以外に右罫線。lg では 4 列なので 3 番目にも罫線を出す
-              i !== collections.length - 1 && "border-r border-line",
+              "group border-line px-1 py-6 transition hover:bg-card motion-reduce:transition-none sm:px-4",
+              // 2列/4列どちらでも列間だけに縦罫線が出るようにする（モック top-b-sharp 準拠）。
+              // 辞書・本は常時右罫線、記事は 4 列（lg）時のみ右罫線、タグは罫線なし。
+              (i === 0 || i === 2) && "border-r",
               i === 1 && "lg:border-r",
             ]}
           >
