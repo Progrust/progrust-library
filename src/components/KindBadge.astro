@@ -1,0 +1,36 @@
+---
+// コンテンツ種別バッジ（辞書・記事・本。ui-design-spec「コンテンツ種別バッジ」）。
+// 角型アウトライン + 4px 角丸。記事は accent トークンで自動ダーク追従、
+// 辞書・本はトークン外の生カラーのため dark: を併記する。
+// 新着一覧（pages R-5）・タグ詳細（R-19・T3-6）で再利用する。
+import type { ContentKind } from "../lib/content";
+
+interface Props {
+  kind: ContentKind;
+  /** 配置調整用のクラス（例: justify-self-start / w-[4.5rem] text-center） */
+  class?: string;
+}
+
+const { kind, class: className = "" } = Astro.props;
+
+const KIND: Record<ContentKind, { label: string; color: string }> = {
+  dict: {
+    label: "辞書",
+    color:
+      "border-[#A87B1C] text-[#8F6812] dark:border-[#D9B25E] dark:text-[#D9B25E]",
+  },
+  article: { label: "記事", color: "border-accent text-accent" },
+  book: {
+    label: "本",
+    color:
+      "border-[#7A3B2E] text-[#7A3B2E] dark:border-[#D08A72] dark:text-[#D08A72]",
+  },
+};
+
+const { label, color } = KIND[kind];
+---
+
+<span
+  class={`rounded border px-2 py-0.5 font-display text-[11px] font-bold ${color} ${className}`}
+  >{label}</span
+>
