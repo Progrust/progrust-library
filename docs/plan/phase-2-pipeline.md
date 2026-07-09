@@ -22,6 +22,18 @@ wikilink以外の自作プラグインを本組込みし、全記法（[markdown
   全プラグインを同一パイプラインに登録し（順序: [markdown-pipeline/README.md](../markdown-pipeline/README.md)）、未検証だったwikilink×linkCard併存を含めて確認する。結果をmarkdown-pipeline/README.mdの残課題へ反映する。
   完了条件: rule.mdの全記法を含むテスト用mdが1ページで正しくレンダリングされる。wikilinkがカード化されないことを確認済み。
 
+## 実施履歴
+
+### T2-1
+
+### T2-2
+
+### T2-3
+
+### T2-4
+
+### T2-5
+
 ## フェーズ完了条件
 
 rule.mdの全記法がダミーコンテンツ上で正しくレンダリングされ、プラグインのvitestが全て通る。

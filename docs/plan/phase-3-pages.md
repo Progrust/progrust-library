@@ -27,6 +27,20 @@
   タグページ（章も対象）・profile.astro直書き（profile.htmlモック準拠）・404。
   完了条件: pages.md AC-1 / AC-6 / AC-8 を満たす。
 
+## 実施履歴
+
+### T3-1
+
+### T3-2
+
+### T3-3
+
+### T3-4
+
+### T3-5
+
+### T3-6
+
 ## フェーズ完了条件
 
 pages.md・theme.mdの全受入基準を満たし、全URLがビルドされui-design-specと目視一致する。

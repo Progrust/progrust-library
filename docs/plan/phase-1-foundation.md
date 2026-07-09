@@ -19,9 +19,9 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
   辞書ファイル名一意性（dict-index.mjs）・章連番形式/重複・wikilinkリンク切れ/公開非対称を実装する。
   完了条件: content-model AC-2 / AC-5 / AC-9 / AC-10 を満たす（意図的な違反ファイルで各エラーを確認し、削除してビルド成功に戻す）。プラグインのvitestが通る。
 
-## 実施メモ
+## 実施履歴
 
-### T1-1（完了）
+### T1-1
 
 対応概要:
 
@@ -36,6 +36,12 @@ Astroプロジェクトを初期化し、コンテンツコレクションとビ
 - **ESLint の `.mjs` 対応済み**: `plugins/**/*.mjs` に `globals.node` を付与済み。T1-3 以降で `plugins/*.mjs` を追加しても Node global（`URL`/`process` 等）が `no-undef` にならない。
 - **★ wikilink 検証はコードフェンスを除外すること（T1-3 / T1-4 で重要）**: `content/articles/rust-performance-tuning.md` の ```` ```toml ```` ブロックに Cargo 設定の `[[bench]]`（array-of-tables）がある。これは wikilink **ではない**。リンク切れ検証（[content-model AC-9](../spec/content-model.md)）や逆リンクグラフ（[architecture.md 5章](../architecture.md)）を raw 正規表現で走査すると誤検出するため、**mdast の text ノードのみを対象にする**（code ノードは対象外）。この前提が崩れると `[[bench]]` が偽のリンク切れとしてビルドを落とす。コードフェンス外の `[[...]]` は全て dict エントリに解決済み（リンク切れ0件）。
 - **移植は「コピー」**: 原本は `docs/ui-design/dummy-contents/` に残置（デザイン参照用）。将来 `content/` を正とする場合は原本の扱いを別途決める。
+
+### T1-2
+
+### T1-3
+
+### T1-4
 
 ## フェーズ完了条件
 

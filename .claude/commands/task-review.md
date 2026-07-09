@@ -18,7 +18,7 @@ argument-hint: <タスクID 例: T1-3>
 
 ## 3. コンテキスト読込
 
-- `docs/plan/phase-<N>-*.md` の該当タスクブロック（説明・完了条件）
+- `docs/plan/phase-<N>-*.md` の該当タスクブロック（説明・完了条件・実施履歴）
 - 完了条件が参照している `docs/spec/` の受入基準（AC）
 - `docs/implementation-rules.md`（規約の判定基準として全章）
 

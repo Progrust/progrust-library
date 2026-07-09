@@ -21,6 +21,16 @@
   `src/lib/wikilink-graph.ts`でグラフ構築（公開フィルタ適用）し、Backlinks / LinkedDictList コンポーネントで表示する。
   完了条件: wikilink-ui AC-7 / AC-8 を満たし、グラフ構築のvitestが通る。
 
+## 実施履歴
+
+### T4-1
+
+### T4-2
+
+### T4-3
+
+### T4-4
+
 ## フェーズ完了条件
 
 wikilink-ui.mdの全受入基準（AC-1〜AC-8）を満たす。
