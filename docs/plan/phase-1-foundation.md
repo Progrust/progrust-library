@@ -101,7 +101,7 @@ T1-4向けの申し送り（特記事項）:
 
 特記事項（後続向け申し送り）:
 
-- config評価は dev/check/build すべてで走るため、壊れたwikilink等は `astro dev` 起動も落とす（ソロ執筆運用では許容）。将来重ければwikilink検証だけ `astro:build:start` へ寄せる余地あり。
+- config評価は dev/check/build すべてで走るため、壊れたwikilink等は `astro dev` 起動も落とす想定（devでの表示は未実測。`astro build` のexit 1は実測。ソロ執筆運用では許容）。将来重ければwikilink検証だけ `astro:build:start` へ寄せる余地あり。
 - **R-12伝播とwikilink非対称判定は未対応**（過検出側の既知制限）。詳細は [wikilink.md 制約・残課題](../markdown-pipeline/wikilink.md)。
 
 作成コミット: `737abec` feat: ビルド時検証3種を実装しconfig評価時に統合 / `7b2506b` test: ビルド時検証のAC-2/5/9/10テストを追加 / `36cc986` docs: T1-4のビルド時検証実装をwikilink.mdへ反映
