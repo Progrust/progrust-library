@@ -258,5 +258,6 @@ if (node.name === 'message') {
 - figureの出力は`<figure><figcaption>…</figcaption><p><img…></p></figure>`で**imgが`<p>`に包まれたまま**。剥がす場合はhastプラグイン等で追加処理（表示はCSSで対処可能なので必須ではない）
 - `\:`によるコロンのエスケープが可能かは未検証（復元プラグインで実害がないため不要と判断）
 - `:::message{.alert}`（class shorthand）は`attributes: { class: 'alert' }`に入ることまで確認済みだが、変換プラグインは`{alert}`方式のみ対応（class方式は採用しない）
+- **messageの種別属性のタイポは検出しない**（`:::message{warnig}` 等）。`MESSAGE_TYPES.find((t) => t in attrs)` が `undefined` になり、種別なしの `class="message"` として静かにレンダリングされる（本文は消えない）。未知のdirective**名**はthrowするのと非対称だが、属性値の網羅的バリデーションは行わない（落とし穴1の「スペース区切り引数の書き間違いはプラグインで検出不能」と同じ割り切り）。将来throw検出へ変える場合は、`type` が未定義かつ `attrs` に想定外キーがあるときにthrowする分岐を追加する
 - messageのタイトル省略時にデフォルトタイトル（「Info」「Warning」等）を表示するかは未決定。表示する場合はCSSの`::before`か、labelが無いときに`prependChild`でタイトル段落を挿入する（detailsの`attrs.title`分岐と同じパターン）のどちらでも実現できる
 - `:::message[タイトル]{info}`のlabel+属性併用パターンは、figureでの実測結果からの類推だったが、**T2-1実装時にダンプ確認済み**: `containerDirective name=message attrs={ info: '' }` かつ先頭childが `paragraph data={ directiveLabel: true }` になり、figureと同じパース結果（属性に種別・先頭childにlabel）であることを確認した。出力は `<aside class="message message-info"><p class="message-title">…</p>…</aside>`
