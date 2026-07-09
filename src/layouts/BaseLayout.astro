@@ -1,0 +1,59 @@
+---
+// 全ページ共通レイアウト（architecture.md 6章）。
+// <head>（meta / テーマ初期化スクリプト / フォント）+ ヘッダー + フッター。
+// meta / OGP / Analytics の本格拡充は P6。
+// コンテンツ幅は画面ごとに異なる（一覧=max-w-6xl / 詳細=max-w-7xl。ui-design-spec「レイアウト」）
+// ため、コンテナと <main> は各ページ / DetailLayout 側に持たせ、ここでは規定しない。
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE } from "../lib/site";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+---
+
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      /*
+      FOUC 防止（theme.md R-3）: 初期テーマの適用は他のいかなる描画よりも先に
+      <head> 内の同期スクリプトで行う。localStorage 優先・未保存なら
+      prefers-color-scheme を尊重する（R-1）。切替ロジックは src/scripts/theme.ts。
+      コンポーネント内クライアント JS の唯一の例外（implementation-rules §4）。
+    */
+    }
+    <script is:inline>
+      (function () {
+        const saved = localStorage.getItem("theme");
+        const dark = saved
+          ? saved === "dark"
+          : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (dark) document.documentElement.classList.add("dark");
+      })();
+    </script>
+    {
+      /* フォント読込（ui-design-spec「タイポグラフィ」）。self-host / 全角等幅の最終選定は P6。 */
+    }
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <title>{fullTitle}</title>
+    {description && <meta name="description" content={description} />}
+  </head>
+  <body class="min-h-screen bg-paper font-maru text-ink">
+    <Header />
+    <slot />
+    <Footer />
+  </body>
+</html>

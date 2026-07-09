@@ -1,0 +1,38 @@
+---
+// 全ページ共通フッター（pages.md R-3 / ui-design-spec「フッター」）。
+// コピーライト（mono）+ プロフィール / GitHub / X / RSS のテキストリンク。
+import { SITE, SITE_LINKS } from "../lib/site";
+---
+
+<footer class="mt-16 border-t border-line/70">
+  <div
+    class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+  >
+    <p class="font-mono text-xs text-sub">
+      © {SITE.since}
+      {SITE.author}
+    </p>
+    <nav class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-sub">
+      <a
+        href={SITE_LINKS.profile}
+        class="transition-colors hover:text-accent motion-reduce:transition-none"
+        >Profile</a
+      >
+      <a
+        href={SITE_LINKS.github}
+        class="transition-colors hover:text-accent motion-reduce:transition-none"
+        >GitHub</a
+      >
+      <a
+        href={SITE_LINKS.x}
+        class="transition-colors hover:text-accent motion-reduce:transition-none"
+        >X</a
+      >
+      <a
+        href={SITE_LINKS.rss}
+        class="transition-colors hover:text-accent motion-reduce:transition-none"
+        >RSS</a
+      >
+    </nav>
+  </div>
+</footer>
