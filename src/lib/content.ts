@@ -61,13 +61,20 @@ export function filterPublicChapters<
     .filter((chapter) => preview || chapter.isPublic);
 }
 
+/** 新着順の比較（created_at 降順、同日は title 昇順）。pages R-4 のタイブレーク定義を
+ * 一箇所に集約し、sortByNewest（data 付き）と tagLedger（フラット）双方で使う。 */
+export function compareNewest(
+  a: { created_at: Date; title: string },
+  b: { created_at: Date; title: string },
+): number {
+  const diff = b.created_at.getTime() - a.created_at.getTime();
+  if (diff !== 0) return diff;
+  return a.title.localeCompare(b.title);
+}
+
 /** 新着順（created_at 降順、同日はタイトル昇順でタイブレーク。pages R-4） */
 export function sortByNewest<T extends Datable>(entries: T[]): T[] {
-  return [...entries].sort((a, b) => {
-    const diff = b.data.created_at.getTime() - a.data.created_at.getTime();
-    if (diff !== 0) return diff;
-    return a.data.title.localeCompare(b.data.title);
-  });
+  return [...entries].sort((a, b) => compareNewest(a.data, b.data));
 }
 
 /** 新着一覧・種別バッジの種別ラベル（辞書・記事・本。章は新着に含めない。pages R-5） */
@@ -152,13 +159,7 @@ export function tagLedger(
   items: TagLedgerItem[],
   tag: string,
 ): TagLedgerItem[] {
-  return items
-    .filter((item) => item.tags.includes(tag))
-    .sort((a, b) => {
-      const diff = b.created_at.getTime() - a.created_at.getTime();
-      if (diff !== 0) return diff;
-      return a.title.localeCompare(b.title);
-    });
+  return items.filter((item) => item.tags.includes(tag)).sort(compareNewest);
 }
 
 /** 目次に載せる見出しの最小構造（render() の headings = MarkdownHeading と構造互換） */
