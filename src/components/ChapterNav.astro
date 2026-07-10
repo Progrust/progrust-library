@@ -1,0 +1,52 @@
+---
+// 前後章ナビ（pages R-16 / ui-design-spec §313）。本文末尾に前の章・次の章の
+// カード型リンクを置く。先頭章は prev 側・最終章は next 側を空セルにする。
+// 章の並び・非公開スキップは content.ts の chapterNav が算出済み（ここは表示のみ）。
+
+interface NavTarget {
+  href: string;
+  /** ゼロ埋め2桁の連番ラベル */
+  order: string;
+  title: string;
+}
+
+interface Props {
+  prev: NavTarget | null;
+  next: NavTarget | null;
+}
+
+const { prev, next } = Astro.props;
+---
+
+{
+  (prev || next) && (
+    <nav
+      aria-label="前後の章"
+      class="mt-12 grid gap-3 border-t border-line pt-8 sm:grid-cols-2"
+    >
+      {prev ? (
+        <a
+          href={prev.href}
+          class="rounded border border-line bg-card px-4 py-3 transition-colors hover:border-accent motion-reduce:transition-none"
+        >
+          <p class="font-mono text-[11px] text-sub">← prev / {prev.order}</p>
+          <p class="mt-1 text-sm text-strong">{prev.title}</p>
+        </a>
+      ) : (
+        <div class="hidden sm:block" />
+      )}
+
+      {next ? (
+        <a
+          href={next.href}
+          class="rounded border border-line bg-card px-4 py-3 text-right transition-colors hover:border-accent motion-reduce:transition-none"
+        >
+          <p class="font-mono text-[11px] text-sub">next / {next.order} →</p>
+          <p class="mt-1 text-sm text-strong">{next.title}</p>
+        </a>
+      ) : (
+        <div class="hidden sm:block" />
+      )}
+    </nav>
+  )
+}

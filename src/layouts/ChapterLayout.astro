@@ -1,0 +1,135 @@
+---
+// 章詳細レイアウト（pages R-12/R-13/R-16 / ui-design-spec §309〜314）。
+// DetailLayout（辞書・記事）を踏襲した3カラムだが、左カラムを複合目次（章リスト+
+// 現在章の本文見出し）に、ヘッダーを章用（eyebrow // book chapter・NN/本タイトル・
+// タグ/画像なし・created/updated）に差し替え、本文末尾に前後章ナビを置く。
+// 右カラム・モバイルは辞書詳細と同一（DictPane 枠 / MobileNav。動作は P4）。
+import type { MarkdownHeading } from "astro";
+import type { ChapterLedgerItem } from "../lib/content";
+import BaseLayout from "./BaseLayout.astro";
+import ChapterToc from "../components/ChapterToc.astro";
+import ChapterNav from "../components/ChapterNav.astro";
+import DictPane from "../components/DictPane.astro";
+import MobileNav from "../components/MobileNav.astro";
+
+/** 前後章ナビの表示データ（連番・タイトル・URL。ページ側で算出） */
+interface NavTarget {
+  href: string;
+  order: string;
+  title: string;
+}
+
+interface Props {
+  title: string;
+  description?: string;
+  /** 本タイトル（ヘッダー補助行・サイドバー） */
+  bookTitle: string;
+  /** 本トップへの URL */
+  bookHref: string;
+  /** 現在章のゼロ埋め2桁連番（ヘッダー補助行） */
+  order: string;
+  createdAt: Date;
+  updatedAt: Date;
+  /** 章の台帳（連番昇順・複合目次用） */
+  chapters: ChapterLedgerItem[];
+  /** 現在章の slug（複合目次の強調対象） */
+  currentSlug: string;
+  /** 現在章の本文見出し（複合目次のネスト部） */
+  headings: MarkdownHeading[];
+  /** 前後章ナビ（先頭章の prev・最終章の next は null） */
+  prev: NavTarget | null;
+  next: NavTarget | null;
+}
+
+const {
+  title,
+  description,
+  bookTitle,
+  bookHref,
+  order,
+  createdAt,
+  updatedAt,
+  chapters,
+  currentSlug,
+  headings,
+  prev,
+  next,
+} = Astro.props;
+
+const createdIso = createdAt.toISOString().slice(0, 10);
+const updatedIso = updatedAt.toISOString().slice(0, 10);
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="mx-auto max-w-7xl px-4 py-10 sm:px-8">
+    <div class="lg:grid lg:grid-cols-[220px_minmax(0,1fr)_320px] lg:gap-10">
+      {/* 左: 複合目次（章リスト + 現在章の見出し・lg 以上・sticky） */}
+      <aside class="hidden lg:block">
+        <ChapterToc
+          bookTitle={bookTitle}
+          bookHref={bookHref}
+          chapters={chapters}
+          currentSlug={currentSlug}
+          headings={headings}
+          class="sticky top-24"
+        />
+      </aside>
+
+      {/* 中央: 章ヘッダー / 本文 / 前後章ナビ */}
+      <article class="mx-auto min-w-0 max-w-2xl lg:max-w-none">
+        <header class="mb-8 border-b border-line pb-6">
+          <p class="mb-3 font-mono text-xs text-accent">// book chapter</p>
+          <a
+            href={bookHref}
+            class="font-mono text-xs text-sub transition-colors hover:text-accent motion-reduce:transition-none"
+          >
+            {order} / {bookTitle}
+          </a>
+          <h1
+            class="mt-2 font-display text-3xl font-black leading-tight tracking-tight text-strong sm:text-4xl"
+          >
+            {title}<span class="text-accent">.</span>
+          </h1>
+          <div
+            class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-sub"
+          >
+            <time datetime={createdIso}>created: {createdIso}</time>
+            <time datetime={updatedIso}>updated: {updatedIso}</time>
+          </div>
+        </header>
+
+        <div class="prose">
+          <slot />
+        </div>
+
+        {/* 前後章ナビ（R-16） */}
+        <ChapterNav prev={prev} next={next} />
+      </article>
+
+      {/* 右: 辞書ペイン（枠のみ・動作は P4）。使用辞書一覧も P4。 */}
+      <aside class="hidden lg:block">
+        <div class="sticky top-24">
+          <DictPane />
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  {
+    /* モバイル: フローティング目次ボタン + ボトムシート（複合目次を差し込む・§314） */
+  }
+  <MobileNav headings={headings}>
+    <ChapterToc
+      bookTitle={bookTitle}
+      bookHref={bookHref}
+      chapters={chapters}
+      currentSlug={currentSlug}
+      headings={headings}
+    />
+  </MobileNav>
+
+  <script>
+    import { initToc } from "../scripts/toc";
+    initToc();
+  </script>
+</BaseLayout>

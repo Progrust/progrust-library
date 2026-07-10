@@ -1,0 +1,113 @@
+---
+// 章目次／複合目次（ui-design-spec §306/§307/§311）。
+// - currentSlug 無し: 章の台帳リストのみ（本トップのサイドバー）。
+// - currentSlug 有り: 現在章をアクセント色で強調（リンクなし・aria-current）、直下に
+//   本文見出し目次をネスト表示（章詳細の複合目次。data-toc-link で toc.ts の現在地追従に連動）。
+// - label 有り: 可視見出し + `N chapters` 件数を付す（本トップのモバイル章目次セクション）。
+import type { MarkdownHeading } from "astro";
+import type { ChapterLedgerItem } from "../lib/content";
+import { tocHeadings } from "../lib/content";
+
+interface Props {
+  /** 本タイトル（サイドバー上部のリンクに表示） */
+  bookTitle: string;
+  /** 本トップへの URL */
+  bookHref: string;
+  /** 章の台帳（連番昇順） */
+  chapters: ChapterLedgerItem[];
+  /** 現在章の slug（章詳細のとき指定。台帳の該当行を強調し見出しをネスト） */
+  currentSlug?: string;
+  /** 現在章の本文見出し（複合目次のネスト部。currentSlug と併用） */
+  headings?: MarkdownHeading[];
+  /** モバイル章目次セクションの可視見出し（指定時は本タイトルリンクの代わりに見出し+件数を出す） */
+  label?: string;
+  /** 配置調整用の追加クラス（sticky 等はレイアウト側で付与） */
+  class?: string;
+}
+
+const {
+  bookTitle,
+  bookHref,
+  chapters,
+  currentSlug,
+  headings = [],
+  label,
+  class: className = "",
+} = Astro.props;
+
+// ネストする本文見出し（h2〜h4・脚注ラベル除外）の定義は content.ts に集約（pages R-13）
+const items = tocHeadings(headings);
+// 見出し深さに応じたインデント（h3・h4 を段下げ。§311: h3 は pl-6）
+const indent: Record<number, string> = { 2: "", 3: "pl-6", 4: "pl-10" };
+---
+
+<nav class={className} aria-label="章目次">
+  <p class="mb-3 font-mono text-xs text-accent">// chapters</p>
+
+  {
+    label ? (
+      <div class="mb-3 flex items-baseline gap-2">
+        <h2 class="font-display text-lg font-bold text-strong">{label}</h2>
+        <span class="font-mono text-xs text-sub">
+          {chapters.length} chapters
+        </span>
+      </div>
+    ) : (
+      <a
+        href={bookHref}
+        class="mb-3 block font-display text-sm font-bold text-strong transition-colors hover:text-accent motion-reduce:transition-none"
+      >
+        {bookTitle}
+      </a>
+    )
+  }
+
+  <ul>
+    {
+      chapters.map((chapter) => {
+        const isCurrent = chapter.slug === currentSlug;
+        return (
+          <li>
+            {isCurrent ? (
+              <span
+                aria-current="page"
+                class="flex items-center gap-2.5 border-t border-line px-2 py-2 text-[13px]"
+              >
+                <span class="font-mono text-xs text-accent">
+                  {chapter.order}
+                </span>
+                <span class="text-accent">{chapter.title}</span>
+              </span>
+            ) : (
+              <a
+                href={chapter.href}
+                class="group flex items-center gap-2.5 border-t border-line px-2 py-2 text-[13px] transition-colors hover:bg-card motion-reduce:transition-none"
+              >
+                <span class="font-mono text-xs text-sub">{chapter.order}</span>
+                <span class="text-sub group-hover:text-accent">
+                  {chapter.title}
+                </span>
+              </a>
+            )}
+
+            {isCurrent && items.length > 0 && (
+              <ul class="ml-[1.75rem] border-l border-line text-[13px]">
+                {items.map((heading) => (
+                  <li>
+                    <a
+                      href={`#${heading.slug}`}
+                      data-toc-link={heading.slug}
+                      class={`-ml-px block border-l-2 border-transparent py-1 pl-4 text-sub transition-colors hover:text-accent motion-reduce:transition-none ${indent[heading.depth]}`}
+                    >
+                      {heading.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        );
+      })
+    }
+  </ul>
+</nav>

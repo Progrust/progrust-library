@@ -1,7 +1,9 @@
 ---
 // モバイル（lg 未満）のフローティングボタン + 目次ボトムシート
 // （ui-design-spec「モバイル（lg未満）」/ pages R-13）。
-// 目次ボタン → 下からボトムシートで Toc を再掲（開閉は src/scripts/toc.ts）。
+// 目次ボタン → 下からボトムシートで目次を再掲（開閉は src/scripts/toc.ts）。
+// デフォルトは Toc（辞書・記事）。default slot を渡すとシート本体を差し替える
+// （章詳細は ChapterToc の複合目次を渡す。ui-design-spec §314）。
 // 辞書ボタンは静的プレースホルダ（配置のみ）。辞書ボトムシートの動作は P4。
 import type { MarkdownHeading } from "astro";
 import Toc from "./Toc.astro";
@@ -12,8 +14,10 @@ interface Props {
 }
 
 const { headings } = Astro.props;
-// 目次ボタンの表示要否も Toc と同じ絞り込み（content.ts）で判定する
-const hasToc = tocHeadings(headings).length > 0;
+// シート本体を差し替える slot が渡されたか（章詳細の複合目次など）
+const hasSheetSlot = Astro.slots.has("default");
+// 目次ボタン・シートの表示要否。slot 差し替え時は常に表示、既定は Toc と同じ絞り込みで判定
+const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
 ---
 
 <div class="lg:hidden">
@@ -70,7 +74,9 @@ const hasToc = tocHeadings(headings).length > 0;
               </svg>
             </button>
           </div>
-          <Toc headings={headings} />
+          <slot>
+            <Toc headings={headings} />
+          </slot>
         </div>
       </div>
     )
