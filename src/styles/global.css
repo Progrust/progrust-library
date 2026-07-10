@@ -49,6 +49,22 @@
   line-height: 1.9;
 }
 
+/* スクリーンリーダー専用（視覚的に隠す）。パイプラインは脚注セクションに
+   <h2 class="sr-only" id="footnote-label">Footnotes</h2> を出力するが、この class は
+   src/ の Tailwind スキャン対象に現れずビルド CSS に含まれないため、ここで明示定義する
+   （未定義だと .prose h2 のスタイルで「Footnotes」が可視表示される）。 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* ブロック間の縦リズム（先頭要素は詰める） */
 .prose > * {
   margin-top: 1.25rem;

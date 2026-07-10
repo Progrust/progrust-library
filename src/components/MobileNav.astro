@@ -5,13 +5,15 @@
 // 辞書ボタンは静的プレースホルダ（配置のみ）。辞書ボトムシートの動作は P4。
 import type { MarkdownHeading } from "astro";
 import Toc from "./Toc.astro";
+import { tocHeadings } from "../lib/content";
 
 interface Props {
   headings: MarkdownHeading[];
 }
 
 const { headings } = Astro.props;
-const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 4);
+// 目次ボタンの表示要否も Toc と同じ絞り込み（content.ts）で判定する
+const hasToc = tocHeadings(headings).length > 0;
 ---
 
 <div class="lg:hidden">

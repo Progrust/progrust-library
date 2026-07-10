@@ -4,6 +4,7 @@
 // h2〜h4 を階層表示する（pages R-13 / AC-7。body 先頭 h1 = タイトル重複は除外）。
 // 現在地ハイライトは src/scripts/toc.ts が [data-toc-link] に toc-active を付け替える。
 import type { MarkdownHeading } from "astro";
+import { tocHeadings } from "../lib/content";
 
 interface Props {
   headings: MarkdownHeading[];
@@ -12,7 +13,8 @@ interface Props {
 }
 
 const { headings, class: className = "" } = Astro.props;
-const items = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+// 目次対象（h2〜h4・h1/脚注ラベル除外）の定義は content.ts に集約（pages R-13）
+const items = tocHeadings(headings);
 // 見出し深さに応じたインデント（h3・h4 を段下げ）
 const indent: Record<number, string> = { 2: "", 3: "pl-4", 4: "pl-8" };
 ---

@@ -130,6 +130,23 @@ export function tagCounts<T extends Tagged>(
     .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 }
 
+/** 目次に載せる見出しの最小構造（render() の headings = MarkdownHeading と構造互換） */
+interface Headingish {
+  depth: number;
+  slug: string;
+}
+
+/**
+ * 目次に載せる見出しを絞り込む（pages R-13 / AC-7）。h2〜h4 を対象とし、本文先頭の h1
+ * （ページタイトルと重複）と脚注ラベル（`footnote-label`。パイプラインが sr-only で出力する
+ * 「Footnotes」見出し）を除外する。Toc / MobileNav で共用し、対象範囲の定義を一箇所に集約する。
+ */
+export function tocHeadings<T extends Headingish>(headings: T[]): T[] {
+  return headings.filter(
+    (h) => h.depth >= 2 && h.depth <= 4 && h.slug !== "footnote-label",
+  );
+}
+
 /** 元ファイル名先頭のゼロ埋め2桁連番を取り出す（欠落時は 0） */
 function chapterOrder(entry: FilePathed): number {
   const fileName = entry.filePath?.split("/").pop() ?? "";

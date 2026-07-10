@@ -7,6 +7,7 @@ import {
   sortChapters,
   mergeRecent,
   tagCounts,
+  tocHeadings,
 } from "../../src/lib/content";
 
 // 純関数テスト。fixture は各関数が要求する最小構造だけを手組みで用意する。
@@ -186,5 +187,36 @@ describe("tagCounts（タグ出現件数の集計・一覧の絞込チップ）"
 
   it("空配列では空を返す", () => {
     expect(tagCounts([])).toEqual([]);
+  });
+});
+
+describe("tocHeadings（目次対象の絞り込み・pages R-13/AC-7）", () => {
+  const h = (depth: number, slug: string) => ({ depth, slug, text: slug });
+
+  it("[AC-7] h2〜h4 のみを対象にし、h1・h5・h6 を除外する", () => {
+    const headings = [
+      h(1, "title"),
+      h(2, "a"),
+      h(3, "b"),
+      h(4, "c"),
+      h(5, "d"),
+      h(6, "e"),
+    ];
+
+    const result = tocHeadings(headings);
+
+    expect(result.map((x) => x.slug)).toEqual(["a", "b", "c"]);
+  });
+
+  it("脚注ラベル（footnote-label）を除外する", () => {
+    const headings = [h(2, "a"), h(2, "footnote-label")];
+
+    expect(tocHeadings(headings).map((x) => x.slug)).toEqual(["a"]);
+  });
+
+  it("元の順序を保持する", () => {
+    const headings = [h(2, "x"), h(4, "y"), h(3, "z")];
+
+    expect(tocHeadings(headings).map((x) => x.slug)).toEqual(["x", "y", "z"]);
   });
 });
