@@ -17,6 +17,7 @@
 - [ ] **T4-3: ホバープレビュー（dict-preview.ts）**
   小窓表示（下端反転）・全文表示・小窓内リンクはプレビューなし・タッチ環境無効・フェッチキャッシュのペインとの共有。
   完了条件: wikilink-ui AC-3 を満たす。
+  申し送り（T4-2レビュー推奨1）: `dict-pane.ts` の `navigateTo` は、辞書Aのfetch中に辞書BをクリックするとBの描画後にAの解決で上書きされ、履歴もクリック順と逆になる競合がある。T4-3で同じクリック委譲・`fetchDictEmbed` 共有を触る際、世代トークン（クリックごとに採番し解決時に最新のみ描画）で併せて対処する。
 - [ ] **T4-4: wikilinkグラフ（逆リンク・使用辞書一覧）**
   `src/lib/wikilink-graph.ts`でグラフ構築（公開フィルタ適用）し、Backlinks / LinkedDictList コンポーネントで表示する。
   完了条件: wikilink-ui AC-7 / AC-8 を満たし、グラフ構築のvitestが通る。
