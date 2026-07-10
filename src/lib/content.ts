@@ -130,6 +130,37 @@ export function tagCounts<T extends Tagged>(
     .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 }
 
+/** タグ詳細の台帳1行分（辞書・記事・本・章を種別横断でまとめた表示データ。pages R-19） */
+export interface TagLedgerItem {
+  kind: ContentKind;
+  /** 表示タイトル。章は章タイトルのみを持ち、本タイトルは bookTitle に分ける */
+  title: string;
+  /** 章のみ: 併記する本タイトル（「本タイトル › 章タイトル」表示用） */
+  bookTitle?: string;
+  /** そのページへの URL */
+  href: string;
+  created_at: Date;
+  /** そのページの全タグ（右端の「他タグ」表示に使う。当該タグの除外は呼び出し側で行う） */
+  tags: string[];
+}
+
+/**
+ * タグ詳細の一覧（pages R-19 / AC-6）。種別混在の台帳から指定タグを持つ項目だけを抜き出し、
+ * created_at 降順・同日は title 昇順（R-4）で並べる。章（kind:"book"）も対象に含める。
+ */
+export function tagLedger(
+  items: TagLedgerItem[],
+  tag: string,
+): TagLedgerItem[] {
+  return items
+    .filter((item) => item.tags.includes(tag))
+    .sort((a, b) => {
+      const diff = b.created_at.getTime() - a.created_at.getTime();
+      if (diff !== 0) return diff;
+      return a.title.localeCompare(b.title);
+    });
+}
+
 /** 目次に載せる見出しの最小構造（render() の headings = MarkdownHeading と構造互換） */
 interface Headingish {
   depth: number;

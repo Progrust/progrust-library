@@ -10,7 +10,9 @@ import {
   chapterLedger,
   mergeRecent,
   tagCounts,
+  tagLedger,
   tocHeadings,
+  type TagLedgerItem,
 } from "../../src/lib/content";
 
 // 純関数テスト。fixture は各関数が要求する最小構造だけを手組みで用意する。
@@ -323,5 +325,81 @@ describe("tocHeadings（目次対象の絞り込み・pages R-13/AC-7）", () =>
     const headings = [h(2, "x"), h(4, "y"), h(3, "z")];
 
     expect(tocHeadings(headings).map((x) => x.slug)).toEqual(["x", "y", "z"]);
+  });
+});
+
+describe("tagLedger（タグ詳細の一覧・pages R-19/AC-6）", () => {
+  const item = (
+    kind: TagLedgerItem["kind"],
+    title: string,
+    date: string,
+    tags: string[],
+    extra: Partial<TagLedgerItem> = {},
+  ): TagLedgerItem => ({
+    kind,
+    title,
+    href: `/${kind}/${title}`,
+    created_at: new Date(date),
+    tags,
+    ...extra,
+  });
+
+  it("[AC-6] 指定タグを持つ章（kind:book）が結果に含まれる", () => {
+    const items = [
+      item("dict", "arc", "2024-01-01", ["並行処理"]),
+      item("book", "最初のAPI", "2024-06-03", ["Web開発"], {
+        bookTitle: "Rustで始めるWeb API開発",
+      }),
+    ];
+
+    const result = tagLedger(items, "Web開発");
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      kind: "book",
+      title: "最初のAPI",
+      bookTitle: "Rustで始めるWeb API開発",
+    });
+  });
+
+  it("created_at 降順で並ぶ", () => {
+    const items = [
+      item("article", "古", "2024-01-01", ["Rust"]),
+      item("dict", "新", "2024-05-01", ["Rust"]),
+      item("book", "中", "2024-03-01", ["Rust"]),
+    ];
+
+    expect(tagLedger(items, "Rust").map((e) => e.title)).toEqual([
+      "新",
+      "中",
+      "古",
+    ]);
+  });
+
+  it("同日は title 昇順でタイブレークする（R-4）", () => {
+    const items = [
+      item("dict", "banana", "2024-05-01", ["Rust"]),
+      item("dict", "apple", "2024-05-01", ["Rust"]),
+    ];
+
+    expect(tagLedger(items, "Rust").map((e) => e.title)).toEqual([
+      "apple",
+      "banana",
+    ]);
+  });
+
+  it("指定タグを持たない項目は除外される", () => {
+    const items = [
+      item("dict", "a", "2024-01-01", ["型"]),
+      item("dict", "b", "2024-01-02", ["所有権"]),
+    ];
+
+    expect(tagLedger(items, "型").map((e) => e.title)).toEqual(["a"]);
+  });
+
+  it("右端の他タグ表示用に元の tags を保持する", () => {
+    const items = [item("article", "a", "2024-01-01", ["Rust", "API", "Axum"])];
+
+    expect(tagLedger(items, "Rust")[0].tags).toEqual(["Rust", "API", "Axum"]);
   });
 });
