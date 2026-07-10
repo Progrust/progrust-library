@@ -131,7 +131,8 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 - Tailwind（`darkMode: 'class'`）。カラートークンは [ui-design-spec.md](ui-design/ui-design-spec.md) の表を正とし、CSS変数化（`--color-paper`等をテーマで切替）してdark:クラスの併記を減らす方式を採用する
 - Markdown変換結果（コードブロック・diff・メッセージ・辞書リンク等）へのスタイルは`src/styles/global.css`に置く（変換HTMLにはTailwindクラスを直接付与できないため）
-- prose本文（詳細ページ）のセレクタは、パイプラインが出力する**素クラス**を対象にする（T3-4で実装。dist実測で確定）: 辞書リンク=`.wikilink`（ui-design-specの`.dict-link`ではない）/ message=`.message`＋`.message-{type}`＋`.message-title` / details=素の`<details>/<summary>` / コード=`.astro-code`（`.line`・`has-diff`・`diff add|remove`）/ ファイル名=`.code-block > .code-filename` / リンクカード=`.link-card*`。本文は`.prose`配下にスコープする
+- prose本文（詳細ページ）のセレクタは、パイプラインが出力する**素クラス**を対象にする（T3-4で実装。dist実測で確定）: 辞書リンク=`.wikilink`（ui-design-specの`.dict-link`ではない）/ message=`.message`＋`.message-{type}`＋`.message-title` / details=素の`<details>/<summary>` / コード=`.astro-code`（`.line`・`has-diff`・`diff add|remove`）/ ファイル名=`.code-block > .code-filename` / リンクカード=`.link-card*`
+  - スコープ方針: プレーンなmarkdown要素（`h2`〜`h4`・`p`・`ul`/`ol`・`blockquote`・`table`・`details`・脚注等）は`.prose`配下にスコープする。一方、**再利用しうる部品クラス**（`.wikilink`・`.message*`・`.astro-code`・`.code-filename`・`.link-card*`・`.sr-only`）は`.prose`外でも使えるようグローバルに定義する（P4の辞書ペイン内など`.prose`外での辞書リンク/本文表示を見据える）
 - コードブロックはE案（ライトでもダーク面）のため、Shiki dual themeの前景トークンは**両テーマとも`--shiki-dark`側**を使い、背景・枠線だけダーク差で切り替える（`.astro-code`）。Shikiトークンのカスタムパレット化（keyword色等）は[ui-design-spec.md](ui-design/ui-design-spec.md)「未確定」項として保留
 
 ## 10. テスト構成（vitest）
