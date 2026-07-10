@@ -1,0 +1,76 @@
+---
+// モバイル（lg 未満）のフローティングボタン + 目次ボトムシート
+// （ui-design-spec「モバイル（lg未満）」/ pages R-13）。
+// 目次ボタン → 下からボトムシートで Toc を再掲（開閉は src/scripts/toc.ts）。
+// 辞書ボタンは静的プレースホルダ（配置のみ）。辞書ボトムシートの動作は P4。
+import type { MarkdownHeading } from "astro";
+import Toc from "./Toc.astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 4);
+---
+
+<div class="lg:hidden">
+  {/* 右下フローティングボタン */}
+  <div class="fixed bottom-5 right-5 z-30 flex flex-col gap-3">
+    {
+      hasToc && (
+        <button
+          type="button"
+          data-toc-open
+          aria-label="目次を開く"
+          class="grid h-12 w-12 place-items-center rounded border border-line bg-card font-display text-[10px] font-bold text-strong shadow-lg"
+        >
+          目次
+        </button>
+      )
+    }
+    <button
+      type="button"
+      data-dict-open
+      disabled
+      aria-label="辞書ペインを開く"
+      class="grid h-12 w-12 place-items-center rounded border border-accent bg-card font-display text-[10px] font-bold text-accent shadow-lg disabled:opacity-60"
+    >
+      辞書
+    </button>
+  </div>
+
+  {/* 目次ボトムシート */}
+  {
+    hasToc && (
+      <div data-toc-sheet class="fixed inset-0 z-40 hidden">
+        <div data-toc-backdrop class="absolute inset-0 bg-black/40" />
+        <div class="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-md border-t border-line bg-paper p-5">
+          <div class="mb-2 flex items-center justify-between">
+            <span class="font-mono text-xs text-sub">目次</span>
+            <button
+              type="button"
+              data-toc-close
+              aria-label="目次を閉じる"
+              class="grid h-8 w-8 place-items-center rounded border border-line text-sub"
+            >
+              <svg
+                class="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <Toc headings={headings} />
+        </div>
+      </div>
+    )
+  }
+</div>

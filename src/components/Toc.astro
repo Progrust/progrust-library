@@ -1,0 +1,39 @@
+---
+// 目次（詳細ページ左・ui-design-spec「目次（詳細ページ左）」）。
+// render() が返す headings（Sätteri が github-slugger で採番。slug は本文見出しの id と一致）から
+// h2〜h4 を階層表示する（pages R-13 / AC-7。body 先頭 h1 = タイトル重複は除外）。
+// 現在地ハイライトは src/scripts/toc.ts が [data-toc-link] に toc-active を付け替える。
+import type { MarkdownHeading } from "astro";
+
+interface Props {
+  headings: MarkdownHeading[];
+  /** 配置調整用の追加クラス（sticky 等はレイアウト側で付与） */
+  class?: string;
+}
+
+const { headings, class: className = "" } = Astro.props;
+const items = headings.filter((h) => h.depth >= 2 && h.depth <= 4);
+// 見出し深さに応じたインデント（h3・h4 を段下げ）
+const indent: Record<number, string> = { 2: "", 3: "pl-4", 4: "pl-8" };
+---
+
+{
+  items.length > 0 && (
+    <nav class={className} aria-label="目次">
+      <p class="mb-3 font-mono text-xs text-accent">// toc</p>
+      <ul class="border-l border-line text-sm">
+        {items.map((h) => (
+          <li>
+            <a
+              href={`#${h.slug}`}
+              data-toc-link={h.slug}
+              class={`-ml-px block border-l-2 border-transparent py-1 pl-4 text-sub transition-colors hover:text-accent motion-reduce:transition-none ${indent[h.depth]}`}
+            >
+              {h.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
