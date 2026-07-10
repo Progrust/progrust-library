@@ -33,19 +33,484 @@
   --color-accent: #f0684a;
 }
 
-/* Shiki dual theme（defaultColor:false）を html.dark で出し分ける（shiki.md のレシピ / theme.md AC-4）。
-   トークンは実 color を持たず --shiki-light / --shiki-dark の CSS 変数のみ出力されるため、
-   この切替 CSS がないと配色が付かない。セレクタは .shiki ではなく .astro-code（Astro helper 由来）。
-   コードブロックの E 案フル配色・ファイル名タブ・diff 等の詳細スタイルは T3-4 で扱う。 */
+/* =========================================================================
+   詳細ページ本文（prose）のスタイル。
+   architecture.md §9: Markdown 変換結果（コードブロック・diff・メッセージ・
+   辞書リンク等）へのスタイルは global.css に集約する（変換 HTML には Tailwind
+   クラスを直接付与できないため）。セレクタは Sätteri パイプラインが出力する素クラス
+   （.wikilink / .message / .code-filename / .astro-code 等。dist 実測で確定）を対象にし、
+   ui-design-spec.md の各 Tailwind レシピを素 CSS へ翻訳したもの。
+   ========================================================================= */
+
+.prose {
+  color: var(--color-ink);
+  font-family: var(--font-maru);
+  font-size: 0.95rem;
+  line-height: 1.9;
+}
+
+/* ブロック間の縦リズム（先頭要素は詰める） */
+.prose > * {
+  margin-top: 1.25rem;
+}
+.prose > *:first-child {
+  margin-top: 0;
+}
+
+/* 見出し（h1〜h4）。アンカー遷移時に sticky ヘッダー（h-14）へ潜らないよう
+   scroll-margin を確保する（pages AC-7 のクリック遷移）。 */
+.prose :is(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-strong);
+  scroll-margin-top: 5rem;
+}
+.prose h1 {
+  font-size: 1.9rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+.prose h2 {
+  margin-top: 2.5rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 1.45rem;
+}
+.prose h3 {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+}
+.prose h4 {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+}
+
+/* 段落・リスト・引用・区切り線・強調・画像 */
+.prose :is(ul, ol) {
+  padding-left: 1.5rem;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li {
+  margin-top: 0.35rem;
+}
+.prose li > :is(ul, ol) {
+  margin-top: 0.35rem;
+}
+/* チェックリスト（ul.contains-task-list > li.task-list-item） */
+.prose ul.contains-task-list {
+  list-style: none;
+  padding-left: 0.25rem;
+}
+.prose li.task-list-item input {
+  margin-right: 0.5rem;
+  accent-color: var(--color-accent);
+}
+.prose blockquote {
+  border-left: 2px solid var(--color-line);
+  padding-left: 1rem;
+  color: var(--color-sub);
+}
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin-block: 2rem;
+}
+.prose strong {
+  font-weight: 700;
+  color: var(--color-strong);
+}
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+.prose figure {
+  margin-inline: auto;
+  text-align: center;
+}
+.prose figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-sub);
+}
+
+/* 通常リンク（辞書リンク .wikilink・リンクカード .link-card は別扱い） */
+.prose a:not(.wikilink):not(.link-card) {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+}
+.prose a:not(.wikilink):not(.link-card):hover {
+  text-decoration-thickness: 2px;
+}
+
+/* テーブル */
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.prose :is(th, td) {
+  border: 1px solid var(--color-line);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+.prose th {
+  background: var(--color-card);
+  font-family: var(--font-display);
+  color: var(--color-strong);
+}
+
+/* 脚注 */
+.prose sup {
+  font-size: 0.75em;
+}
+.prose .footnotes {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-line);
+  font-size: 0.85rem;
+  color: var(--color-sub);
+}
+
+/* インラインコード（ui-design-spec「インラインコード」）。ブロックと異なり明るい面 +
+   アクセント文字。`:not(pre) > code` でコードブロック内の <code> を除外する。 */
+.prose :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0.1em 0.4em;
+  border-radius: 4px;
+  background: #ebe7df;
+  color: var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent);
+}
+html.dark .prose :not(pre) > code {
+  background: #171411;
+}
+
+/* 辞書リンク（wikilink 変換後の <a class="wikilink">）。ui-design-spec「辞書リンク」の
+   .dict-link レシピを、実出力クラス .wikilink セレクタへ移植。本アイコンは CSS mask。 */
+.wikilink {
+  color: #c63d22;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  font-weight: 500;
+}
+.wikilink::before {
+  content: "";
+  display: inline-block;
+  width: 0.75em;
+  height: 0.75em;
+  margin-right: 0.25em;
+  vertical-align: -0.05em;
+  background-color: currentColor;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22H20v-2.5H6.5a1 1 0 0 1 0-2H20"/></svg>')
+    center / contain no-repeat;
+}
+.wikilink:hover {
+  text-decoration-style: solid;
+}
+html.dark .wikilink {
+  color: #f0684a;
+}
+
+/* =========================================================================
+   コードブロック（ui-design-spec「コードブロック（★E案・ダーク反転で確定）」）。
+   Shiki dual theme（defaultColor:false）はトークンに --shiki-light / --shiki-dark の
+   CSS 変数のみ出力する。E案は「ライトでもコードだけダーク面」にするため、前景トークンは
+   常に dark 側（--shiki-dark）を使い、背景・枠線だけ E案の値にする（theme.md AC-4 の
+   切替は背景/枠のダーク差のみ）。トークンのカスタムパレット化は ui-design-spec「未確定」項。
+   ========================================================================= */
 .astro-code {
-  background-color: var(--shiki-light-bg);
+  overflow-x: auto;
+  border-radius: 4px;
+  padding: 1rem 0; /* 左右 padding は .line 側に持たせる（diff の tint を端まで伸ばすため） */
+  background: #2a241f;
+  border: 1px solid #4a4238;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.7;
 }
 .astro-code span {
-  color: var(--shiki-light);
+  color: var(--shiki-dark);
 }
 html.dark .astro-code {
-  background-color: var(--shiki-dark-bg);
+  background: #171411;
+  border-color: var(--color-line);
 }
-html.dark .astro-code span {
-  color: var(--shiki-dark);
+/* 全コードブロック共通: 左右 padding は行スパン側 */
+.astro-code .line {
+  display: inline-block;
+  width: 100%;
+  padding: 0 1rem;
+}
+/* diff（transformerNotationDiff。追加=success緑・削除=accent赤の両テーマ共通配色） */
+.astro-code.has-diff .line {
+  padding-left: 2.25rem;
+  position: relative;
+}
+.astro-code.has-diff .line.diff::before {
+  position: absolute;
+  left: 0.9rem;
+  font-weight: 600;
+}
+.astro-code .line.diff.add {
+  background: rgba(155, 184, 110, 0.15);
+}
+.astro-code .line.diff.add::before {
+  content: "+";
+  color: #9bb86e;
+}
+.astro-code .line.diff.remove {
+  background: rgba(240, 104, 74, 0.13);
+}
+.astro-code .line.diff.remove::before {
+  content: "-";
+  color: #f0684a;
+}
+.astro-code .line.diff.remove > span {
+  opacity: 0.55;
+}
+
+/* ファイル名タブ（```lang:file → <div class="code-block"><span class="code-filename">+<pre>）。
+   全幅バーではなくファイル名幅のタブ。pre 左上のみ角丸なしでタブと接続する。 */
+.code-filename {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid #4a4238;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: #332c25;
+  color: #9c9186;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.code-block .astro-code {
+  border-top-left-radius: 0;
+}
+html.dark .code-filename {
+  background: var(--color-card);
+  border-color: var(--color-line);
+  color: var(--color-sub);
+}
+
+/* =========================================================================
+   :::message（ui-design-spec「:::message の変換後スタイル」）。左ボーダー・eyebrow・
+   種別色だけを種別で変え、背景は card 面で統一。通常はニュートラル（sub 色）。
+   ========================================================================= */
+.message {
+  border-left: 2px solid var(--color-sub);
+  border-radius: 4px;
+  padding: 0.9rem 1.25rem;
+  background: var(--color-card);
+  font-size: 0.875rem;
+}
+.message > * + * {
+  margin-top: 0.4rem;
+}
+.message-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-sub);
+}
+.message-title::before {
+  content: "// "; /* eyebrow 形式（ui-design-spec「共通ルール」の // 記法） */
+}
+.message-info {
+  border-left-color: #3e6b8c;
+}
+.message-info .message-title {
+  color: #3e6b8c;
+}
+html.dark .message-info {
+  border-left-color: #86abc9;
+}
+html.dark .message-info .message-title {
+  color: #86abc9;
+}
+.message-tip {
+  border-left-color: #8f6812;
+}
+.message-tip .message-title {
+  color: #8f6812;
+}
+html.dark .message-tip {
+  border-left-color: #d9b25e;
+}
+html.dark .message-tip .message-title {
+  color: #d9b25e;
+}
+.message-question {
+  border-left-color: #7a5a8c;
+}
+.message-question .message-title {
+  color: #7a5a8c;
+}
+html.dark .message-question {
+  border-left-color: #b99bd1;
+}
+html.dark .message-question .message-title {
+  color: #b99bd1;
+}
+.message-success {
+  border-left-color: #5c7a3b;
+}
+.message-success .message-title {
+  color: #5c7a3b;
+}
+html.dark .message-success {
+  border-left-color: #9bb86e;
+}
+html.dark .message-success .message-title {
+  color: #9bb86e;
+}
+.message-warning {
+  border-left-color: #b45a1c;
+}
+.message-warning .message-title {
+  color: #b45a1c;
+}
+html.dark .message-warning {
+  border-left-color: #e09a5a;
+}
+html.dark .message-warning .message-title {
+  color: #e09a5a;
+}
+.message-danger {
+  border-left-color: var(--color-accent);
+}
+.message-danger .message-title {
+  color: var(--color-accent);
+}
+/* ネスト時（::::details 内など card 面の上）は面の重なりを避け背景を paper に落とす */
+.prose details .message {
+  background: var(--color-paper);
+}
+
+/* =========================================================================
+   :::details（ui-design-spec「:::details の変換後スタイル」）。
+   ========================================================================= */
+.prose details {
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-card);
+}
+.prose details > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-strong);
+  list-style: none;
+}
+.prose details > summary::-webkit-details-marker {
+  display: none;
+}
+/* シェブロン（疑似要素の枠線で三角を作り、open 時に回転） */
+.prose details > summary::before {
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s;
+}
+.prose details[open] > summary::before {
+  transform: rotate(45deg);
+}
+.prose details[open] > summary {
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 70%, transparent);
+}
+.prose details > :not(summary) {
+  padding-inline: 1rem;
+}
+.prose details > summary + :not(summary) {
+  padding-top: 0.75rem;
+}
+.prose details > :not(summary):last-child {
+  padding-bottom: 0.9rem;
+}
+.prose details > :not(summary) + :not(summary) {
+  margin-top: 0.6rem;
+}
+
+/* =========================================================================
+   リンクカード（.link-card-wrap > a.link-card > .link-card__body 等）。
+   ========================================================================= */
+.link-card {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-card);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+.link-card:hover {
+  border-color: var(--color-accent);
+}
+.link-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.9rem 1.1rem;
+}
+.link-card__title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--color-strong);
+}
+.link-card__desc {
+  font-size: 0.8rem;
+  color: var(--color-sub);
+  overflow: hidden;
+}
+.link-card__host {
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-sub);
+}
+.link-card__image {
+  width: 8rem;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+.link-card--fallback {
+  padding: 0.9rem 1.1rem;
+  color: var(--color-accent);
+  word-break: break-all;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose details > summary::before,
+  .link-card {
+    transition: none;
+  }
+}
+
+/* 目次の現在地ハイライト（toc.ts が IntersectionObserver で付け替える）。
+   基底の border-l-2 border-transparent / text-sub（Tailwind ユーティリティ）を
+   同 specificity・後勝ちで上書きする（@import tailwindcss はファイル先頭のため本規則が後）。 */
+[data-toc-link].toc-active {
+  border-color: var(--color-accent);
+  color: var(--color-strong);
 }
