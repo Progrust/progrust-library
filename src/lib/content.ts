@@ -159,6 +159,88 @@ export function sortChapters<T extends FilePathed>(chapters: T[]): T[] {
   return [...chapters].sort((a, b) => chapterOrder(a) - chapterOrder(b));
 }
 
+/** 章の連番ラベル（ゼロ埋め2桁文字列。ヘッダー補助行・ナビ・台帳の表示用。R-7） */
+export function chapterOrderLabel(entry: FilePathed): string {
+  return String(chapterOrder(entry)).padStart(2, "0");
+}
+
+/** 前後章ナビの最小構造（id で現在章を特定し、公開章のみを辿る） */
+interface Navigable {
+  id: string;
+  isPublic: boolean;
+}
+
+/**
+ * 前後章ナビ（pages R-16 / AC-4）。連番昇順の章リストから現在章の前後に位置する
+ * 最も近い公開章を返す。間に非公開章があってもスキップし次の公開章へつなぐ。
+ * 先頭章の prev・最終章の next は null。現在章が見つからない場合も両方 null。
+ * 本番ビルドでは getPublicChapters が既に公開章のみだが、dev（全章）でも R-16 通り
+ * 非公開をスキップするため isPublic を見る。
+ */
+export function chapterNav<T extends Navigable>(
+  sortedChapters: T[],
+  currentId: string,
+): { prev: T | null; next: T | null } {
+  const index = sortedChapters.findIndex((c) => c.id === currentId);
+  if (index < 0) return { prev: null, next: null };
+
+  let prev: T | null = null;
+  for (let i = index - 1; i >= 0; i--) {
+    if (sortedChapters[i].isPublic) {
+      prev = sortedChapters[i];
+      break;
+    }
+  }
+  let next: T | null = null;
+  for (let i = index + 1; i < sortedChapters.length; i++) {
+    if (sortedChapters[i].isPublic) {
+      next = sortedChapters[i];
+      break;
+    }
+  }
+  return { prev, next };
+}
+
+/** 台帳表示用の章メタ（本トップ・章詳細の章目次で共用） */
+export interface ChapterLedgerItem {
+  /** 連番除去後の章 slug（URL 末尾） */
+  slug: string;
+  title: string;
+  /** ゼロ埋め2桁の連番ラベル（表示用） */
+  order: string;
+  isPublic: boolean;
+  /** 章詳細への URL（/books/[本slug]/[章slug]） */
+  href: string;
+}
+
+/** 台帳表示に必要な最小構造（章エントリ） */
+interface Chapterish extends FilePathed {
+  id: string;
+  isPublic: boolean;
+  data: { title: string };
+}
+
+/**
+ * 章目次の台帳データを組み立てる（pages R-17・章詳細サイドバー）。章 ID は
+ * `[本slug]/[章slug]`。URL 規則（content-model R-8）と連番ラベルを一箇所に集約する。
+ * 連番昇順に整列済みのリストを渡す前提（sortChapters 済み）。
+ */
+export function chapterLedger<T extends Chapterish>(
+  sortedChapters: T[],
+  bookSlug: string,
+): ChapterLedgerItem[] {
+  return sortedChapters.map((chapter) => {
+    const slug = chapter.id.split("/")[1] ?? "";
+    return {
+      slug,
+      title: chapter.data.title,
+      order: chapterOrderLabel(chapter),
+      isPublic: chapter.isPublic,
+      href: `/books/${bookSlug}/${slug}`,
+    };
+  });
+}
+
 /** 公開辞書（dev では全件・isPublic 付き、本番では公開のみ） */
 export async function getPublicDict() {
   return filterPublic(await getCollection("dict"), isPreview());

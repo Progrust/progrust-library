@@ -5,6 +5,9 @@ import {
   filterPublicChapters,
   sortByNewest,
   sortChapters,
+  chapterOrderLabel,
+  chapterNav,
+  chapterLedger,
   mergeRecent,
   tagCounts,
   tocHeadings,
@@ -157,6 +160,98 @@ describe("sortChapters（章順・content-model R-7）", () => {
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({}); // 連番0が先頭
+  });
+});
+
+describe("chapterOrderLabel（連番ラベル・content-model R-7）", () => {
+  it("元ファイル名先頭の連番をゼロ埋め2桁文字列で返す", () => {
+    expect(chapterOrderLabel({ filePath: "content/books/x/01-intro.md" })).toBe(
+      "01",
+    );
+    expect(chapterOrderLabel({ filePath: "content/books/x/12-final.md" })).toBe(
+      "12",
+    );
+  });
+
+  it("連番が無い（filePath 欠落）場合は 00 を返す", () => {
+    expect(chapterOrderLabel({})).toBe("00");
+  });
+});
+
+describe("chapterNav（前後章ナビ・pages R-16/AC-4）", () => {
+  // 連番昇順に整列済みの章リストを前提にした最小構造
+  const ch = (id: string, isPublic: boolean) => ({ id, isPublic });
+
+  it("[AC-4] 中間章では直前・直後の章を返す", () => {
+    const chapters = [ch("x/a", true), ch("x/b", true), ch("x/c", true)];
+
+    const { prev, next } = chapterNav(chapters, "x/b");
+
+    expect(prev?.id).toBe("x/a");
+    expect(next?.id).toBe("x/c");
+  });
+
+  it("[AC-4] 間に非公開章がある場合はスキップして次の公開章へつなぐ", () => {
+    const chapters = [ch("x/a", true), ch("x/hidden", false), ch("x/c", true)];
+
+    const { prev, next } = chapterNav(chapters, "x/c");
+
+    // 直前の x/hidden は非公開なのでスキップし x/a を prev とする
+    expect(prev?.id).toBe("x/a");
+    expect(next).toBeNull();
+  });
+
+  it("[AC-4] 先頭章の prev・最終章の next は null", () => {
+    const chapters = [ch("x/a", true), ch("x/b", true)];
+
+    expect(chapterNav(chapters, "x/a").prev).toBeNull();
+    expect(chapterNav(chapters, "x/b").next).toBeNull();
+  });
+
+  it("現在章が見つからない場合は両方 null", () => {
+    const chapters = [ch("x/a", true), ch("x/b", true)];
+
+    expect(chapterNav(chapters, "x/zzz")).toEqual({ prev: null, next: null });
+  });
+});
+
+describe("chapterLedger（章目次の台帳データ・pages R-17）", () => {
+  const chapter = (
+    seq: string,
+    slug: string,
+    title: string,
+    isPublic = true,
+  ) => ({
+    id: `rust-book/${slug}`,
+    isPublic,
+    filePath: `content/books/rust-book/${seq}-${slug}.md`,
+    data: { title },
+  });
+
+  it("slug・連番ラベル・URL・公開状態を台帳項目に組み立てる", () => {
+    const chapters = [
+      chapter("01", "intro", "イントロ"),
+      chapter("02", "setup", "環境構築", false),
+    ];
+
+    const result = chapterLedger(chapters, "rust-book");
+
+    expect(result).toEqual([
+      {
+        slug: "intro",
+        title: "イントロ",
+        order: "01",
+        isPublic: true,
+        href: "/books/rust-book/intro",
+      },
+      {
+        slug: "setup",
+        title: "環境構築",
+        order: "02",
+        isPublic: false,
+        href: "/books/rust-book/setup",
+      },
+    ]);
   });
 });
 
