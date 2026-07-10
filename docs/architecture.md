@@ -145,6 +145,10 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - ロード戦略: テーマ初期化のみ`<head>`同期インライン、他は`<script>`（Astroのバンドル）でdefer相当。検索インデックスとembedはユーザー操作時に遅延fetch
 - JS無効時はすべてプログレッシブエンハンスメント（wikilinkは通常`<a>`遷移、検索ボックスは非表示または無効表示、サイドバーは静的表示のまま）
 
+#### embedフェッチの共有（T4-2で確定）
+
+`dict-pane.ts` は `fetchDictEmbed(slug): Promise<DictEmbed | null>` を named export し、slug単位の module-level Map でfetch結果をキャッシュする。`dict-preview.ts`（T4-3）はこの関数を import して**ホバープレビューとサイドペインでフェッチ結果を共有**する（同一辞書を二重fetchしない）。fetch失敗時は `null` を返し、呼び出し側は素の `/dict/[slug]` 遷移にフォールバックする（wikilink-ui R-16）。辞書リンク（本文・ペイン内とも `a.wikilink[data-dict-link]`）のクリックは `document` への単一委譲ハンドラで捕捉し、R-11/R-12 を1経路で処理する。デスクトップ右ペインとモバイルボトムシート内の `DictPane` は同一 `data-dict-pane-*` フックの複製で、`querySelectorAll` でまとめて状態同期する（`toc.ts` の複数DOM同期と同方式）。
+
 ## 9. スタイリング
 
 - Tailwind（`darkMode: 'class'`）。カラートークンは [ui-design-spec.md](ui-design/ui-design-spec.md) の表を正とし、CSS変数化（`--color-paper`等をテーマで切替）してdark:クラスの併記を減らす方式を採用する

@@ -11,7 +11,7 @@
 - [x] **T4-1: embedパーシャル**
   `dict/[slug]/embed.astro`（`export const partial = true`）で本文断片+メタ情報を静的生成する。
   完了条件: wikilink-ui AC-6 を満たす。
-- [ ] **T4-2: サイドペイン（dict-pane.ts）**
+- [x] **T4-2: サイドペイン（dict-pane.ts）**
   embedフェッチ・デフォルト/選択の2状態・ペイン内履歴（進む/戻る・ページ遷移でリセット）・ペイン内wikilinkの差し替え・モバイルボトムシート。
   完了条件: wikilink-ui AC-2 / AC-4 / AC-5 を満たす（AC-2はJS無効での通常遷移）。
 - [ ] **T4-3: ホバープレビュー（dict-preview.ts）**
@@ -36,6 +36,20 @@
 - **コミット**: 下記「作成したコミット」を参照。
 
 ### T4-2
+
+辞書サイドペインのクライアント動作を実装（完了条件 wikilink-ui AC-2 / AC-4 / AC-5）。
+
+- **変更ファイル**
+  - 新規 `src/scripts/dict-pane.ts`: embedフェッチ（共有キャッシュ）・履歴（配列+カーソル）・デフォルト/選択2状態描画・辞書リンククリックの単一委譲・モバイルボトムシート開閉。履歴操作は DOM 非依存の純関数（`createHistory`/`pushEntry`/`goBack`/`goForward`/`canGoBack`/`canGoForward`/`currentSlug`）として分離し export。`fetchDictEmbed` も export しプレビュー（T4-3）とキャッシュ共有する。
+  - 新規 `tests/scripts/dict-pane.test.ts`: 履歴純ロジックの `[AC-5]` テスト6件（往復・境界・分岐時の前方切り捨て・同一slug無視・リセット）。
+  - `src/components/DictPane.astro`: 選択状態コンテナ `data-dict-pane-content` と `data-dict-pane-default`・戻る/進むボタンの `data-dict-pane-prev`/`-next` フックを付与。
+  - `src/components/MobileNav.astro`: 辞書ボタンの `disabled` を解除し、辞書ボトムシート（`data-dict-sheet`/`-backdrop`/`-close` に `DictPane` を再掲）を追加。
+  - `src/layouts/DetailLayout.astro` / `src/layouts/ChapterLayout.astro`: `initDictPane()` を配線。
+  - `docs/architecture.md` §8: embedフェッチ共有・単一委譲・複数DOM同期の方式を追記（[architecture.md §8](../architecture.md)）。
+- **満たしたAC**: AC-2（JS無効時は素の `<a href="/dict/[slug]">` 遷移。R-3）・AC-4（クリックでURL不変・ペイン表示。R-11/R-13）・AC-5（進む/戻る往復・リロードでリセット。R-12/R-13）。
+- **設計判断**: 辞書リンク（本文・ペイン内）は `data-dict-link` を共有するため `document` への単一 click 委譲で R-11/R-12 を一括処理。デスクトップ右ペインとモバイルシート内の `DictPane` は同一フックの複製とし `querySelectorAll` でまとめて同期（`toc.ts` 同方式）。種別ラベルは辞書固定のため `KindBadge` の辞書クラスを JS 側で複製。fetch失敗は `location.assign('/dict/[slug]')` で通常遷移にフォールバック（R-16）。DOM配線は architecture §10 の方針によりビルド生成物+目視で確認し、テストは純ロジックのみ。
+- **検証**: `npm run check`（format/lint/typecheck/vitest 95 tests）・`npx astro build`（115ページ）ともに成功。生成物確認で詳細ページに `data-dict-pane-*`（デスクトップ+モバイルシートで各2）・`data-dict-sheet`・`data-dict-open` を確認、`dict-pane` スクリプトのバンドル生成、embed断片が `<html>` を含まないことを確認。
+- **コミット**: 下記「作成したコミット」を参照。
 
 ### T4-3
 
