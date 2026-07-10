@@ -1,0 +1,160 @@
+---
+// タグ詳細（pages.md R-19 / AC-1 / AC-6）。確定モック tags-detail を視覚の正とする。
+// そのタグを持つ公開ページ（辞書・記事・本・章）を種別バッジ付き・created_at 降順で並べる。
+// 章は「本タイトル › 章タイトル」で併記し、種別バッジは「本」を用いる。
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import KindBadge from "../../components/KindBadge.astro";
+import {
+  getPublicDict,
+  getPublicArticles,
+  getPublicBooks,
+  getPublicChapters,
+  tagCounts,
+  tagLedger,
+  type TagLedgerItem,
+} from "../../lib/content";
+
+export const getStaticPaths = (async () => {
+  const [dict, articles, books, chapters] = await Promise.all([
+    getPublicDict(),
+    getPublicArticles(),
+    getPublicBooks(),
+    getPublicChapters(),
+  ]);
+
+  // 本タイトルを章の併記に使うため id → title の対応を作る（章 id = [本slug]/[章slug]）
+  const bookTitleBySlug = new Map(books.map((b) => [b.id, b.data.title]));
+
+  // 種別横断の台帳を組み立てる（URL 規則は他ページと同じ）
+  const items: TagLedgerItem[] = [
+    ...dict.map((e) => ({
+      kind: "dict" as const,
+      title: e.data.title,
+      href: `/dict/${e.id}`,
+      created_at: e.data.created_at,
+      tags: e.data.tags,
+    })),
+    ...articles.map((e) => ({
+      kind: "article" as const,
+      title: e.data.title,
+      href: `/articles/${e.id}`,
+      created_at: e.data.created_at,
+      tags: e.data.tags,
+    })),
+    ...books.map((e) => ({
+      kind: "book" as const,
+      title: e.data.title,
+      href: `/books/${e.id}`,
+      created_at: e.data.created_at,
+      tags: e.data.tags,
+    })),
+    ...chapters.map((e) => ({
+      kind: "book" as const,
+      title: e.data.title,
+      bookTitle: bookTitleBySlug.get(e.id.split("/")[0]),
+      href: `/books/${e.id}`,
+      created_at: e.data.created_at,
+      tags: e.data.tags,
+    })),
+  ];
+
+  // 全公開タグを列挙し、各タグページへ該当項目（並び済み）を渡す
+  return tagCounts([...dict, ...articles, ...books, ...chapters]).map(
+    ({ tag }) => ({
+      params: { tag },
+      props: { tag, entries: tagLedger(items, tag) },
+    }),
+  );
+}) satisfies GetStaticPaths;
+
+interface Props {
+  tag: string;
+  entries: TagLedgerItem[];
+}
+
+const { tag, entries } = Astro.props;
+
+const isoDate = (d: Date) => d.toISOString().slice(0, 10);
+---
+
+<BaseLayout title={`#${tag} のページ一覧`}>
+  <main class="mx-auto max-w-6xl px-4 sm:px-8">
+    <section class="pb-8 pt-10 sm:pt-14">
+      <a
+        href="/tags/"
+        class="mb-8 inline-flex h-9 items-center gap-2 rounded border border-line bg-card px-3.5 font-display text-xs font-bold text-strong transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+      >
+        <svg
+          width="13"
+          height="13"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M19 12H5m6 6-6-6 6-6"></path>
+        </svg>
+        タグ一覧
+      </a>
+      <p class="mb-3 font-mono text-xs text-accent">// tag</p>
+      <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h1
+          class="font-display text-4xl font-black leading-none tracking-tighter text-strong sm:text-5xl"
+        >
+          <span class="mr-1.5 text-accent">#</span>{tag}
+        </h1>
+        <p class="font-mono text-xs text-sub">
+          {entries.length} entries / created_at desc
+        </p>
+      </div>
+      <p class="mt-4 max-w-lg text-sm leading-relaxed text-sub">
+        このタグが付いている公開ページの一覧。本の章も含まれます。
+      </p>
+    </section>
+
+    <section aria-label="タグが付いたページ一覧" class="pb-12 sm:pb-16">
+      <ol class="border-t border-line">
+        {
+          entries.map((e) => (
+            <li>
+              <a
+                href={e.href}
+                class="group grid grid-cols-[auto_auto_1fr] items-center gap-x-4 border-b border-line py-4 transition hover:bg-card motion-reduce:transition-none sm:grid-cols-[7rem_4.5rem_1fr_auto]"
+              >
+                <time
+                  datetime={isoDate(e.created_at)}
+                  class="font-mono text-xs text-sub"
+                >
+                  {isoDate(e.created_at)}
+                </time>
+                <KindBadge
+                  kind={e.kind}
+                  class="w-[4.5rem] justify-self-start text-center"
+                />
+                <span class="col-span-3 mt-1 min-w-0 truncate font-display font-bold text-strong group-hover:text-accent sm:col-span-1 sm:mt-0">
+                  {e.bookTitle && (
+                    <>
+                      {e.bookTitle} <span class="text-sub">›</span>{" "}
+                    </>
+                  )}
+                  {e.title}
+                </span>
+                <span class="hidden gap-2 font-mono text-[11px] text-sub sm:flex">
+                  {e.tags
+                    .filter((t) => t !== tag)
+                    .slice(0, 2)
+                    .map((t) => (
+                      <span>#{t}</span>
+                    ))}
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+  </main>
+</BaseLayout>

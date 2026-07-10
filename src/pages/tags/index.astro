@@ -1,0 +1,59 @@
+---
+// タグ一覧（pages.md R-18 / AC-1）。確定モック tags-index を視覚の正とする。
+// 公開コンテンツ（辞書・記事・本・章）で使われる全タグを件数付き・省略なしで表示する。
+// 並びは件数降順・同数はタグ名昇順（tagCounts）。
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  getPublicDict,
+  getPublicArticles,
+  getPublicBooks,
+  getPublicChapters,
+  tagCounts,
+} from "../../lib/content";
+
+const [dict, articles, books, chapters] = await Promise.all([
+  getPublicDict(),
+  getPublicArticles(),
+  getPublicBooks(),
+  getPublicChapters(),
+]);
+
+// 章も集計対象（R-18・トップの tagCount と同じ母集団）
+const tags = tagCounts([...dict, ...articles, ...books, ...chapters]);
+---
+
+<BaseLayout title="タグ一覧">
+  <main class="mx-auto max-w-6xl px-4 sm:px-8">
+    <section class="border-b border-line pb-8 pt-12 sm:pt-16">
+      <p class="mb-3 font-mono text-xs text-accent">// tags</p>
+      <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <h1
+          class="font-display text-4xl font-black leading-none tracking-tighter text-strong sm:text-5xl"
+        >
+          タグ<span class="text-accent">.</span>
+        </h1>
+        <p class="font-mono text-xs text-sub">
+          {tags.length} tags / count desc
+        </p>
+      </div>
+      <p class="mt-4 max-w-lg text-sm leading-relaxed text-sub">
+        公開中のコンテンツに付いているタグの一覧。タグを選ぶと、そのタグが付いたページの一覧を表示します。
+      </p>
+    </section>
+
+    <section aria-label="タグ一覧" class="py-10 sm:py-12">
+      <div class="flex flex-wrap gap-2.5">
+        {
+          tags.map(({ tag, count }) => (
+            <a
+              href={`/tags/${encodeURIComponent(tag)}`}
+              class="rounded border border-line bg-card px-3 py-1.5 font-mono text-xs text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+            >
+              #{tag} <span class="opacity-60">{count}</span>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</BaseLayout>
