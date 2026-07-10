@@ -1,0 +1,40 @@
+---
+// 404（pages.md R-21 / AC-1 / AC-8）。専用モックは無く、デザインシステムから構成する。
+// ヘッダー/フッターは BaseLayout が供給するため（＝共通デザイン）、<main> にメッセージと
+// トップへの導線のみを置く。
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="ページが見つかりません">
+  <main
+    class="mx-auto flex max-w-6xl flex-col items-start px-4 py-24 sm:px-8 sm:py-32"
+  >
+    <p class="mb-4 font-mono text-xs text-accent">// 404</p>
+    <h1
+      class="mb-6 font-display text-6xl font-black leading-none tracking-tighter text-strong sm:text-8xl"
+    >
+      404<span class="text-accent">.</span>
+    </h1>
+    <p class="mb-10 max-w-lg text-sm leading-relaxed text-sub sm:text-base">
+      お探しのページは見つかりませんでした。URLが変更されたか、削除された可能性があります。
+    </p>
+    <a
+      href="/"
+      class="inline-flex h-10 items-center gap-2 rounded border border-line bg-card px-4 font-display text-sm font-bold text-strong transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+    >
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M19 12H5m6 6-6-6 6-6"></path>
+      </svg>
+      トップへ戻る
+    </a>
+  </main>
+</BaseLayout>
