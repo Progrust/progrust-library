@@ -4,9 +4,10 @@
 // 目次ボタン → 下からボトムシートで目次を再掲（開閉は src/scripts/toc.ts）。
 // デフォルトは Toc（辞書・記事）。default slot を渡すとシート本体を差し替える
 // （章詳細は ChapterToc の複合目次を渡す。ui-design-spec §314）。
-// 辞書ボタンは静的プレースホルダ（配置のみ）。辞書ボトムシートの動作は P4。
+// 辞書ボタン → 辞書ボトムシート（DictPane を再掲）。開閉と内容差し替えは src/scripts/dict-pane.ts。
 import type { MarkdownHeading } from "astro";
 import Toc from "./Toc.astro";
+import DictPane from "./DictPane.astro";
 import { tocHeadings } from "../lib/content";
 
 interface Props {
@@ -38,7 +39,6 @@ const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
     <button
       type="button"
       data-dict-open
-      disabled
       aria-label="辞書ペインを開く"
       class="grid h-12 w-12 place-items-center rounded border border-accent bg-card font-display text-[10px] font-bold text-accent shadow-lg disabled:opacity-60"
     >
@@ -81,4 +81,35 @@ const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
       </div>
     )
   }
+
+  {/* 辞書ボトムシート（辞書ボタン・辞書リンククリックで開く。R-14） */}
+  <div data-dict-sheet class="fixed inset-0 z-40 hidden">
+    <div data-dict-backdrop class="absolute inset-0 bg-black/40"></div>
+    <div
+      class="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-md border-t border-line bg-paper p-5"
+    >
+      <div class="mb-2 flex items-center justify-end">
+        <button
+          type="button"
+          data-dict-close
+          aria-label="辞書ペインを閉じる"
+          class="grid h-8 w-8 place-items-center rounded border border-line text-sub"
+        >
+          <svg
+            class="h-4 w-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M18 6L6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <DictPane />
+    </div>
+  </div>
 </div>

@@ -1,7 +1,7 @@
 ---
 // 辞書サイドペイン（詳細ページ右・ui-design-spec「辞書サイドペイン（詳細ページ右）」）。
-// 本タスク（T3-4）は「右ペインは枠のみ」の指示に従いデフォルト状態の静的枠だけを描画する。
-// embed フェッチ・履歴配列・選択時表示・ホバープレビューは P4（src/scripts/dict-pane.ts）。
+// デフォルト状態の静的枠を描画し、選択状態（種別ラベル・タイトル・タグ・本文・辞書リンク）は
+// src/scripts/dict-pane.ts が data-* フックを介してクライアント側で差し替える（wikilink-ui R-10〜R-13）。
 ---
 
 <div class="rounded border border-line bg-card" data-dict-pane>
@@ -13,6 +13,7 @@
       <button
         type="button"
         disabled
+        data-dict-pane-prev
         aria-label="前の辞書へ戻る"
         class="grid h-7 w-7 place-items-center rounded border border-line text-sub disabled:opacity-40"
       >
@@ -32,6 +33,7 @@
       <button
         type="button"
         disabled
+        data-dict-pane-next
         aria-label="次の辞書へ進む"
         class="grid h-7 w-7 place-items-center rounded border border-line text-sub disabled:opacity-40"
       >
@@ -50,7 +52,9 @@
       </button>
     </div>
   </div>
+  {/* デフォルト状態（案内）。辞書リンククリック時に dict-pane.ts が隠す。 */}
   <div
+    data-dict-pane-default
     class="flex max-h-[60vh] flex-col items-center gap-3 overflow-y-auto p-5 text-center"
   >
     <svg
@@ -70,5 +74,11 @@
     <p class="text-sm text-sub">
       辞書リンクを押すと、ここに内容が表示されます。
     </p>
+  </div>
+
+  {
+    /* 選択状態のコンテナ（初期は空・非表示）。dict-pane.ts が embed 内容を挿入する。 */
+  }
+  <div data-dict-pane-content class="hidden max-h-[60vh] overflow-y-auto p-5">
   </div>
 </div>
