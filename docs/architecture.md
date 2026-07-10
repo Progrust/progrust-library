@@ -103,7 +103,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 主要コンポーネント（ui-design-spec.mdのコンポーネント仕様と1:1対応）:
 
-`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterNav` / `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileFloatingButtons`（目次・辞書ボトムシート）
+`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterNav` / `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileNav`（モバイルの目次・辞書フローティングボタン + 目次ボトムシート）
 
 ## 7. 検索インデックス生成
 
@@ -131,6 +131,8 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 - Tailwind（`darkMode: 'class'`）。カラートークンは [ui-design-spec.md](ui-design/ui-design-spec.md) の表を正とし、CSS変数化（`--color-paper`等をテーマで切替）してdark:クラスの併記を減らす方式を採用する
 - Markdown変換結果（コードブロック・diff・メッセージ・辞書リンク等）へのスタイルは`src/styles/global.css`に置く（変換HTMLにはTailwindクラスを直接付与できないため）
+- prose本文（詳細ページ）のセレクタは、パイプラインが出力する**素クラス**を対象にする（T3-4で実装。dist実測で確定）: 辞書リンク=`.wikilink`（ui-design-specの`.dict-link`ではない）/ message=`.message`＋`.message-{type}`＋`.message-title` / details=素の`<details>/<summary>` / コード=`.astro-code`（`.line`・`has-diff`・`diff add|remove`）/ ファイル名=`.code-block > .code-filename` / リンクカード=`.link-card*`。本文は`.prose`配下にスコープする
+- コードブロックはE案（ライトでもダーク面）のため、Shiki dual themeの前景トークンは**両テーマとも`--shiki-dark`側**を使い、背景・枠線だけダーク差で切り替える（`.astro-code`）。Shikiトークンのカスタムパレット化（keyword色等）は[ui-design-spec.md](ui-design/ui-design-spec.md)「未確定」項として保留
 
 ## 10. テスト構成（vitest）
 
