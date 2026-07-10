@@ -1,0 +1,40 @@
+---
+// 辞書embedパーシャル（wikilink-ui R-15 / AC-6）。
+// ホバープレビュー（dict-preview.ts）とサイドペイン（dict-pane.ts）が fetch する、
+// 本文断片 + メタ情報のみのHTML断片をビルド時に静的生成する（レイアウトなし）。
+// 断片構造のコントラクトは architecture.md §5 を正とする。
+import { render } from "astro:content";
+import { getPublicDict } from "../../../lib/content";
+
+// レイアウトの <html>/<head> ラッピングを無効化し、断片のみを出力する
+export const partial = true;
+
+export async function getStaticPaths() {
+  // getPublicDict は本番ビルドで非公開辞書を除外するため、
+  // 非公開辞書の embed は生成されない（AC-6 後段。[slug].astro と同一パターン）
+  const dict = await getPublicDict();
+  return dict.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+// メタは data 属性で持つ（可視ヘッダーは描画しない）。consumer が用途別に組み立てる。
+// data-tags は DictCard と同じパイプ区切り規約。
+const { title, tags } = entry.data;
+---
+
+<div
+  data-dict-embed
+  data-slug={entry.id}
+  data-title={title}
+  data-tags={tags.join("|")}
+>
+  {/* .prose のスタイルはホストページ（global.css ロード済み）から適用される */}
+  <div class="prose">
+    <Content />
+  </div>
+</div>

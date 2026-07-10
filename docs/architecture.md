@@ -90,6 +90,23 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - 各`getStaticPaths`は`src/lib/content.ts`の公開フィルタを必ず通す
 - embedパーシャルは辞書本文の`render()`結果+メタ情報のみを出力する（レイアウトなし）
 
+#### embed断片の構造コントラクト（T4-1で確定。wikilink-ui §3が委譲した詳細）
+
+`dict/[slug]/embed.astro`（`export const partial = true`）は、`getPublicDict()`で非公開を除外しつつ次の断片のみを出力する（`<html>`/`<head>`・ヘッダー・ナビを含まない）:
+
+```html
+<div data-dict-embed data-slug="[slug]" data-title="タイトル" data-tags="タグA|タグB">
+  <div class="prose"><!-- render() の本文HTML --></div>
+</div>
+```
+
+- **メタは data 属性で持ち、可視ヘッダーは描画しない**。用途別の見た目はconsumer（`dict-pane.ts`/`dict-preview.ts`）が組み立てる:
+  - プレビュー（R-7・本文全文のみ）は `.prose` をそのまま挿入する
+  - サイドペイン（R-11）は data属性から種別ラベル/タイトル/タグ/辞書リンクのヘッダーを組み立て、`.prose` を本文として挿入する
+- `data-tags` は `DictCard` と同じ**パイプ区切り**規約。`data-slug` は「辞書ページを開く →」リンク（`/dict/[slug]`）用の自己記述。
+- 種別ラベルは辞書embedでは常に辞書固定のため断片には持たせない（consumerが`KindBadge`相当で付与）
+- 断片自身は `global.css` を読み込まない。挿入先のホスト詳細ページのスタイルで `.prose`・`.wikilink` 等が適用される（§9の部品クラスをグローバル定義する方針の前提）
+
 ### wikilinkグラフ（逆リンク・使用辞書一覧）の構築（src/lib/wikilink-graph.ts）
 
 - ビルド時に全公開コンテンツのmd本文から`[[slug]]`出現を抽出し、「ページ → リンクしている辞書slug群」の対応表を構築する（レンダリングとは独立にraw bodyの正規表現走査で行う。コードブロック内の`[[...]]`誤検出はエッジケースとして許容し、問題になればmdast走査に切り替える）
