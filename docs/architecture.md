@@ -99,11 +99,12 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 ## 6. レイアウト・コンポーネント構成
 
 - `layouts/BaseLayout.astro`: `<head>`（meta/OGP/テーマ初期化スクリプト/Analytics）+ ヘッダー + フッター。全ページで使用
-- `layouts/DetailLayout.astro`: 詳細ページ3カラムグリッド（左目次/中央本文/右ペイン。[ui-design-spec.md](ui-design/ui-design-spec.md)「レイアウト」）。辞書・記事・章・本トップで共用
+- `layouts/DetailLayout.astro`: 詳細ページ3カラムグリッド（左目次/中央本文/右ペイン。[ui-design-spec.md](ui-design/ui-design-spec.md)「レイアウト」）。辞書・記事で共用
+- `layouts/ChapterLayout.astro`: 章詳細の3カラム（DetailLayout を踏襲。左=複合目次 `ChapterToc` / 中央=章ヘッダー+本文+`ChapterNav` / 右=`DictPane`。ui-design-spec §309〜314）。本トップ（`pages/books/[slug].astro`）は2カラムのため `BaseLayout` 直接利用
 
 主要コンポーネント（ui-design-spec.mdのコンポーネント仕様と1:1対応）:
 
-`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterNav` / `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileNav`（モバイルの目次・辞書フローティングボタン + 目次ボトムシート）
+`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterToc`（本トップ・章詳細の章目次／複合目次で共用）/ `ChapterNav`（前後章ナビ）/ `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileNav`（モバイルの目次・辞書フローティングボタン + 目次ボトムシート。既定は `Toc`、slot 差し替えで章詳細は複合目次を表示）
 
 ## 7. 検索インデックス生成
 
