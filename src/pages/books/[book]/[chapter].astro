@@ -32,12 +32,12 @@ export async function getStaticPaths() {
     const ledger = chapterLedger(bookChapters, bookSlug);
     const { prev, next } = chapterNav(bookChapters, chapter.id);
 
-    // 前後章エントリを台帳から表示データ（href/order/title）へ変換する
+    // 前後章エントリを台帳項目（href/order/title を保持）へ引き当てて表示データにする
     const toTarget = (entry: (typeof bookChapters)[number] | null) => {
       if (!entry) return null;
       const item = ledger.find((l) => l.slug === entry.id.split("/")[1]);
       return item
-        ? { href: item.href, order: item.order, title: entry.data.title }
+        ? { href: item.href, order: item.order, title: item.title }
         : null;
     };
 

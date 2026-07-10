@@ -191,7 +191,7 @@ describe("chapterNav（前後章ナビ・pages R-16/AC-4）", () => {
     expect(next?.id).toBe("x/c");
   });
 
-  it("[AC-4] 間に非公開章がある場合はスキップして次の公開章へつなぐ", () => {
+  it("[AC-4] 間に非公開章がある場合はスキップして次の公開章へつなぐ（prev 方向）", () => {
     const chapters = [ch("x/a", true), ch("x/hidden", false), ch("x/c", true)];
 
     const { prev, next } = chapterNav(chapters, "x/c");
@@ -199,6 +199,16 @@ describe("chapterNav（前後章ナビ・pages R-16/AC-4）", () => {
     // 直前の x/hidden は非公開なのでスキップし x/a を prev とする
     expect(prev?.id).toBe("x/a");
     expect(next).toBeNull();
+  });
+
+  it("[AC-4] 間に非公開章がある場合はスキップして次の公開章へつなぐ（next 方向）", () => {
+    const chapters = [ch("x/a", true), ch("x/hidden", false), ch("x/c", true)];
+
+    const { prev, next } = chapterNav(chapters, "x/a");
+
+    // 直後の x/hidden は非公開なのでスキップし x/c を next とする
+    expect(prev).toBeNull();
+    expect(next?.id).toBe("x/c");
   });
 
   it("[AC-4] 先頭章の prev・最終章の next は null", () => {
