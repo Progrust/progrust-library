@@ -149,6 +149,8 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 `dict-pane.ts` は `fetchDictEmbed(slug): Promise<DictEmbed | null>` を named export し、slug単位の module-level Map でfetch結果をキャッシュする。`dict-preview.ts`（T4-3）はこの関数を import して**ホバープレビューとサイドペインでフェッチ結果を共有**する（同一辞書を二重fetchしない）。fetch失敗時は `null` を返し、呼び出し側は素の `/dict/[slug]` 遷移にフォールバックする（wikilink-ui R-16）。辞書リンク（本文・ペイン内とも `a.wikilink[data-dict-link]`）のクリックは `document` への単一委譲ハンドラで捕捉し、R-11/R-12 を1経路で処理する。デスクトップ右ペインとモバイルボトムシート内の `DictPane` は同一 `data-dict-pane-*` フックの複製で、`querySelectorAll` でまとめて状態同期する（`toc.ts` の複数DOM同期と同方式）。
 
+非同期fetch後の描画は**世代トークン**で後勝ちを保証する（T4-3で確定）。`dict-pane.ts`（クリック・戻る/進む）と `dict-preview.ts`（ホバー）はそれぞれモジュールスコープのカウンタを持ち、描画要求ごとに採番して解決時に最新要求のみを描画する。これにより「辞書Aのfetch中にBを操作するとAの解決が後勝ちでBを上書きし、ペイン履歴もクリック順と逆になる」競合を防ぐ。
+
 ## 9. スタイリング
 
 - Tailwind（`darkMode: 'class'`）。カラートークンは [ui-design-spec.md](ui-design/ui-design-spec.md) の表を正とし、CSS変数化（`--color-paper`等をテーマで切替）してdark:クラスの併記を減らす方式を採用する

@@ -14,7 +14,7 @@
 - [x] **T4-2: サイドペイン（dict-pane.ts）**
   embedフェッチ・デフォルト/選択の2状態・ペイン内履歴（進む/戻る・ページ遷移でリセット）・ペイン内wikilinkの差し替え・モバイルボトムシート。
   完了条件: wikilink-ui AC-2 / AC-4 / AC-5 を満たす（AC-2はJS無効での通常遷移）。
-- [ ] **T4-3: ホバープレビュー（dict-preview.ts）**
+- [x] **T4-3: ホバープレビュー（dict-preview.ts）**
   小窓表示（下端反転）・全文表示・小窓内リンクはプレビューなし・タッチ環境無効・フェッチキャッシュのペインとの共有。
   完了条件: wikilink-ui AC-3 を満たす。
   申し送り（T4-2レビュー推奨1）: `dict-pane.ts` の `navigateTo` は、辞書Aのfetch中に辞書BをクリックするとBの描画後にAの解決で上書きされ、履歴もクリック順と逆になる競合がある。T4-3で同じクリック委譲・`fetchDictEmbed` 共有を触る際、世代トークン（クリックごとに採番し解決時に最新のみ描画）で併せて対処する。
@@ -53,6 +53,19 @@
 - **コミット**: 下記「作成したコミット」を参照。
 
 ### T4-3
+
+辞書リンクのホバープレビューを実装（完了条件 wikilink-ui AC-3）。あわせてT4-2レビューの申し送り（fetch競合）を対処。
+
+- **変更ファイル**
+  - 新規 `src/scripts/dict-preview.ts`: `dict-pane.ts` の `fetchDictEmbed` を import してフェッチ結果を共有し、`a.wikilink[data-dict-link]` へのホバーで本文全文（`.prose`）を `fixed` 小窓に表示。`document` への `pointerover`/`pointerout` 単一委譲で本文・ペイン内リンクを対象化し（R-6）、小窓内リンク（`[data-dict-preview]` 配下）は除外（R-8）。hover非対応環境（`(hover: hover) and (pointer: fine)` 不一致）は初期化時に何もせずタッチ端末を無効化（R-9）。位置決めは純関数 `resolvePreviewPlacement`（リンク下・下端で上反転・左右クランプ）へ分離。表示/非表示ディレイの既定値を実装で確定（show 220ms / hide 150ms、小窓 `pointerenter`/`leave` で非表示を保留し小窓内スクロール・クリックを可能に）。
+  - 新規 `tests/scripts/dict-preview.test.ts`: `resolvePreviewPlacement` の `[AC-3]` テスト3件（下配置・下端反転・右端クランプ）。
+  - `src/scripts/dict-pane.ts`: 世代トークン `renderGeneration` を導入し `navigateTo`（クリック）・`showCurrent`（戻る/進む）の fetch 後描画をガード。辞書Aのfetch中にBを操作するとAの解決を破棄し、後勝ち・履歴逆順を解消（申し送り対処）。純ロジック・exportシグネチャは不変。
+  - `src/layouts/DetailLayout.astro` / `src/layouts/ChapterLayout.astro`: `initDictPreview()` を配線。
+  - `docs/architecture.md` §8: 世代トークンで後勝ちを保証する方式（プレビュー・ペイン共通の競合対処）を追記し申し送りをクローズ（[architecture.md §8](../architecture.md)）。
+- **満たしたAC**: AC-3（ホバーで本文全文の小窓表示・小窓内リンクはプレビューなし。R-7/R-8）。R-6（ペイン内リンクも対象）・R-9（タッチ無効）・R-16（fetch失敗時は小窓を出さずリンクは素で機能）も併せて満たす。
+- **設計判断**: 位置決め純関数のみ vitest 対象とし、ホバー発火・小窓内除外・タッチ無効はビルド生成物+目視で確認（architecture §10。`dict-pane.ts` が純ロジックのみをテストする前例に合わせる）。小窓は単一 `[data-dict-preview]` を `body` に一度だけ生成し `innerHTML` を差し替え。`.prose` はホスト詳細ページの global.css でスタイルが適用される（T4-1 断片コントラクトの前提）。
+- **検証**: `npm run check`（format/lint/typecheck/vitest 98 tests）・`npx astro build`（115ページ）ともに成功。生成物確認で `DetailLayout`/`ChapterLayout` の script チャンクが `dict-preview.*.js` を import すること、embed断片が `<html>` を含まないことを確認。
+- **コミット**: 下記「作成したコミット」を参照。
 
 ### T4-4
 
