@@ -141,6 +141,11 @@ function selectedMarkup(embed: DictEmbed): string {
 // （ブラウザの window.history とは無関係。R-13）
 let paneHistory = createHistory();
 
+// 描画要求ごとに採番し、fetch 解決時に最新の要求だけを描画する世代トークン。
+// 辞書 A の fetch 中に B をクリックすると、A の解決が後勝ちで B を上書きし履歴も
+// クリック順と逆になる競合を防ぐ（T4-2 レビュー申し送り）。
+let renderGeneration = 0;
+
 /** 全ペイン（デスクトップ + モバイルシート）の戻る/進むボタンの活性を履歴に同期する。 */
 function syncNav(): void {
   const back = !canGoBack(paneHistory);
@@ -190,6 +195,7 @@ function renderDefault(): void {
 
 /** 履歴カーソル位置の辞書を（キャッシュ経由で）再描画する。戻る/進む用。 */
 async function showCurrent(): Promise<void> {
+  const gen = ++renderGeneration;
   const slug = currentSlug(paneHistory);
   syncNav();
   if (!slug) {
@@ -197,6 +203,8 @@ async function showCurrent(): Promise<void> {
     return;
   }
   const embed = await fetchDictEmbed(slug);
+  // 戻る/進むの連打で新しい要求に追い越されていたら描画しない。
+  if (gen !== renderGeneration) return;
   if (embed) renderEmbed(embed);
 }
 
@@ -212,7 +220,10 @@ function openSheetIfMobile(): void {
 
 /** 辞書リンククリック時: embed を取得し履歴に積んで表示する（R-11 / R-12）。 */
 async function navigateTo(slug: string): Promise<void> {
+  const gen = ++renderGeneration;
   const embed = await fetchDictEmbed(slug);
+  // 別の辞書クリックに追い越されていたら破棄する（後勝ち・履歴逆順の防止）。
+  if (gen !== renderGeneration) return;
   if (!embed) {
     // 取得失敗時はペイン表示を諦め、リンク本来の遷移を保つ（R-16）。
     window.location.assign(`/dict/${encodeURIComponent(slug)}`);
