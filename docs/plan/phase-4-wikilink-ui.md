@@ -65,6 +65,7 @@
 - **満たしたAC**: AC-3（ホバーで本文全文の小窓表示・小窓内リンクはプレビューなし。R-7/R-8）。R-6（ペイン内リンクも対象）・R-9（タッチ無効）・R-16（fetch失敗時は小窓を出さずリンクは素で機能）も併せて満たす。
 - **設計判断**: 位置決め純関数のみ vitest 対象とし、ホバー発火・小窓内除外・タッチ無効はビルド生成物+目視で確認（architecture §10。`dict-pane.ts` が純ロジックのみをテストする前例に合わせる）。小窓は単一 `[data-dict-preview]` を `body` に一度だけ生成し `innerHTML` を差し替え。`.prose` はホスト詳細ページの global.css でスタイルが適用される（T4-1 断片コントラクトの前提）。
 - **検証**: `npm run check`（format/lint/typecheck/vitest 98 tests）・`npx astro build`（115ページ）ともに成功。生成物確認で `DetailLayout`/`ChapterLayout` の script チャンクが `dict-preview.*.js` を import すること、embed断片が `<html>` を含まないことを確認。
+- **レビュー対応**: [レビュー結果](../archive/review/T4-3.md)（承認・要修正なし）の推奨1・軽微2をすべて修正。(1) A→B直接ホバー移動でBのfetch失敗時にAの小窓が残留する問題を `requestPreview` で `hidePreview()` により解消、(2) ホバー保持スクロールで小窓がリンクから乖離する問題を `scroll` での `hideOnScroll` で解消、(3) showTimer発火時にリンクがDOMから外れていると座標が全0になる問題を `link.isConnected` ガードで防止。
 - **コミット**: 下記「作成したコミット」を参照。
 
 ### T4-4

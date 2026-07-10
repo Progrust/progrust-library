@@ -109,6 +109,11 @@ function scheduleHide(): void {
   hideTimer = window.setTimeout(hidePreview, HIDE_DELAY_MS);
 }
 
+/** 表示中の小窓はスクロールで隠す（fixed 小窓がリンク位置から乖離するのを防ぐ）。 */
+function hideOnScroll(): void {
+  if (previewEl && !previewEl.classList.contains("hidden")) hidePreview();
+}
+
 /** 本文を小窓に挿入し、リンク矩形を基準に位置決めして表示する。 */
 function showPreview(
   el: HTMLElement,
@@ -131,9 +136,14 @@ function showPreview(
 function requestPreview(link: HTMLElement, slug: string): void {
   const gen = ++hoverGeneration;
   void fetchDictEmbed(slug).then((embed) => {
-    // ホバー先が変わっていたら（世代不一致）描画しない。fetch 失敗（null）は
-    // 小窓を出さず、リンクは素で機能する（R-16）。
-    if (gen !== hoverGeneration || !embed) return;
+    // ホバー先が変わっていたら（世代不一致）・リンクが DOM から外れていたら描画しない
+    // （後者は座標が全0になり左上に誤表示されるのを防ぐ）。
+    if (gen !== hoverGeneration || !link.isConnected) return;
+    if (!embed) {
+      // fetch 失敗（R-16）。直前まで別辞書を表示していた小窓が残らないよう隠す。
+      hidePreview();
+      return;
+    }
     showPreview(ensurePreviewEl(), link, embed.bodyHtml);
   });
 }
@@ -177,4 +187,6 @@ function initHoverDelegation(): void {
 export function initDictPreview(): void {
   if (!window.matchMedia(HOVER_QUERY).matches) return;
   initHoverDelegation();
+  // ホバーを保ったままスクロールすると小窓がリンクから乖離するため隠す（一般的なツールチップ挙動）。
+  window.addEventListener("scroll", hideOnScroll, { passive: true });
 }
