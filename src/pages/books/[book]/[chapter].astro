@@ -1,0 +1,82 @@
+---
+// 章詳細（pages R-1/R-12/R-13/R-16, AC-4 / ui-design-spec §309〜314）。
+// getStaticPaths は getPublicChapters 経由で列挙する（本番は公開章のみ・非公開は404）。
+// 本ごとに台帳（複合目次）と前後章ナビ（chapterNav が非公開をスキップ・AC-4）を算出する。
+import { render } from "astro:content";
+import {
+  getPublicBooks,
+  getPublicChapters,
+  sortChapters,
+  chapterLedger,
+  chapterNav,
+  chapterOrderLabel,
+} from "../../../lib/content";
+import ChapterLayout from "../../../layouts/ChapterLayout.astro";
+
+export async function getStaticPaths() {
+  const [books, chapters] = await Promise.all([
+    getPublicBooks(),
+    getPublicChapters(),
+  ]);
+  const bookById = new Map(books.map((book) => [book.id, book]));
+
+  return chapters.flatMap((chapter) => {
+    const [bookSlug, chapterSlug] = chapter.id.split("/");
+    const book = bookById.get(bookSlug);
+    // 親本が引けない（=非公開本配下）章はページ化しない。通常 getPublicChapters が除外済み
+    if (!book) return [];
+
+    const bookChapters = sortChapters(
+      chapters.filter((entry) => entry.id.startsWith(`${bookSlug}/`)),
+    );
+    const ledger = chapterLedger(bookChapters, bookSlug);
+    const { prev, next } = chapterNav(bookChapters, chapter.id);
+
+    // 前後章エントリを台帳から表示データ（href/order/title）へ変換する
+    const toTarget = (entry: (typeof bookChapters)[number] | null) => {
+      if (!entry) return null;
+      const item = ledger.find((l) => l.slug === entry.id.split("/")[1]);
+      return item
+        ? { href: item.href, order: item.order, title: entry.data.title }
+        : null;
+    };
+
+    return [
+      {
+        params: { book: bookSlug, chapter: chapterSlug },
+        props: {
+          chapter,
+          bookTitle: book.data.title,
+          bookHref: `/books/${bookSlug}`,
+          order: chapterOrderLabel(chapter),
+          ledger,
+          currentSlug: chapterSlug,
+          prev: toTarget(prev),
+          next: toTarget(next),
+        },
+      },
+    ];
+  });
+}
+
+const { chapter, bookTitle, bookHref, order, ledger, currentSlug, prev, next } =
+  Astro.props;
+const { Content, headings } = await render(chapter);
+---
+
+<ChapterLayout
+  title={chapter.data.title}
+  description={chapter.data.description}
+  bookTitle={bookTitle}
+  bookHref={bookHref}
+  order={order}
+  createdAt={chapter.data.created_at}
+  updatedAt={chapter.data.updated_at}
+  chapters={ledger}
+  currentSlug={currentSlug}
+  headings={headings}
+  prev={prev}
+  next={next}
+>
+  <Content />
+</ChapterLayout>
