@@ -72,7 +72,7 @@ const embedCache = new Map<string, Promise<DictEmbed | null>>();
 
 async function requestEmbed(slug: string): Promise<DictEmbed | null> {
   try {
-    const res = await fetch(`/dict/${slug}/embed/`);
+    const res = await fetch(`/dict/${encodeURIComponent(slug)}/embed/`);
     if (!res.ok) return null;
     const doc = new DOMParser().parseFromString(await res.text(), "text/html");
     const root = doc.querySelector<HTMLElement>("[data-dict-embed]");
@@ -94,7 +94,11 @@ async function requestEmbed(slug: string): Promise<DictEmbed | null> {
 export function fetchDictEmbed(slug: string): Promise<DictEmbed | null> {
   const cached = embedCache.get(slug);
   if (cached) return cached;
-  const pending = requestEmbed(slug);
+  const pending = requestEmbed(slug).then((embed) => {
+    // 一時的な失敗（null）は恒久キャッシュせず、次回クリックで再試行できるようにする。
+    if (!embed) embedCache.delete(slug);
+    return embed;
+  });
   embedCache.set(slug, pending);
   return pending;
 }
@@ -133,12 +137,14 @@ function selectedMarkup(embed: DictEmbed): string {
   `;
 }
 
-let history = createHistory();
+// ペイン単体の履歴。モジュールスコープで保持し、ページ遷移（フルリロード）で自然にリセットされる。
+// （ブラウザの window.history とは無関係。R-13）
+let paneHistory = createHistory();
 
 /** 全ペイン（デスクトップ + モバイルシート）の戻る/進むボタンの活性を履歴に同期する。 */
 function syncNav(): void {
-  const back = !canGoBack(history);
-  const forward = !canGoForward(history);
+  const back = !canGoBack(paneHistory);
+  const forward = !canGoForward(paneHistory);
   for (const btn of document.querySelectorAll<HTMLButtonElement>(
     "[data-dict-pane-prev]",
   )) {
@@ -184,7 +190,7 @@ function renderDefault(): void {
 
 /** 履歴カーソル位置の辞書を（キャッシュ経由で）再描画する。戻る/進む用。 */
 async function showCurrent(): Promise<void> {
-  const slug = currentSlug(history);
+  const slug = currentSlug(paneHistory);
   syncNav();
   if (!slug) {
     renderDefault();
@@ -209,10 +215,10 @@ async function navigateTo(slug: string): Promise<void> {
   const embed = await fetchDictEmbed(slug);
   if (!embed) {
     // 取得失敗時はペイン表示を諦め、リンク本来の遷移を保つ（R-16）。
-    window.location.assign(`/dict/${slug}`);
+    window.location.assign(`/dict/${encodeURIComponent(slug)}`);
     return;
   }
-  history = pushEntry(history, slug);
+  paneHistory = pushEntry(paneHistory, slug);
   renderEmbed(embed);
   syncNav();
   openSheetIfMobile();
@@ -229,8 +235,14 @@ function initLinkDelegation(): void {
     if (!link) return;
     const slug = link.dataset.dictLink;
     if (!slug) return;
-    // 修飾クリック（新規タブ等）はブラウザ標準に委ねる。
-    if (event.defaultPrevented || event.metaKey || event.ctrlKey) return;
+    // 修飾クリック（新規タブ・新規ウィンドウ等）はブラウザ標準に委ねる。
+    if (
+      event.defaultPrevented ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    )
+      return;
     event.preventDefault();
     void navigateTo(slug);
   });
@@ -240,13 +252,13 @@ function initLinkDelegation(): void {
 function initControls(): void {
   for (const btn of document.querySelectorAll("[data-dict-pane-prev]")) {
     btn.addEventListener("click", () => {
-      history = goBack(history);
+      paneHistory = goBack(paneHistory);
       void showCurrent();
     });
   }
   for (const btn of document.querySelectorAll("[data-dict-pane-next]")) {
     btn.addEventListener("click", () => {
-      history = goForward(history);
+      paneHistory = goForward(paneHistory);
       void showCurrent();
     });
   }

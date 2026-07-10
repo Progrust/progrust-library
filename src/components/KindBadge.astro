@@ -3,6 +3,8 @@
 // 角型アウトライン + 4px 角丸。記事は accent トークンで自動ダーク追従、
 // 辞書・本はトークン外の生カラーのため dark: を併記する。
 // 新着一覧（pages R-5）・タグ詳細（R-19・T3-6）で再利用する。
+// 注: 辞書バリアントのクラスは src/scripts/dict-pane.ts の DICT_BADGE_CLASS が
+//     JS でペインヘッダーに複製している。バッジデザイン変更時は両者を揃えること。
 import type { ContentKind } from "../lib/content";
 
 interface Props {
