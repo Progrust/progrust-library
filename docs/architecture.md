@@ -112,6 +112,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - ビルド時に全公開コンテンツのmd本文から`[[slug]]`出現を抽出し、「ページ → リンクしている辞書slug群」の対応表を構築する（レンダリングとは独立にraw bodyの正規表現走査で行う。コードブロック内の`[[...]]`誤検出はエッジケースとして許容し、問題になればmdast走査に切り替える）
 - 逆引き（辞書slug → リンク元ページ群）が逆リンク一覧（wikilink-ui R-18）、正引きが使用辞書一覧（R-17）のデータソース
 - グラフ構築も公開フィルタを通す（非公開ページからのリンクは本番で載せない）
+- 実装確定（T4-4）: 純関数 `extractWikilinkSlugs` / `buildWikilinkGraph` ＋ 薄いラッパ `buildContentWikilinkGraph`（`getPublic*` を集約）に分ける（`content.ts` と同方針。前2者が vitest 対象）。各ページの `getStaticPaths` で1回構築し `forward`/`backward` のスライスを props で配る（module-level メモ化はしない＝dev の再実行で陳腐化を避ける）。抽出トークンは辞書slugへ解決できたもののみ採用するため、コードフェンス由来の誤検出（`[[bench]]`等）は自然に落ちる。**自己リンク**（辞書が自分自身をリンク）は forward/backward いずれからも除外。**本トップ（index.md）は逆リンク源に含めない**（R-18 は辞書・記事・章のみ）が、使用辞書一覧（forward）には含める。逆リンクの並びは kind（辞書<記事<本）→ title(`localeCompare` "ja") → href で決定的。使用辞書一覧のリンクは本文 wikilink と同一挙動（`class="wikilink" data-dict-link`）にし、既存 `dict-pane.ts`/`dict-preview.ts` の委譲に乗せる（init 未配線の本トップでは素の遷移にフォールバック。wikilink-ui §5 の未確定を解消）。
 
 ## 6. レイアウト・コンポーネント構成
 

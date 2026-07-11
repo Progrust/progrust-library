@@ -18,7 +18,7 @@
   小窓表示（下端反転）・全文表示・小窓内リンクはプレビューなし・タッチ環境無効・フェッチキャッシュのペインとの共有。
   完了条件: wikilink-ui AC-3 を満たす。
   申し送り（T4-2レビュー推奨1）: `dict-pane.ts` の `navigateTo` は、辞書Aのfetch中に辞書BをクリックするとBの描画後にAの解決で上書きされ、履歴もクリック順と逆になる競合がある。T4-3で同じクリック委譲・`fetchDictEmbed` 共有を触る際、世代トークン（クリックごとに採番し解決時に最新のみ描画）で併せて対処する。
-- [ ] **T4-4: wikilinkグラフ（逆リンク・使用辞書一覧）**
+- [x] **T4-4: wikilinkグラフ（逆リンク・使用辞書一覧）**
   `src/lib/wikilink-graph.ts`でグラフ構築（公開フィルタ適用）し、Backlinks / LinkedDictList コンポーネントで表示する。
   完了条件: wikilink-ui AC-7 / AC-8 を満たし、グラフ構築のvitestが通る。
 
@@ -69,6 +69,21 @@
 - **コミット**: 下記「作成したコミット」を参照。
 
 ### T4-4
+
+wikilinkグラフを構築し逆リンク・使用辞書一覧を実装（完了条件 wikilink-ui AC-7 / AC-8）。
+
+- **変更ファイル**
+  - 新規 `src/lib/wikilink-graph.ts`: 純関数 `extractWikilinkSlugs`（生本文から `[[slug]]` 抽出・trim・初出順で重複除去）・`buildWikilinkGraph`（forward=使用辞書一覧 / backward=逆リンク の2マップ構築）＋ 薄いラッパ `buildContentWikilinkGraph`（`getPublic*` 集約）。辞書slug解決で誤検出を除去、自己リンク除外、本トップは逆リンク源から除外（forwardには含む）、逆リンクは kind→title→href で決定的ソート。方式の詳細は [architecture.md §5](../architecture.md)。
+  - 新規 `src/components/LinkedDictList.astro`: 使用辞書一覧（R-17）。空なら非表示。リンクは `class="wikilink" data-dict-link` で本文 wikilink と同一挙動（ペイン＋プレビュー）。
+  - 新規 `src/components/Backlinks.astro`: 逆リンク（R-18）。`KindBadge` で種別バッジ付き、章は「本 › 章」併記。`slot="below"` 用の上罫線セクション。
+  - 新規 `tests/lib/wikilink-graph.test.ts`: `extractWikilinkSlugs` 5件＋ `buildWikilinkGraph` の `[AC-7]`（逆リンク・バッジ・順序・非公開除外）・`[AC-8]`（使用辞書一覧・誤検出除去・初出順）・`[R-18]`（本トップ除外）・自己リンク除外。
+  - `src/layouts/DetailLayout.astro` / `ChapterLayout.astro`: `linkedDicts` prop 追加、右ペイン上（デスクトップ）＋本文下部（モバイル `lg:hidden`）に `LinkedDictList` を配置。
+  - `src/pages/dict/[slug].astro`: グラフ構築し `linkedDicts` ＋ `<Backlinks slot="below">`。`articles/[slug].astro`・`books/[book]/[chapter].astro`・`books/[slug].astro`: `linkedDicts` を配線（本トップは右レール無しのため本文下部）。
+  - `docs/architecture.md` §5: 実装確定事項（純関数分離・getStaticPaths構築・自己リンク/本トップ除外・ソート順・使用辞書一覧の挙動）を追記。
+- **満たしたAC**: AC-7（逆リンクに公開記事・公開章がバッジ付きで表示・非公開ソース除外。R-18/R-19）・AC-8（使用辞書一覧が本文の wikilink 先と一致。R-17）。
+- **設計判断**: グラフは生bodyの正規表現走査（architecture §5）。使用辞書一覧のクリック挙動（spec §5 未確定）は「本文 wikilink と同じ（ペイン＋プレビュー）」に確定（ユーザー選択）。DOM配線はビルド生成物で検証し、テストは純ロジックのみ（architecture §10。`content.ts` の前例に合わせる）。
+- **検証**: `npm run check`（format/lint/typecheck/vitest 109 tests）・`npx astro build`（115ページ）ともに成功。生成物確認で `dist/dict/ownership/index.html` の逆リンクが辞書×2→記事×2→本×2 の決定的順・章は「本 › 章」表示、使用辞書一覧 `[borrowing, lifetime]` が本文 wikilink と一致、`rust-performance-tuning` の TOML `[[bench]]` 誤検出が使用辞書一覧に出ないこと（`iterator` のみ）、逆リンクに非公開ソース由来のリンク切れが無いことを確認。
+- **コミット**: 下記「作成したコミット」を参照。
 
 ## フェーズ完了条件
 
