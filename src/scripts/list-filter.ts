@@ -4,17 +4,13 @@
 // と同一セマンティクスに保つ（重複実装なし）。純ロジック（vitest 対象）と DOM 配線（architecture
 // §10 によりビルド + 目視）を search-box.ts と同型に分離する。
 
-import type { ParsedQuery } from "./search";
+import type { ParsedQuery, Matchable } from "./search";
 import { parseQuery, entryMatches } from "./search";
 
 // --- 表示用の純ロジック（DOM 非依存・vitest 対象。AC-7） ----------------------
 
-/** 絞込判定に必要なカードの部分情報（SearchEntry のうち type/url を除いた集合）。 */
-export interface CardModel {
-  title: string;
-  description: string;
-  tags: string[];
-}
+/** 絞込判定に必要なカードの部分情報（マッチ判定が参照する title/description/tags）。 */
+export type CardModel = Matchable;
 
 /**
  * 選択タグ（AND・完全一致）とキーワード入力から各カードの可視状態を返す純関数
@@ -32,10 +28,7 @@ export function computeCardVisibility(
     keywords: parsed.keywords,
     tags: [...selectedTags, ...parsed.tags],
   };
-  // entryMatches は SearchEntry を取るが、判定に使うのは title/description/tags のみ。
-  return cards.map((card) =>
-    entryMatches({ ...card, type: "dict", url: "" }, merged),
-  );
+  return cards.map((card) => entryMatches(card, merged));
 }
 
 // --- DOM 配線（目視確認・architecture §10） ----------------------------------

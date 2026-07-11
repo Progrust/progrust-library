@@ -31,19 +31,22 @@ export function parseQuery(query: string): ParsedQuery {
 }
 
 /** キーワードがタイトル・概要・タグ名のいずれかに部分一致するか（R-4: 大文字小文字非区別） */
-function matchesKeyword(entry: SearchEntry, keyword: string): boolean {
+function matchesKeyword(entry: Matchable, keyword: string): boolean {
   const needle = keyword.toLowerCase();
   if (entry.title.toLowerCase().includes(needle)) return true;
   if (entry.description.toLowerCase().includes(needle)) return true;
   return entry.tags.some((tag) => tag.toLowerCase().includes(needle));
 }
 
+/** マッチ判定が参照するフィールドのみ（type/url は判定に使わない）。 */
+export type Matchable = Pick<SearchEntry, "title" | "description" | "tags">;
+
 /**
  * エントリがパース済みクエリを満たすか判定する（search.md R-4〜R-6）。
  * 全キーワード（部分一致）かつ全タグ（完全一致）を満たすとき真。空条件は自動的に真。
  * 一覧絞込（list-filter.ts）もこの述語を共有し、マッチ判定を単一実装に保つ。
  */
-export function entryMatches(entry: SearchEntry, parsed: ParsedQuery): boolean {
+export function entryMatches(entry: Matchable, parsed: ParsedQuery): boolean {
   return (
     parsed.keywords.every((keyword) => matchesKeyword(entry, keyword)) &&
     // タグはタグ名の完全一致（R-5: 部分一致ではヒットさせない）。

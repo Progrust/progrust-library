@@ -77,6 +77,11 @@
 - **テスト**: `tests/scripts/list-filter.test.ts`。`computeCardVisibility` を最小フィクスチャで検証（AC-7 由来を `[AC-7]` 命名: タグ2択で両タグ持ちのみ／片方のみで複数可視。加えてタグ+キーワード AND・R-4 部分一致大小非区別・空条件全件・`#タグ` 和集合）。純関数のためモックなし。
 - **検証**: `npm run check`（format/lint/typecheck/test 134件）・`npx astro build`（115ページ）ともに成功。`dist/dict/index.html` で `data-list-grid`・`data-description`×23（公開辞書数と一致）・`data-filter-empty`・タグチップ34件中22件 `hidden`（12件超）・バンドル済み `initListFilter` inline を静的確認。`aria-pressed:` variant が `[aria-pressed=true]{border-color/color:var(--color-accent)}` として CSS 出力されることも確認。
 - **知見の還流**: architecture §8 の `list-filter.ts` 行を参照属性 `data-description` 追加・`entryMatches` 再利用の旨に更新。
+- **レビュー対応**（[review/T5-4.md](../archive/review/T5-4.md)）:
+  - 要修正1（spec R-2/§1 の「一覧絞込も検索インデックス JSON を利用する」が実装の `data-*` 属性参照方式と矛盾）: DOM 方式は合理的（fetch 不要・R-11 を構造的に充足・マッチ判定は `entryMatches` 共有でセマンティクス同一）と判断し、**実装は変えず spec を実態に合わせて更新**。search.md §1 概要と R-2 を「一覧絞込は fetch を伴わずカードの `data-title`/`data-description`/`data-tags` を対象にし、マッチ判定ロジックを検索ボックスと共有する」に改訂。
+  - 推奨1: `ListFilter.astro` のキーワード入力 `aria-label` から「（準備中）」を除去（`SearchBox.astro`（T5-3）と整合。JS で有効化済みのため）。
+  - 軽微1: `entryMatches`/`matchesKeyword` の第1引数を `Matchable = Pick<SearchEntry, "title"|"description"|"tags">` に狭め、`list-filter.ts` のダミー `type`/`url` 合成を解消（`CardModel = Matchable`）。
+  - 軽微2: R-11 括弧書きを「タグ詳細ページには絞込 UI を置かない（全種別の一覧のため）」に明確化。
 - **申し送り**: ブラウザ非搭載環境のため実機目視は未実施。`npm run dev` で辞書一覧のタグチップ2択→両タグ辞書のみ表示・件数更新（AC-7）、0件メッセージ、キーワード絞込、+N tags 展開の最終確認が残る。
 - **コミット**:
   - `refactor: filterEntriesの述語をentryMatchesに抽出`
