@@ -1,8 +1,10 @@
 ---
-// ヘッダーの検索ボックス（ui-design-spec「ヘッダー」）。
-// T3-1 では見た目のみのプレースホルダ（disabled）。検索機能の実装は P5（search.md）。
+// ヘッダーの検索ボックス（ui-design-spec「ヘッダー」/ search.md R-2/R-7/R-8）。
 // レイアウトは top-b-sharp モック準拠: ロゴとテーマ切替の間で右寄せ（ml-auto）+ max-w-sm、
 // 先頭に虫めがねアイコンを重ねる。
+// 動作（初回フォーカスでの遅延ロード・ドロップダウン表示・遷移）は src/scripts/search-box.ts。
+// input は markup では disabled のまま置き、JS 有効時に initSearchBox が有効化する
+// （JS 無効なら disabled 表示のまま＝プログレッシブエンハンスメント。architecture §8）。
 ---
 
 <label class="relative ml-auto max-w-sm flex-1">
@@ -27,7 +29,22 @@
     type="search"
     placeholder="キーワード or #タグ"
     disabled
-    aria-label="サイト内検索（準備中）"
+    data-search-input
+    aria-label="サイト内検索"
+    autocomplete="off"
     class="h-9 w-full rounded border border-line bg-card pl-9 pr-3 text-sm text-ink placeholder:text-sub focus:border-accent focus:outline-none"
   />
+  {
+    /* 検索結果ドロップダウン（search.md R-7）。中身は search-box.ts が差し込む。 */
+  }
+  <div
+    data-search-results
+    class="absolute left-0 right-0 top-full z-40 mt-1 hidden max-h-80 overflow-y-auto rounded border border-line bg-card py-1 shadow-xl"
+  >
+  </div>
 </label>
+
+<script>
+  import { initSearchBox } from "../scripts/search-box";
+  initSearchBox();
+</script>
