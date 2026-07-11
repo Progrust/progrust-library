@@ -510,6 +510,25 @@ html.dark .message-warning .message-title {
 .prose details > :not(summary) + :not(summary) {
   margin-top: 0.6rem;
 }
+/* ネストした details。上の :not(summary) 系の padding は内側 details ボックスの
+   内部パディングになるだけで周囲に余白を作らないため、margin へ振り替える。
+   specificity が同点のためソース順の後勝ちに依存する（この位置から動かさないこと） */
+.prose details > details {
+  padding-inline: 0;
+  margin-inline: 1rem;
+}
+.prose details > summary + details {
+  padding-top: 0;
+  margin-top: 0.75rem;
+}
+.prose details > details:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0.9rem;
+}
+/* ネスト時は面の重なりを避け背景を paper に落とす（.prose details .message と同じ扱い） */
+.prose details details {
+  background: var(--color-paper);
+}
 
 /* =========================================================================
    リンクカード（.link-card-wrap > a.link-card > .link-card__body 等）。

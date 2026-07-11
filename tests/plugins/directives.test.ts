@@ -109,6 +109,19 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       expect(html).toContain("<summary>外</summary>");
       expect(html).toContain('<aside class="message">');
     });
+
+    it("details内にネストしたdetailsを正しく入れ子で変換する", () => {
+      const html = compileWithDirectives(
+        "::::details[外]\n:::details[内]\n内側の中身。\n:::\n::::",
+      );
+      expect(html).toContain("<summary>外</summary>");
+      expect(html).toContain("<summary>内</summary>");
+      // 内側detailsが外側details内に入れ子で出力される（</details>が2つ）
+      expect(html.match(/<details>/g)).toHaveLength(2);
+      expect(html.indexOf("<summary>外</summary>")).toBeLessThan(
+        html.indexOf("<summary>内</summary>"),
+      );
+    });
   });
 
   describe("未知のディレクティブ", () => {

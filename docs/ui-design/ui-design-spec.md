@@ -368,20 +368,22 @@ html.dark .dict-link { color: #F0684A; }
 
 ### `:::details` の変換後スタイル
 
+実際の出力はコンテンツのラッパ`<div>`を持たず、`<summary>`の後に本文ブロックが直接並ぶ（パイプラインの制約。`docs/markdown-pipeline/directives.md`「入出力例」参照）。コンテンツの余白はラッパではなく**`summary`以外の直下子要素それぞれへのpadding**で表現する。
+
 ```html
-<details class="rounded border border-line dark:border-nline bg-card dark:bg-ncard">
-  <summary class="cursor-pointer px-4 py-3 font-display font-bold text-sm ... flex items-center gap-2">
-    <svg class="shrink-0 transition-transform">（シェブロン、open時にCSSで90度回転）</svg> タイトル
-  </summary>
-  <div class="px-4 pb-4 pt-1 border-t border-line/70">...</div>
+<details><!-- rounded / border line / bg-card 相当。シェブロンはsummaryの::beforeで描画 -->
+  <summary>タイトル</summary><!-- cursor-pointer / px-4 py-2.5 / font-display bold sm。open時に下罫線 -->
+  <p>本文...</p><!-- 直下子要素に padding-inline:1rem、先頭に padding-top、末尾に padding-bottom -->
 </details>
 ```
 
 ```css
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
-details[open] > summary svg { transform: rotate(90deg); }
+details[open] > summary::before { transform: rotate(45deg); } /* シェブロン回転 */
 ```
+
+- **ネストしたdetails**（`details > details`）: 直下子要素へのpaddingは内側detailsボックスの内部パディングになるだけで周囲に余白を作らないため、**paddingを0にしてmarginへ振り替える**（margin-inline: 1rem、先頭margin-top / 末尾margin-bottomも同様）。背景はネスト時のメッセージと同じく `bg-paper dark:bg-npaper` に落とす（card面の重なり回避）
 
 ## 意思決定の履歴（要約）
 
