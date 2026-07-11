@@ -385,6 +385,11 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 
 - **ネストしたdetails**（`details > details`）: 直下子要素へのpaddingは内側detailsボックスの内部パディングになるだけで周囲に余白を作らないため、**paddingを0にしてmarginへ振り替える**（margin-inline: 1rem、先頭margin-top / 末尾margin-bottomも同様）。背景はネスト時のメッセージと同じく `bg-paper dark:bg-npaper` に落とす（card面の重なり回避）
 
+### `:::figure` の変換後スタイル
+
+- `<figure>`は`width: fit-content; max-width: 100%`で**画像幅に収縮**させ、`margin-inline: auto`で本文幅の中央に置く。これによりキャプションの中央寄せも**本文全幅ではなく画像幅が基準**になる
+- `<figcaption>`は`width: 0; min-width: 100%`で、長いキャプションがfigureのintrinsic幅（=画像幅）を広げずに画像幅で折り返すようにする。sub色・0.8rem・中央寄せ
+
 ## 意思決定の履歴（要約）
 
 1. トップページを3案（warm / sharp / balance）で比較 → **sharp系を採用**。sharp派生2案（サイドバー型・カタログ型）も比較したが元のtop-b-sharpで確定

@@ -147,10 +147,17 @@
   border-radius: 4px;
 }
 .prose figure {
+  /* fit-content で figure を画像幅に収縮させ、キャプションも画像幅基準の中央にする */
+  width: fit-content;
+  max-width: 100%;
   margin-inline: auto;
   text-align: center;
 }
 .prose figcaption {
+  /* width:0 + min-width:100% で、長いキャプションが figure の
+     intrinsic 幅（=画像幅）を広げずに画像幅で折り返すようにする */
+  width: 0;
+  min-width: 100%;
   margin-top: 0.5rem;
   font-size: 0.8rem;
   color: var(--color-sub);
