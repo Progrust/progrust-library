@@ -49,8 +49,9 @@
 .prose {
   color: var(--color-ink);
   font-family: var(--font-maru);
-  font-size: 0.95rem;
-  line-height: 1.9;
+  /* ui-design-spec「本文タイポグラフィ」: モックの text-[15px] leading-relaxed */
+  font-size: 0.9375rem;
+  line-height: 1.625;
 }
 
 /* スクリーンリーダー専用（視覚的に隠す）。パイプラインは脚注セクションに
@@ -69,9 +70,9 @@
   border: 0;
 }
 
-/* ブロック間の縦リズム（先頭要素は詰める） */
+/* ブロック間の縦リズム（先頭要素は詰める）。モックの space-y-6 */
 .prose > * {
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
 }
 .prose > *:first-child {
   margin-top: 0;
@@ -91,15 +92,14 @@
   font-weight: 900;
   letter-spacing: -0.02em;
 }
+/* h2 のセクション区切りは見出しの「上」に薄罫線（モックの pt-6 border-t border-line/70） */
 .prose h2 {
-  margin-top: 2.5rem;
-  padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--color-line);
-  font-size: 1.45rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent);
+  font-size: 1.5rem;
 }
 .prose h3 {
-  margin-top: 2rem;
-  font-size: 1.2rem;
+  font-size: 1.125rem;
 }
 .prose h4 {
   margin-top: 1.5rem;
@@ -246,6 +246,30 @@ html.dark .prose :not(pre) > code {
 }
 html.dark .wikilink {
   color: #f0684a;
+}
+
+/* 辞書ペイン・ホバープレビュー内の embed 本文はコンパクト表示にする
+   （ui-design-spec「ペイン/プレビューの内容表示」。モックの space-y-3 text-[13px]
+   leading-relaxed 相当）。見出しも小窓向けに一回り落とす。 */
+:is([data-dict-pane-content], [data-dict-preview]) .prose {
+  font-size: 13px;
+  line-height: 1.625;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .prose > * {
+  margin-top: 0.75rem;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .prose h1 {
+  font-size: 1.25rem;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .prose h2 {
+  padding-top: 0.75rem;
+  font-size: 1.1rem;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .prose h3 {
+  font-size: 1rem;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .prose h4 {
+  font-size: 0.9rem;
 }
 
 /* =========================================================================
@@ -509,31 +533,45 @@ html.dark .message-warning .message-title {
   border-bottom: 1px solid
     color-mix(in srgb, var(--color-line) 70%, transparent);
 }
-.prose details > :not(summary) {
+/* 直下子要素への padding で details の内側余白を表現する。ただし枠・背景を
+   持つボックス要素は padding だとボックスの内部パディングになるだけで周囲に
+   余白を作らないため、除外して下の margin 方式で寄せる（ui-design-spec
+   「:::details の変換後スタイル」） */
+.prose
+  details
+  > :not(summary, details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
   padding-inline: 1rem;
 }
-.prose details > summary + :not(summary) {
+.prose
+  details
+  > summary
+  + :not(summary, details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
   padding-top: 0.75rem;
 }
-.prose details > :not(summary):last-child {
+.prose
+  details
+  > :not(summary, details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table):last-child {
   padding-bottom: 0.9rem;
 }
 .prose details > :not(summary) + :not(summary) {
   margin-top: 0.6rem;
 }
-/* ネストした details。上の :not(summary) 系の padding は内側 details ボックスの
-   内部パディングになるだけで周囲に余白を作らないため、margin へ振り替える。
-   specificity が同点のためソース順の後勝ちに依存する（この位置から動かさないこと） */
-.prose details > details {
-  padding-inline: 0;
+/* 枠・背景を持つボックス直下子は margin で余白を表現する（ボックス自身の
+   内部パディングは単体配置時と同じまま保つ） */
+.prose
+  details
+  > :is(details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
   margin-inline: 1rem;
 }
-.prose details > summary + details {
-  padding-top: 0;
+.prose
+  details
+  > summary
+  + :is(details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
   margin-top: 0.75rem;
 }
-.prose details > details:last-child {
-  padding-bottom: 0;
+.prose
+  details
+  > :is(details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table):last-child {
   margin-bottom: 0.9rem;
 }
 /* ネスト時は面の重なりを避け背景を paper に落とす（.prose details .message と同じ扱い） */

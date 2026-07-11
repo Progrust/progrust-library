@@ -5,6 +5,7 @@
 // タイトルは frontmatter の title を正とする（markdown-notation/rule.md: 本文で h1 は基本使わない）。
 import type { MarkdownHeading } from "astro";
 import type { DictTarget } from "../lib/wikilink-graph";
+import { tocHeadings } from "../lib/content";
 import BaseLayout from "./BaseLayout.astro";
 import Toc from "../components/Toc.astro";
 import DictPane from "../components/DictPane.astro";
@@ -33,18 +34,30 @@ const {
   linkedDicts = [],
 } = Astro.props;
 const updatedIso = updatedAt.toISOString().slice(0, 10);
+// 目次対象見出しが無いページは左カラム（200px）を省略して2カラムにする
+// （Toc.astro の表示条件と同じ tocHeadings で判定。ui-design-spec「レイアウト」）
+const hasToc = tocHeadings(headings).length > 0;
+const gridCols = hasToc
+  ? "lg:grid-cols-[200px_minmax(0,1fr)_320px]"
+  : "lg:grid-cols-[minmax(0,1fr)_320px]";
 ---
 
 <BaseLayout title={title} description={description}>
   <main class="mx-auto max-w-7xl px-4 py-10 sm:px-8">
-    <div class="lg:grid lg:grid-cols-[200px_minmax(0,1fr)_320px] lg:gap-10">
-      {/* 左: 目次（lg 以上・sticky） */}
-      <aside class="hidden lg:block">
-        <Toc headings={headings} class="sticky top-24" />
-      </aside>
+    <div class={`lg:grid lg:gap-10 ${gridCols}`}>
+      {/* 左: 目次（lg 以上・sticky）。目次が無いページではカラムごと省略 */}
+      {
+        hasToc && (
+          <aside class="hidden lg:block">
+            <Toc headings={headings} class="sticky top-24" />
+          </aside>
+        )
+      }
 
       {/* 中央: タイトル / タグ一覧 / 更新日 / 本文（pages R-12） */}
-      <article class="mx-auto min-w-0 max-w-2xl lg:max-w-none">
+      {/* lg 以上（グリッド時）は mx-auto を切る: グリッドアイテムに auto マージンが
+          付くと stretch が効かず fit-content 幅に縮むため（lg 未満の中央寄せ用にのみ残す） */}
+      <article class="mx-auto min-w-0 max-w-2xl lg:mx-0 lg:max-w-none">
         <header class="mb-8 border-b border-line pb-6">
           {
             eyebrow && (
@@ -64,7 +77,7 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
                     <li>
                       <a
                         href={`/tags/${encodeURIComponent(tag)}`}
-                        class="font-mono text-[11px] text-sub transition-colors hover:text-accent motion-reduce:transition-none"
+                        class="rounded border border-line bg-card px-2.5 py-1 font-mono text-[11px] text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
                       >
                         #{tag}
                       </a>

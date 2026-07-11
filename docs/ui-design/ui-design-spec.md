@@ -113,7 +113,7 @@ tailwind.config = {
 | 画面 | コンテナ | 構成 |
 | --- | --- | --- |
 | トップ / 辞書一覧 / タグ一覧 / タグ詳細 / プロフィール | `max-w-6xl px-4 sm:px-8` | 1カラム |
-| 辞書詳細（記事も同様の想定） | `max-w-7xl px-4 sm:px-8` | `lg:grid lg:grid-cols-[200px_minmax(0,1fr)_320px] lg:gap-10`（左=目次 / 中央=本文 / 右=使用辞書+サイドペイン） |
+| 辞書詳細（記事も同様の想定） | `max-w-7xl px-4 sm:px-8` | `lg:grid lg:grid-cols-[200px_minmax(0,1fr)_320px] lg:gap-10`（左=目次 / 中央=本文 / 右=使用辞書+サイドペイン）。目次対象見出し（h2〜h4）が無いページでは左カラムを省略し `lg:grid-cols-[minmax(0,1fr)_320px]` の2カラムにする（本文が左の空きを使う） |
 | 章詳細 | `max-w-7xl px-4 sm:px-8` | 辞書詳細と同じ3カラム。ただし左カラムは `220px` で**複合目次**（章リスト+現在章の本文見出し）に差し替え |
 | 本トップ | `max-w-5xl px-4 sm:px-8` | `lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12`（左=章目次サイドバー / 右=ヒーロー+本文、本文列は `max-w-3xl`） |
 
@@ -155,6 +155,11 @@ tailwind.config = {
 <a class="group grid grid-cols-[auto_auto_1fr] sm:grid-cols-[7rem_4.5rem_1fr_auto] items-center gap-x-4 py-4 border-b border-line dark:border-nline hover:bg-card dark:hover:bg-ncard transition motion-reduce:transition-none">
 ```
 
+逆リンクセクション（辞書詳細の本文下・★dict-detail.htmlで確定）は、`mt-12 pt-8 border-t` のセクション内に見出し行 + 台帳リストで構成する:
+
+- 見出し行: `flex items-baseline justify-between mb-5` で、h2「この辞書が使われているページ」（`font-display font-black text-xl tracking-tight text-strong`）+ 件数 `backlinks N`（`font-mono text-[11px] text-sub`）
+- 行は日付・タグ列なしの `grid grid-cols-[auto_1fr] gap-x-4 py-3.5`（バッジ `w-[4.5rem] text-center` + タイトル `font-display font-bold text-sm text-strong group-hover:text-accent truncate`）。章は「本タイトル › 章タイトル」で併記
+
 ### 辞書カード（一覧）
 
 タイトル + タグのみ（概要なし）。`data-title` / `data-tags`（`|` 区切り）を持たせ、絞込JSで参照する。
@@ -167,6 +172,8 @@ tailwind.config = {
 
 `font-mono text-[11px] px-2.5 py-1 rounded border bg-card` + `#タグ名` + 出現件数。選択時は `border-accent dark:border-naccent text-accent dark:text-naccent` をclassList.toggleで付与し `aria-pressed` を更新（トークン定義順でaccentがline/subより後のため上書きが効く）。タグはAND、キーワードはタイトル+タグの部分一致。件数表示は `N / 総数 entries`（ヒット数 N を `text-strong font-semibold` で強調）、0件時はメッセージ表示。タグが多い場合は上位12個 + 「+ N tags」（アクセント色テキストのボタン）で展開。
 
+**詳細ページヘッダーのタグ**（★dict-detail.htmlで確定）も同型のチップ（`font-mono text-[11px] px-2.5 py-1 rounded border border-line bg-card text-sub`）を `<a>`（タグ詳細ページへのリンク）で使う。件数・選択状態はなし、ホバーで文字・枠がアクセント色。
+
 絞込JS（P5・`list-filter.ts`）が参照する `data-*` 属性コントラクト（SSoT。カード側 `data-title` / `data-tags`（`|`区切り）と対で使う）:
 
 | 属性 | 付与先 | 用途 |
@@ -176,6 +183,15 @@ tailwind.config = {
 | `data-filter-count` / `data-filter-hits` | 件数表示 `<p>` / ヒット数 `<span>` | ヒット数の更新先 |
 | `data-filter-tag`（値=タグ名） | タグチップ | AND絞込の選択状態管理 |
 | `data-filter-more` | 「+ N tags」ボタン | 残りタグの展開トリガ |
+
+### 本文タイポグラフィ（prose・★dict-detail.htmlで確定）
+
+モックの本文コンテナ `space-y-6 leading-relaxed text-[15px]` に合わせる。
+
+- 基本: font-size 15px（0.9375rem）/ line-height 1.625（`leading-relaxed`）/ ブロック間 margin-top 1.5rem（`space-y-6`）
+- h2: `text-2xl`（1.5rem）。セクション区切りは**見出しの上**に薄罫線（`pt-6 border-t border-line/70` 相当。margin-top はブロック間の 1.5rem のまま）。見出し下線（border-bottom）は使わない
+- h3: `text-lg`（1.125rem）、罫線なし。margin-top は汎用の 1.5rem
+- h4 以下・リスト・blockquote 等はモックに対応要素がないため実装値（`global.css`）に従う
 
 ### コードブロック（★E案・ダーク反転で確定）
 
@@ -284,15 +300,25 @@ html.dark .dict-link { color: #F0684A; }
 
 挙動（デスクトップ）:
 
-- ホバー: プレビュー小窓（`w-80 max-h-72 overflow-y-auto rounded border bg-card shadow-xl p-4`、fixed配置）に辞書の全文を表示。リンク下に出し、画面下端にかかる場合は上に反転。プレビュー内の辞書リンクはさらにプレビューしない
+- ホバー: プレビュー小窓（`w-80 max-h-72 overflow-y-auto rounded border bg-card shadow-xl p-4`、fixed配置）に辞書の内容（後述の「ペイン/プレビューの内容表示」の compact 形）を表示。リンク下に出し、画面下端にかかる場合は上に反転。プレビュー内の辞書リンクはさらにプレビューしない
 - クリック: 画面遷移せず右のサイドペインに表示（モバイルは辞書ボトムシートを開く）
 
 ### 辞書サイドペイン（詳細ページ右）
 
 - 枠: `rounded border bg-card`、ヘッダー行に `// dictionary pane` + 戻る/進むボタン（`w-7 h-7 rounded border`、`disabled:opacity-40`）
 - 本文: `p-5 max-h-[60vh] overflow-y-auto`
-- 2状態: デフォルト（本アイコン + 「辞書リンクを押すと、ここに内容が表示されます。」）/ 選択時（種別ラベル・タイトル・タグ・本文・「辞書ページを開く →」リンク）
+- 2状態: デフォルト（本アイコン + 「辞書リンクを押すと、ここに内容が表示されます。」）/ 選択時（後述の「ペイン/プレビューの内容表示」）
 - 履歴はペイン単体でJS配列管理（ページ遷移でリセット）。ペイン内の辞書リンククリックで内容を差し替え
+
+### ペイン/プレビューの内容表示（★dict-detail.htmlベース・種別ラベルのみ実装判断で変更）
+
+サイドペイン（選択時）とホバープレビューは同一構成。プレビューは compact 形（タイトル小さめ・フッターリンクなし）。
+
+- 種別ラベル: **KindBadge の辞書バリアント（金色の角型バッジ）**。モックのプレーンな mono「辞書」表記は不採用（一覧・逆リンクのバッジと表記を揃える）
+- タイトル: `font-display font-bold text-strong mb-2`。ペイン `text-base` / プレビュー `text-sm`
+- タグ: 小チップ `font-mono text-[10px] px-1.5 py-0.5 rounded border border-line text-sub`、コンテナ `mb-3 flex flex-wrap gap-1.5`
+- 本文: embed 断片の `.prose` をコンパクト表示（13px / line-height 1.625 / ブロック間 0.75rem。モックの `space-y-3 text-[13px] leading-relaxed` 相当）
+- フッターリンク（ペインのみ）: `inline-flex items-center gap-1.5 mt-4 font-display font-bold text-xs text-accent hover:underline` +「辞書ページを開く」+ 右矢印SVG（11x11・stroke-width 2.5）
 
 ### 目次（詳細ページ左）
 
@@ -372,7 +398,7 @@ html.dark .dict-link { color: #F0684A; }
 
 ### `:::details` の変換後スタイル
 
-実際の出力はコンテンツのラッパ`<div>`を持たず、`<summary>`の後に本文ブロックが直接並ぶ（パイプラインの制約。`docs/markdown-pipeline/directives.md`「入出力例」参照）。コンテンツの余白はラッパではなく**`summary`以外の直下子要素それぞれへのpadding**で表現する。
+実際の出力はコンテンツのラッパ`<div>`を持たず、`<summary>`の後に本文ブロックが直接並ぶ（パイプラインの制約。`docs/markdown-pipeline/directives.md`「入出力例」参照）。コンテンツの余白はラッパではなく**`summary`以外の直下子要素それぞれへのpadding**で表現する（枠・背景を持つボックス要素は例外的にmarginを使う。後述）。
 
 ```html
 <details><!-- rounded / border line / bg-card 相当。シェブロンはsummaryの::beforeで描画 -->
@@ -387,7 +413,8 @@ details > summary::-webkit-details-marker { display: none; }
 details[open] > summary::before { transform: rotate(45deg); } /* シェブロン回転 */
 ```
 
-- **ネストしたdetails**（`details > details`）: 直下子要素へのpaddingは内側detailsボックスの内部パディングになるだけで周囲に余白を作らないため、**paddingを0にしてmarginへ振り替える**（margin-inline: 1rem、先頭margin-top / 末尾margin-bottomも同様）。背景はネスト時のメッセージと同じく `bg-paper dark:bg-npaper` に落とす（card面の重なり回避）
+- **枠・背景を持つボックス直下子**（ネストしたdetails / message / コードブロック（ファイル名付きのラッパー含む） / リンクカード / blockquote / table）: 直下子要素へのpaddingはボックスの内部パディングになるだけで周囲に余白を作らないため、**paddingではなくmarginで余白を表現する**（margin-inline: 1rem、先頭margin-top / 末尾margin-bottomも同様）。ボックス自身の内部パディング（messageの1.25rem等）は単体配置時と同じまま保つ。`figure`は`width: fit-content; margin-inline: auto`の中央寄せがpadding方式で成立しているため対象外
+- **ネストしたdetailsの背景**はネスト時のメッセージと同じく `bg-paper dark:bg-npaper` に落とす（card面の重なり回避）
 
 ### `:::figure` の変換後スタイル
 

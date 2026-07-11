@@ -1,10 +1,11 @@
 // 辞書リンクのホバープレビュー（wikilink-ui R-6〜R-9 / AC-3）。
-// 辞書リンク（a.wikilink[data-dict-link]）にマウスホバーすると、辞書の本文全文を
-// プレビュー小窓に表示する。フェッチ結果は dict-pane.ts の fetchDictEmbed と共有し、
+// 辞書リンク（a.wikilink[data-dict-link]）にマウスホバーすると、辞書の内容
+// （バッジ・タイトル・タグ・本文全文の compact 形。ui-design-spec「ペイン/プレビューの
+// 内容表示」）をプレビュー小窓に表示する。フェッチ結果は dict-pane.ts の fetchDictEmbed と共有し、
 // 同一辞書を二重 fetch しない（architecture §8）。タッチ環境では動作しない（R-9）。
 // クライアント JS はコンポーネントに書かない規約（§4）に従い本モジュールへ分離する。
 
-import { fetchDictEmbed } from "./dict-pane";
+import { dictMarkup, fetchDictEmbed, type DictEmbed } from "./dict-pane";
 
 // --- 位置決めの純ロジック（DOM 非依存・vitest 対象。AC-3） --------------------
 
@@ -114,13 +115,14 @@ function hideOnScroll(): void {
   if (previewEl && !previewEl.classList.contains("hidden")) hidePreview();
 }
 
-/** 本文を小窓に挿入し、リンク矩形を基準に位置決めして表示する。 */
+/** 辞書の内容（compact 形: バッジ・タイトル・タグ・本文）を小窓に挿入し、
+    リンク矩形を基準に位置決めして表示する。 */
 function showPreview(
   el: HTMLElement,
   link: HTMLElement,
-  bodyHtml: string,
+  embed: DictEmbed,
 ): void {
-  el.innerHTML = bodyHtml;
+  el.innerHTML = dictMarkup(embed, true);
   el.classList.remove("hidden");
   const rect = link.getBoundingClientRect();
   const placement = resolvePreviewPlacement(
@@ -144,7 +146,7 @@ function requestPreview(link: HTMLElement, slug: string): void {
       hidePreview();
       return;
     }
-    showPreview(ensurePreviewEl(), link, embed.bodyHtml);
+    showPreview(ensurePreviewEl(), link, embed);
   });
 }
 

@@ -118,22 +118,32 @@ const DICT_BADGE_CLASS =
   "rounded border px-2 py-0.5 font-display text-[11px] font-bold " +
   "border-[#A87B1C] text-[#8F6812] dark:border-[#D9B25E] dark:text-[#D9B25E]";
 
-/** 選択状態の内側 HTML（種別ラベル・タイトル・タグ・本文・辞書ページリンク）を組み立てる。 */
-function selectedMarkup(embed: DictEmbed): string {
+/**
+ * ペイン選択状態・ホバープレビュー共通の内側 HTML（種別バッジ・タイトル・タグ・本文・
+ * 辞書ページリンク）を組み立てる（ui-design-spec「ペイン/プレビューの内容表示」）。
+ * compact はプレビュー用: タイトルを一回り小さくし、辞書ページリンクを省く。
+ */
+export function dictMarkup(embed: DictEmbed, compact: boolean): string {
   const tagsHtml = embed.tags
     .map(
       (tag) =>
-        `<span class="font-mono text-[11px] text-sub">#${escapeHtml(tag)}</span>`,
+        `<span class="rounded border border-line px-1.5 py-0.5 font-mono text-[10px] text-sub">#${escapeHtml(tag)}</span>`,
     )
     .join("");
+  const openLink = compact
+    ? ""
+    : `
+    <a href="/dict/${encodeURIComponent(embed.slug)}" class="mt-4 inline-flex items-center gap-1.5 font-display text-xs font-bold text-accent hover:underline">
+      辞書ページを開く
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"></path></svg>
+    </a>
+  `;
   return `
     <div class="mb-2"><span class="${DICT_BADGE_CLASS}">辞書</span></div>
-    <h2 class="font-display text-lg font-bold leading-snug text-strong">${escapeHtml(embed.title)}</h2>
-    ${tagsHtml ? `<div class="mt-1.5 flex flex-wrap gap-2">${tagsHtml}</div>` : ""}
+    <h2 class="font-display ${compact ? "text-sm" : "text-base"} mb-2 font-bold text-strong">${escapeHtml(embed.title)}</h2>
+    ${tagsHtml ? `<div class="mb-3 flex flex-wrap gap-1.5">${tagsHtml}</div>` : ""}
     ${embed.bodyHtml}
-    <div class="mt-4 border-t border-line/70 pt-3">
-      <a href="/dict/${encodeURIComponent(embed.slug)}" class="font-mono text-xs text-accent hover:underline">辞書ページを開く →</a>
-    </div>
+    ${openLink}
   `;
 }
 
@@ -164,7 +174,7 @@ function syncNav(): void {
 
 /** 選択状態を全ペインに描画する（デフォルトブロックは隠す）。 */
 function renderEmbed(embed: DictEmbed): void {
-  const markup = selectedMarkup(embed);
+  const markup = dictMarkup(embed, false);
   for (const content of document.querySelectorAll<HTMLElement>(
     "[data-dict-pane-content]",
   )) {
