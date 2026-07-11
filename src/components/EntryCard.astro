@@ -1,7 +1,7 @@
 ---
 // 記事・本一覧の横並びカード（pages R-9/R-10。ユーザー確定: 画像左・横並び）。
 // 左にヘッダ画像、右に 日付 / タイトル / 概要（description）/ タグ。
-// data-title / data-tags は P5 の絞込 JS 用の予約属性（data-tags は | 区切り）。
+// data-title / data-description / data-tags は一覧絞込 JS 用（data-tags は | 区切り。search R-9）。
 // 画像はダミーの remote URL を文字列で受ける（画像最適化は後続タスク。content.config.ts 参照）。
 interface Props {
   href: string;
@@ -19,6 +19,7 @@ const isoDate = createdAt.toISOString().slice(0, 10);
 <a
   href={href}
   data-title={title}
+  data-description={description}
   data-tags={tags.join("|")}
   class="group flex flex-col gap-4 rounded border border-line bg-card p-4 transition-colors hover:border-accent motion-reduce:transition-none sm:flex-row sm:gap-5 sm:p-5"
 >

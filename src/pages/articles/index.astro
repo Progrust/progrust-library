@@ -32,7 +32,7 @@ const tags = tagCounts(articles);
 
     <ListFilter tags={tags} total={articles.length} />
 
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4" data-list-grid>
       {
         articles.map((entry) => (
           <EntryCard

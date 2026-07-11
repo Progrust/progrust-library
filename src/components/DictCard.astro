@@ -1,19 +1,22 @@
 ---
 // 辞書一覧のカード（ui-design-spec「辞書カード（一覧）」pages R-8）。
-// タイトル + タグのみ（概要なし）。data-title / data-tags は P5 の絞込 JS 用の予約属性
-// （data-tags は | 区切り。search R-9〜R-11）。トークンは T3-1/T3-2 方式で dark: を併記しない。
+// 表示はタイトル + タグのみ（概要なし）。data-title / data-description / data-tags は一覧絞込 JS 用
+// の属性（data-tags は | 区切り。search R-9）。description は非表示だがキーワード絞込の対象（R-4）。
+// トークンは T3-1/T3-2 方式で dark: を併記しない。
 interface Props {
   href: string;
   title: string;
+  description: string;
   tags: string[];
 }
 
-const { href, title, tags } = Astro.props;
+const { href, title, description, tags } = Astro.props;
 ---
 
 <a
   href={href}
   data-title={title}
+  data-description={description}
   data-tags={tags.join("|")}
   class="dict-card group flex flex-col gap-3 rounded border border-line bg-card p-5 transition-colors hover:border-accent motion-reduce:transition-none"
 >

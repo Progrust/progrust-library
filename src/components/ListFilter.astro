@@ -1,8 +1,8 @@
 ---
-// 一覧の絞込 UI（ui-design-spec「タグチップ（絞込UI）」search R-9〜R-11）。
-// T3-3 では静的シェルのみ（動作なし）。実際の絞込は P5 で配線する。
-// キーワード入力 + 件数（N / 総数）+ タグチップ（出現件数降順・上位12個 + 超過分の静的表示）。
-// data-* 属性は P5 の絞込 JS が参照できるよう予約する。
+// 一覧の絞込 UI（ui-design-spec「タグチップ（絞込UI）」search R-9〜R-11 / AC-7）。
+// キーワード入力 + 件数（N / 総数）+ タグチップ（出現件数降順・上位12個 + 超過分は展開式）。
+// 動作（タグ AND 選択・キーワード部分一致・件数/0件更新）は src/scripts/list-filter.ts。
+// data-* 属性を絞込 JS が参照する。JS 無効時は disabled の静的表示のまま（PE）。
 interface Props {
   tags: Array<{ tag: string; count: number }>;
   total: number;
@@ -11,8 +11,7 @@ interface Props {
 const { tags, total } = Astro.props;
 
 const VISIBLE_TAGS = 12;
-const visible = tags.slice(0, VISIBLE_TAGS);
-const hidden = tags.length - visible.length;
+const hiddenCount = Math.max(0, tags.length - VISIBLE_TAGS);
 ---
 
 <div
@@ -55,31 +54,43 @@ const hidden = tags.length - visible.length;
     </p>
   </div>
 
+  <p class="hidden text-sm text-sub" data-filter-empty>
+    該当するエントリがありません。
+  </p>
+
   {
     tags.length > 0 && (
       <div class="flex flex-wrap gap-2">
-        {visible.map(({ tag, count }) => (
+        {tags.map(({ tag, count }, i) => (
           <button
             type="button"
             disabled
             aria-pressed="false"
             data-filter-tag={tag}
-            class="rounded border border-line bg-card px-2.5 py-1 font-mono text-[11px] text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+            class:list={[
+              "rounded border border-line bg-card px-2.5 py-1 font-mono text-[11px] text-sub transition-colors hover:border-accent hover:text-accent aria-pressed:border-accent aria-pressed:text-accent motion-reduce:transition-none",
+              { hidden: i >= VISIBLE_TAGS },
+            ]}
           >
             #{tag} <span class="text-sub">{count}</span>
           </button>
         ))}
-        {hidden > 0 && (
+        {hiddenCount > 0 && (
           <button
             type="button"
             disabled
             data-filter-more
             class="px-2.5 py-1 font-mono text-[11px] text-accent transition-colors hover:underline motion-reduce:transition-none"
           >
-            + {hidden} tags
+            + {hiddenCount} tags
           </button>
         )}
       </div>
     )
   }
 </div>
+
+<script>
+  import { initListFilter } from "../scripts/list-filter";
+  initListFilter();
+</script>

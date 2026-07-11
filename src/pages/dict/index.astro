@@ -32,12 +32,16 @@ const tags = tagCounts(dict);
 
     <ListFilter tags={tags} total={dict.length} />
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+      data-list-grid
+    >
       {
         dict.map((entry) => (
           <DictCard
             href={`/dict/${entry.id}`}
             title={entry.data.title}
+            description={entry.data.description}
             tags={entry.data.tags}
           />
         ))
