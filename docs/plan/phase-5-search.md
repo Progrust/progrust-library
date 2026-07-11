@@ -14,7 +14,7 @@
 - [x] **T5-2: クエリパーサ+フィルタ（純関数）**
   `src/scripts/search.ts`: クエリ文字列 →（キーワード群・タグ群）のパース、部分一致/完全一致/ANDのフィルタ。
   完了条件: search.md AC-3 / AC-4 / AC-5 相当のvitestが通る。
-- [ ] **T5-3: ヘッダー検索ボックスUI**
+- [x] **T5-3: ヘッダー検索ボックスUI**
   初回フォーカスでの遅延ロード・ドロップダウン表示（種別バッジ・遷移先規則）。
   完了条件: search.md AC-2 / AC-6 を満たす。
 - [ ] **T5-4: 一覧ページ絞込**
@@ -47,6 +47,19 @@
   - `fae44ba` feat: 検索クエリパーサとフィルタ純関数を追加
 
 ### T5-3
+
+- **実装**: ヘッダー検索ボックスを配線して機能させた（architecture §8 が規定する `src/scripts/search-box.ts`）。
+  - `src/scripts/search-box.ts` を新規追加。純ロジック（vitest 対象）と DOM 配線（architecture §10 によりビルド + 目視）を分離。
+    - 純関数: `SEARCH_TYPE_LABEL`（dict/article/book/chapter → 辞書/記事/本/章。`KindBadge.astro` は3種のみで章を持たないため検索用に "章" を新設）と `buildDropdownItems(entries, limit)`（フィルタ済みエントリを先頭 `limit` 件に絞り種別バッジ付き view model に写す。`url` は `SearchEntry.url` を素通し＝章クリックの遷移先）。
+    - パース/フィルタは T5-2 の `search.ts`（`parseQuery`/`filterEntries`）を import 再利用（重複実装なし）。
+    - 遅延ロード: module-level の `indexPromise` で `/search-index.json` を**初回フォーカスで1回だけ** fetch（AC-2/R-2。`dict-pane.ts` の embed キャッシュと同方式）。fetch 失敗時はドロップダウンを出さない。
+    - `input` イベントで再描画、結果は `<a href={url}>`（バッジ + タイトル）で通常遷移（AC-6）。Escape・ボックス外クリックで閉じる。`initSearchBox` が `disabled` を除去して有効化（JS 無効時は disabled 表示のまま＝PE。architecture §8）。
+  - `src/components/SearchBox.astro`: input に `data-search-input`/`autocomplete=off` を付与し `aria-label` の「（準備中）」を除去（markup では `disabled` のまま＝JS 無効フォールバック）。`data-search-results` のドロップダウンコンテナ（既存トークン構成）と `initSearchBox()` 呼び出しの `<script>` を追加。
+- **未確定事項の決定**（[search.md §5](../spec/search.md)。T5-2 同様 spec §5 は据え置き、決定を本履歴に記録）: ドロップダウン最大表示件数 = **8**（`MAX_RESULTS`）。矢印キー選択は**初期実装では入れない**（クリック + Escape/外クリックで閉じるのみ）。キーワード正規化は T5-2 の大文字小文字同一視を継承。
+- **テスト**: `tests/scripts/search-box.test.ts`。`SEARCH_TYPE_LABEL`（4種別）と `buildDropdownItems`（章の url/label・全項目の充足・limit 切り捨て）を `[AC-6]` 命名で検証（純関数・モックなし）。
+- **検証**: `npm run check`（format/lint/typecheck/test 128件）・`npx astro build`（115ページ）ともに成功。ビルド成果物で `dist/search-index.json` の生成・input の `disabled` フォールバック・`data-search-results` コンテナ・バンドル済み `initSearchBox` の inline を確認。
+- **コミット**:
+  - `8aa9bf5` feat: ヘッダー検索ボックスUIを追加
 
 ### T5-4
 
