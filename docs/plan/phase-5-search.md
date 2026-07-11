@@ -58,8 +58,11 @@
 - **未確定事項の決定**（[search.md §5](../spec/search.md)。T5-2 同様 spec §5 は据え置き、決定を本履歴に記録）: ドロップダウン最大表示件数 = **8**（`MAX_RESULTS`）。矢印キー選択は**初期実装では入れない**（クリック + Escape/外クリックで閉じるのみ）。キーワード正規化は T5-2 の大文字小文字同一視を継承。
 - **テスト**: `tests/scripts/search-box.test.ts`。`SEARCH_TYPE_LABEL`（4種別）と `buildDropdownItems`（章の url/label・全項目の充足・limit 切り捨て）を `[AC-6]` 命名で検証（純関数・モックなし）。
 - **検証**: `npm run check`（format/lint/typecheck/test 128件）・`npx astro build`（115ページ）ともに成功。ビルド成果物で `dist/search-index.json` の生成・input の `disabled` フォールバック・`data-search-results` コンテナ・バンドル済み `initSearchBox` の inline を確認。
+- **レビュー対応**（[review/T5-3.md](../archive/review/T5-3.md) の推奨指摘）: 推奨1（0件ヒット時に空のドロップダウン枠が出る）を修正＝0件時は隠す。推奨2（`KindBadge.astro` の複製注記に `search-box.ts` の `BADGE_CLASS` を追記）を修正。軽微1・2（Tab blur で閉じない・Escape 後の再フォーカス再表示なし）はいずれも spec §5 でキーボード操作を初期実装対象外と決定済みのため現状維持（T5-4 以降の改善候補）。
+- **申し送り**: 推奨3（AC-2/AC-6 のブラウザ目視）。実行環境にブラウザがなく、検証はビルド成果物の静的確認（fetch を `focus` ハンドラ内のみに配線／結果は素の `<a href>` 遷移）に留まる。`npm run dev` での DevTools Network による fetch タイミング（初期ロードで出ない・初回フォーカスで1回）と章クリック遷移（`/books/[本]/[章]`）の目視は未実施＝実機での最終確認が残る。
 - **コミット**:
   - `8aa9bf5` feat: ヘッダー検索ボックスUIを追加
+  - レビュー対応（0件時の空枠・複製注記の修正）
 
 ### T5-4
 

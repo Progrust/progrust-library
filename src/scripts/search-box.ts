@@ -81,6 +81,11 @@ function renderResults(
   }
 
   const items = buildDropdownItems(filterEntries(entries, parseQuery(query)));
+  // 0件時は空のボーダー枠を出さず隠す（search.md はボックスの0件挙動を定めない）。
+  if (items.length === 0) {
+    hideResults(results);
+    return;
+  }
   results.replaceChildren(...items.map(createResultLink));
   results.classList.remove("hidden");
 }
