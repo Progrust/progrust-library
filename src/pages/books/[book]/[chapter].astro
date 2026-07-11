@@ -11,12 +11,14 @@ import {
   chapterNav,
   chapterOrderLabel,
 } from "../../../lib/content";
+import { buildContentWikilinkGraph } from "../../../lib/wikilink-graph";
 import ChapterLayout from "../../../layouts/ChapterLayout.astro";
 
 export async function getStaticPaths() {
-  const [books, chapters] = await Promise.all([
+  const [books, chapters, graph] = await Promise.all([
     getPublicBooks(),
     getPublicChapters(),
+    buildContentWikilinkGraph(),
   ]);
   const bookById = new Map(books.map((book) => [book.id, book]));
 
@@ -53,14 +55,24 @@ export async function getStaticPaths() {
           currentSlug: chapterSlug,
           prev: toTarget(prev),
           next: toTarget(next),
+          linkedDicts: graph.forward.get(chapter.id) ?? [],
         },
       },
     ];
   });
 }
 
-const { chapter, bookTitle, bookHref, order, ledger, currentSlug, prev, next } =
-  Astro.props;
+const {
+  chapter,
+  bookTitle,
+  bookHref,
+  order,
+  ledger,
+  currentSlug,
+  prev,
+  next,
+  linkedDicts,
+} = Astro.props;
 const { Content, headings } = await render(chapter);
 ---
 
@@ -77,6 +89,7 @@ const { Content, headings } = await render(chapter);
   headings={headings}
   prev={prev}
   next={next}
+  linkedDicts={linkedDicts}
 >
   <Content />
 </ChapterLayout>

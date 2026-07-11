@@ -6,10 +6,12 @@
 // 右カラム・モバイルは辞書詳細と同一（DictPane 枠 / MobileNav。動作は P4）。
 import type { MarkdownHeading } from "astro";
 import type { ChapterLedgerItem } from "../lib/content";
+import type { DictTarget } from "../lib/wikilink-graph";
 import BaseLayout from "./BaseLayout.astro";
 import ChapterToc from "../components/ChapterToc.astro";
 import ChapterNav from "../components/ChapterNav.astro";
 import DictPane from "../components/DictPane.astro";
+import LinkedDictList from "../components/LinkedDictList.astro";
 import MobileNav from "../components/MobileNav.astro";
 
 /** 前後章ナビの表示データ（連番・タイトル・URL。ページ側で算出） */
@@ -39,6 +41,8 @@ interface Props {
   /** 前後章ナビ（先頭章の prev・最終章の next は null） */
   prev: NavTarget | null;
   next: NavTarget | null;
+  /** 使用辞書一覧（本文がリンクしている辞書。R-17）。ページ側で wikilink グラフから算出 */
+  linkedDicts?: DictTarget[];
 }
 
 const {
@@ -54,6 +58,7 @@ const {
   headings,
   prev,
   next,
+  linkedDicts = [],
 } = Astro.props;
 
 const createdIso = createdAt.toISOString().slice(0, 10);
@@ -102,13 +107,20 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
           <slot />
         </div>
 
+        {/* モバイル: 使用辞書一覧を本文下部に（R-17。前後章ナビより上） */}
+        <LinkedDictList
+          dicts={linkedDicts}
+          class="mt-12 border-t border-line pt-8 lg:hidden"
+        />
+
         {/* 前後章ナビ（R-16） */}
         <ChapterNav prev={prev} next={next} />
       </article>
 
-      {/* 右: 辞書ペイン（枠のみ・動作は P4）。使用辞書一覧も P4。 */}
+      {/* 右: 使用辞書一覧（R-17・右上）+ 辞書ペイン */}
       <aside class="hidden lg:block">
         <div class="sticky top-24">
+          <LinkedDictList dicts={linkedDicts} class="mb-8" />
           <DictPane />
         </div>
       </aside>

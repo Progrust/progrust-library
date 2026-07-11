@@ -1,0 +1,33 @@
+---
+// 使用辞書一覧（wikilink-ui R-17 / AC-8）。本文がリンクしている辞書を小さく一覧表示する。
+// データは src/lib/wikilink-graph.ts の forward マップ（ページ側の getStaticPaths で構築）。
+// リンクは本文 wikilink と同一挙動（クリックでサイドペイン・ホバーでプレビュー）にするため
+// class="wikilink" + data-dict-link を付与し、既存 dict-pane.ts / dict-preview.ts の
+// document 委譲に乗せる（init 未配線ページでは data 属性は不活性で素の遷移にフォールバック）。
+import type { DictTarget } from "../lib/wikilink-graph";
+
+interface Props {
+  dicts: DictTarget[];
+  /** 配置調整用の追加クラス（配置・余白はレイアウト側で付与） */
+  class?: string;
+}
+
+const { dicts, class: className = "" } = Astro.props;
+---
+
+{
+  dicts.length > 0 && (
+    <nav class={className} aria-label="使用辞書一覧">
+      <p class="mb-3 font-mono text-xs text-accent">// linked dicts</p>
+      <ul class="flex flex-col gap-1.5 text-sm">
+        {dicts.map((dict) => (
+          <li>
+            <a href={dict.href} class="wikilink" data-dict-link={dict.slug}>
+              {dict.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}

@@ -1,0 +1,43 @@
+---
+// 逆リンク（wikilink-ui R-18 / R-19 / AC-7）。辞書詳細ページの本文下に、その辞書を
+// wikilink でリンクしている公開コンテンツ（辞書・記事・章）を種別バッジ付きで一覧表示する。
+// データは src/lib/wikilink-graph.ts の backward マップ（辞書ページの getStaticPaths で構築。
+// 非公開ソースの除外は getPublic* が担保）。DetailLayout の slot="below" に差し込む前提で
+// 上罫線セクションとして本文の下に置く。章は「本タイトル › 章タイトル」で併記する。
+import type { WikilinkRef } from "../lib/wikilink-graph";
+import KindBadge from "./KindBadge.astro";
+
+interface Props {
+  items: WikilinkRef[];
+  /** 配置調整用の追加クラス */
+  class?: string;
+}
+
+const { items, class: className = "" } = Astro.props;
+---
+
+{
+  items.length > 0 && (
+    <section
+      class={`mt-12 border-t border-line pt-8 ${className}`}
+      aria-label="逆リンク"
+    >
+      <p class="mb-4 font-mono text-xs text-accent">// backlinks</p>
+      <ul class="flex flex-col gap-2 text-sm">
+        {items.map((item) => (
+          <li class="flex items-center gap-3">
+            <KindBadge kind={item.kind} class="w-10 shrink-0 text-center" />
+            <a
+              href={item.href}
+              class="text-sub transition-colors hover:text-accent motion-reduce:transition-none"
+            >
+              {item.bookTitle
+                ? `${item.bookTitle} › ${item.title}`
+                : item.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

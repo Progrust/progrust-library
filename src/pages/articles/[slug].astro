@@ -4,17 +4,21 @@
 // ヘッダ画像は詳細ページには表示しない（R-12 が規定するのはタイトル/タグ/更新日/本文のみ）。
 import { render } from "astro:content";
 import { getPublicArticles } from "../../lib/content";
+import { buildContentWikilinkGraph } from "../../lib/wikilink-graph";
 import DetailLayout from "../../layouts/DetailLayout.astro";
 
 export async function getStaticPaths() {
-  const articles = await getPublicArticles();
+  const [articles, graph] = await Promise.all([
+    getPublicArticles(),
+    buildContentWikilinkGraph(),
+  ]);
   return articles.map((entry) => ({
     params: { slug: entry.id },
-    props: { entry },
+    props: { entry, linkedDicts: graph.forward.get(entry.id) ?? [] },
   }));
 }
 
-const { entry } = Astro.props;
+const { entry, linkedDicts } = Astro.props;
 const { Content, headings } = await render(entry);
 ---
 
@@ -25,6 +29,7 @@ const { Content, headings } = await render(entry);
   tags={entry.data.tags}
   updatedAt={entry.data.updated_at}
   headings={headings}
+  linkedDicts={linkedDicts}
 >
   <Content />
 </DetailLayout>

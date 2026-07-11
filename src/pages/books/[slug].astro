@@ -9,13 +9,16 @@ import {
   sortChapters,
   chapterLedger,
 } from "../../lib/content";
+import { buildContentWikilinkGraph } from "../../lib/wikilink-graph";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ChapterToc from "../../components/ChapterToc.astro";
+import LinkedDictList from "../../components/LinkedDictList.astro";
 
 export async function getStaticPaths() {
-  const [books, chapters] = await Promise.all([
+  const [books, chapters, graph] = await Promise.all([
     getPublicBooks(),
     getPublicChapters(),
+    buildContentWikilinkGraph(),
   ]);
   return books.map((book) => {
     // 本 slug 配下の章を連番昇順で台帳化。getPublicChapters は本番で公開章のみ（AC-5）。
@@ -23,11 +26,14 @@ export async function getStaticPaths() {
       chapters.filter((chapter) => chapter.id.startsWith(`${book.id}/`)),
     );
     const ledger = chapterLedger(bookChapters, book.id);
-    return { params: { slug: book.id }, props: { book, ledger } };
+    return {
+      params: { slug: book.id },
+      props: { book, ledger, linkedDicts: graph.forward.get(book.id) ?? [] },
+    };
   });
 }
 
-const { book, ledger } = Astro.props;
+const { book, ledger, linkedDicts } = Astro.props;
 const { Content } = await render(book);
 const createdIso = book.data.created_at.toISOString().slice(0, 10);
 const updatedIso = book.data.updated_at.toISOString().slice(0, 10);
@@ -94,6 +100,14 @@ const updatedIso = book.data.updated_at.toISOString().slice(0, 10);
         <div class="prose">
           <Content />
         </div>
+
+        {
+          /* 使用辞書一覧（R-17。本トップは右レールが無いため本文下部に置く・全ブレークポイント） */
+        }
+        <LinkedDictList
+          dicts={linkedDicts}
+          class="mt-12 border-t border-line pt-8"
+        />
 
         {/* モバイル: 本文後に章目次セクション（lg 未満・§307） */}
         <section class="mt-12 border-t border-line pt-8 lg:hidden">
