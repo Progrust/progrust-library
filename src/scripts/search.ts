@@ -39,6 +39,19 @@ function matchesKeyword(entry: SearchEntry, keyword: string): boolean {
 }
 
 /**
+ * エントリがパース済みクエリを満たすか判定する（search.md R-4〜R-6）。
+ * 全キーワード（部分一致）かつ全タグ（完全一致）を満たすとき真。空条件は自動的に真。
+ * 一覧絞込（list-filter.ts）もこの述語を共有し、マッチ判定を単一実装に保つ。
+ */
+export function entryMatches(entry: SearchEntry, parsed: ParsedQuery): boolean {
+  return (
+    parsed.keywords.every((keyword) => matchesKeyword(entry, keyword)) &&
+    // タグはタグ名の完全一致（R-5: 部分一致ではヒットさせない）。
+    parsed.tags.every((tag) => entry.tags.includes(tag))
+  );
+}
+
+/**
  * パース済みクエリで検索エントリを絞り込む（search.md R-4〜R-6）。
  * 全キーワード（部分一致）かつ全タグ（完全一致）を満たすエントリのみ返す AND 検索。
  * キーワード・タグが空の条件は自動的に真（空クエリは全件を返す）。入力順を保持する。
@@ -47,10 +60,5 @@ export function filterEntries(
   entries: SearchEntry[],
   parsed: ParsedQuery,
 ): SearchEntry[] {
-  return entries.filter(
-    (entry) =>
-      parsed.keywords.every((keyword) => matchesKeyword(entry, keyword)) &&
-      // タグはタグ名の完全一致（R-5: 部分一致ではヒットさせない）。
-      parsed.tags.every((tag) => entry.tags.includes(tag)),
-  );
+  return entries.filter((entry) => entryMatches(entry, parsed));
 }
