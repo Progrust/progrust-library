@@ -17,7 +17,7 @@
 - [x] **T5-3: ヘッダー検索ボックスUI**
   初回フォーカスでの遅延ロード・ドロップダウン表示（種別バッジ・遷移先規則）。
   完了条件: search.md AC-2 / AC-6 を満たす。
-- [ ] **T5-4: 一覧ページ絞込**
+- [x] **T5-4: 一覧ページ絞込**
   タグチップ（AND・件数表示・上位12+展開）+ キーワード入力。辞書・記事・本の3一覧に適用。
   完了条件: search.md AC-7 を満たす。
 
@@ -65,6 +65,23 @@
   - レビュー対応（0件時の空枠・複製注記の修正）
 
 ### T5-4
+
+- **実装**: 一覧ページ（辞書・記事・本）のタグチップ + キーワード絞込を配線し、静的シェルだった `ListFilter.astro` を機能させた（[search.md](../spec/search.md) R-9〜R-11 / AC-7）。
+  - `src/scripts/list-filter.ts` を新規追加。純ロジック（vitest 対象）と DOM 配線（architecture §10 によりビルド + 目視）を search-box.ts と同型に分離。
+    - 純関数 `computeCardVisibility(cards, selectedTags, keyword)`: 各カードの可視 boolean 配列を返す。判定は `search.ts` の `parseQuery` + `entryMatches` を再利用（キーワード欄内の `#タグ` も parseQuery でタグ化し選択タグと和集合。入力順保持・空条件は全件可視）。
+    - DOM 配線 `initListFilter()`: `[data-list-grid]` 直下の `[data-title]` カードから `data-title/description/tags` を読み、タグチップ（`aria-pressed` トグル）とキーワード入力で可視を再計算。件数 `[data-filter-hits]` 更新・0件で `[data-filter-empty]` 表示・`[data-filter-more]` で12件超のチップを展開。init 時に各 `disabled` を除去（JS 無効なら静的表示のまま＝PE）。
+  - `src/scripts/search.ts`: `filterEntries` 内の述語を named export `entryMatches(entry, parsed)` に抽出し `filterEntries` はそれを使う形にリファクタ（挙動不変・既存テスト不変）。一覧絞込とヘッダー検索でマッチ判定を単一実装に統一。
+  - `ListFilter.astro`: タグチップを全件描画し index ≥ 12 に `hidden` を付与（`[data-filter-more]` で展開）。0件メッセージ `[data-filter-empty]`（`hidden`）と `initListFilter()` 呼び出しの `<script>` を追加。選択スタイルは markup の `aria-pressed:` variant で単一管理。
+  - カードに `data-description` を追加（`EntryCard.astro` / `DictCard.astro`。DictCard は `description` prop を新設し `dict/index.astro` から `entry.data.description` を渡す）。dict カードは概要非表示だがキーワード絞込の対象（R-4 忠実・ヘッダー検索と同一セマンティクス）。3一覧の一覧コンテナに `data-list-grid` を付与。
+- **設計判断**: キーワードのマッチ対象に description を含める（R-9→R-4 に忠実。ヘッダー検索ボックスと挙動を一致）。タグ詳細ページ（`tags/[tag].astro`）は絞込 UI 対象外＝現状どおり（R-11 の一覧種別限定）。
+- **テスト**: `tests/scripts/list-filter.test.ts`。`computeCardVisibility` を最小フィクスチャで検証（AC-7 由来を `[AC-7]` 命名: タグ2択で両タグ持ちのみ／片方のみで複数可視。加えてタグ+キーワード AND・R-4 部分一致大小非区別・空条件全件・`#タグ` 和集合）。純関数のためモックなし。
+- **検証**: `npm run check`（format/lint/typecheck/test 134件）・`npx astro build`（115ページ）ともに成功。`dist/dict/index.html` で `data-list-grid`・`data-description`×23（公開辞書数と一致）・`data-filter-empty`・タグチップ34件中22件 `hidden`（12件超）・バンドル済み `initListFilter` inline を静的確認。`aria-pressed:` variant が `[aria-pressed=true]{border-color/color:var(--color-accent)}` として CSS 出力されることも確認。
+- **知見の還流**: architecture §8 の `list-filter.ts` 行を参照属性 `data-description` 追加・`entryMatches` 再利用の旨に更新。
+- **申し送り**: ブラウザ非搭載環境のため実機目視は未実施。`npm run dev` で辞書一覧のタグチップ2択→両タグ辞書のみ表示・件数更新（AC-7）、0件メッセージ、キーワード絞込、+N tags 展開の最終確認が残る。
+- **コミット**:
+  - `refactor: filterEntriesの述語をentryMatchesに抽出`
+  - `feat: 一覧ページのタグ/キーワード絞込を配線`
+  - `test: 一覧絞込の可視判定テストとdocs更新`
 
 ## フェーズ完了条件
 

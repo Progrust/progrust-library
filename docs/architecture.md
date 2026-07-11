@@ -138,7 +138,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | `theme.ts` | 切替ボタン（初期化はBaseLayoutのインラインスクリプト） | [spec/theme.md](spec/theme.md) |
 | `search.ts` | クエリパース+フィルタ（**純関数として分離しvitest対象**） | [spec/search.md](spec/search.md) |
 | `search-box.ts` | ヘッダー検索UI（遅延ロード・ドロップダウン） | 同上 R-2, R-7 |
-| `list-filter.ts` | 一覧絞込（タグチップ+キーワード、`data-title`/`data-tags`参照） | 同上 R-9〜R-11 |
+| `list-filter.ts` | 一覧絞込（タグチップ+キーワード、`data-title`/`data-description`/`data-tags`参照。keywordはR-4どおりdescriptionも対象・判定は`search.ts`の`entryMatches`を再利用） | 同上 R-9〜R-11 |
 | `dict-pane.ts` | サイドペイン（embedフェッチ・履歴配列・ボトムシート） | [spec/wikilink-ui.md](spec/wikilink-ui.md) R-10〜R-14 |
 | `dict-preview.ts` | ホバープレビュー（フェッチ結果はペインと共有キャッシュ） | 同上 R-7〜R-9 |
 | `toc.ts` | モバイル目次ボトムシート（+現在地追従を入れる場合） | [spec/pages.md](spec/pages.md) R-13 |
