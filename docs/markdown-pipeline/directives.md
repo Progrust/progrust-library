@@ -259,6 +259,7 @@ if (node.name === 'message') {
 - `\:`によるコロンのエスケープが可能かは未検証（復元プラグインで実害がないため不要と判断）
 - `:::message{.alert}`（class shorthand）は`attributes: { class: 'alert' }`に入ることまで確認済みだが、変換プラグインは`{alert}`方式のみ対応（class方式は採用しない）
 - **messageの種別属性のタイポは検出しない**（`:::message{warnig}` 等）。`MESSAGE_TYPES.find((t) => t in attrs)` が `undefined` になり、種別なしの `class="message"` として静かにレンダリングされる（本文は消えない）。未知のdirective**名**はthrowするのと非対称だが、属性値の網羅的バリデーションは行わない（落とし穴1の「スペース区切り引数の書き間違いはプラグインで検出不能」と同じ割り切り）。将来throw検出へ変える場合は、`type` が未定義かつ `attrs` に想定外キーがあるときにthrowする分岐を追加する
-- messageのタイトル省略時にデフォルトタイトル（「Info」「Warning」等）を表示するかは未決定。表示する場合はCSSの`::before`か、labelが無いときに`prependChild`でタイトル段落を挿入する（detailsの`attrs.title`分岐と同じパターン）のどちらでも実現できる
-  - **T3-4での状況**: prose側のスタイル（左ボーダー・card面・種別色 + `.message-title`をeyebrow化＝`::before`で`// `前置）は実装済み（`src/styles/global.css`）。ただしui-design-specの「種別アイコン」と「タイトル省略時のデフォルトeyebrow（`// info`等）」は**現状の出力にアイコン要素・種別名テキストが無い**ため未対応（title指定時の`.message-title`表示のみで成立）。message-variants.htmlとの完全一致にはここでの`prependChild`（種別名 + アイコンSVG挿入）が必要で、パイプライン側の対応として本項に集約する
+- messageのタイトル省略時のデフォルトタイトルは**表示する**（ui-design-specの決定に従い実装済み）: labelが無く**種別がある**とき、`prependChild`で種別名のタイトル段落（`<p class="message-title">info</p>` 等）を挿入する。種別なし・タイトルなしはタイトル行を生成しない
+  - CSSの`::before`によるフォールバックではなくプラグイン側の`prependChild`を採用した理由: タイトルあり/なしでDOM構造が揃いCSSが単純になる。また`.message-title`の擬似要素は eyebrow の`// `（`::before`）と種別アイコン（`::after`、CSS mask）で使い切っており、テキスト挿入用に使えない
+  - 種別アイコンはCSS mask方式（`src/styles/global.css`、wikilinkアイコンと同方式）で表示し、パイプライン側でのSVG挿入は行わない（mdast段階のrawHtml再パースの落とし穴回避。SVGパスデータのSSoTはui-design-spec「:::messageの変換後スタイル」）
 - `:::message[タイトル]{info}`のlabel+属性併用パターンは、figureでの実測結果からの類推だったが、**T2-1実装時にダンプ確認済み**: `containerDirective name=message attrs={ info: '' }` かつ先頭childが `paragraph data={ directiveLabel: true }` になり、figureと同じパース結果（属性に種別・先頭childにlabel）であることを確認した。出力は `<aside class="message message-info"><p class="message-title">…</p>…</aside>`

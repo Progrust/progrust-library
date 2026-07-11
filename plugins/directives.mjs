@@ -84,6 +84,14 @@ export const directives = defineMdastPlugin({
           hName: "p",
           hProperties: { class: "message-title" },
         });
+      } else if (type) {
+        // タイトル省略時、種別付きは種別名をデフォルトタイトルにする（rule.md「タイトルを指定する」）。
+        // 種別なしはタイトル行を生成しない。
+        ctx.prependChild(node, {
+          type: "paragraph",
+          data: { hName: "p", hProperties: { class: "message-title" } },
+          children: [{ type: "text", value: type }],
+        });
       }
       ctx.setProperty(node, "data", {
         hName: "aside",

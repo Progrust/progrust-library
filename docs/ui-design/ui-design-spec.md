@@ -355,7 +355,14 @@ html.dark .dict-link { color: #F0684A; }
 | warning | #B45A1C | #E09A5A | 三角！ |
 | danger | `accent` #C63D22 | `naccent` #F0684A | 八角形！ |
 
-- **通常メッセージはニュートラル（sub色）**。dict-detail.html時点のaccent色案は、dangerとの衝突を避けるため不採用（アイコンSVGのパスはmessage-variants.html参照）
+- **通常メッセージはニュートラル（sub色）**。dict-detail.html時点のaccent色案は、dangerとの衝突を避けるため不採用
+- **アイコンSVGのパスデータ（確定）**: lucide系のstrokeアイコン。`viewBox="0 0 24 24"` / `fill="none"` / `stroke-width="2"` / `stroke-linecap="round"` / `stroke-linejoin="round"`、13x13表示。実装はwikilinkアイコンと同じCSS mask方式（`background-color: currentColor` で種別色に自動追従）
+  - info: `<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>`
+  - tip: `<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>`
+  - question: `<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>`
+  - success: `<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`
+  - warning: `<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>`
+  - danger: `<path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"/>`
 - **タイトル指定（`:::message[タイトル]{type}`）はeyebrow置換方式**: eyebrowの種別名をタイトルに差し替えて `// タイトルテキスト` と表示する。行数は増やさず、種別はアイコンと色で判別する。タイトルなしの場合はeyebrow = 種別名（`// info` 等）のデフォルト表示
 - **ネスト時**（`::::details`内など、card面の上に置かれる場合）は面の重なりを避けるため、メッセージ背景を `bg-paper dark:bg-npaper` に落とす
 

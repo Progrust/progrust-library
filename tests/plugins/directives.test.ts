@@ -37,6 +37,20 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       expect(html).toContain('<aside class="message">');
       expect(html).toContain('<p class="message-title">お知らせ</p>');
     });
+
+    it("種別あり・タイトルなしは種別名がデフォルトタイトルになる（rule.md: タイトルを指定する）", () => {
+      const html = compileWithDirectives(":::message{info}\n本文。\n:::");
+      expect(html).toContain('<p class="message-title">info</p>');
+      // デフォルトタイトルは本文より前（先頭）に挿入される
+      expect(html.indexOf("message-title")).toBeLessThan(
+        html.indexOf("本文。"),
+      );
+    });
+
+    it("種別なし・タイトルなしはタイトル要素を生成しない", () => {
+      const html = compileWithDirectives(":::message\n本文。\n:::");
+      expect(html).not.toContain("message-title");
+    });
   });
 
   describe("details", () => {
