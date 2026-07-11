@@ -11,7 +11,7 @@
 - [x] **T5-1: 検索インデックス生成**
   `search-index.json.js` + `src/lib/search-index.ts`（エントリ変換・公開フィルタ・章含む）。
   完了条件: search.md AC-1 を満たし、変換ロジックのvitestが通る。
-- [ ] **T5-2: クエリパーサ+フィルタ（純関数）**
+- [x] **T5-2: クエリパーサ+フィルタ（純関数）**
   `src/scripts/search.ts`: クエリ文字列 →（キーワード群・タグ群）のパース、部分一致/完全一致/ANDのフィルタ。
   完了条件: search.md AC-3 / AC-4 / AC-5 相当のvitestが通る。
 - [ ] **T5-3: ヘッダー検索ボックスUI**
@@ -36,6 +36,15 @@
   - `bf054b8` feat: 検索インデックス生成を追加
 
 ### T5-2
+
+- **実装**: `src/scripts/search.ts` を新規追加。UI/DOM を含まないパース + フィルタの純関数のみを切り出し vitest 対象とする（architecture §8・§10）。`SearchEntry` 型は T5-1 の `src/lib/search-index.ts` から import して再利用（重複定義しない）。
+  - `parseQuery(query)`: 空白区切りでトークン化し `#`始まりをタグ・その他をキーワードに分解（[search.md](../spec/search.md) R-3）。`#`除去後に空のタグは捨てる。分割正規表現は `/\s+/`（JS の `\s` は全角空白 U+3000 も含むため全角区切りに対応。`no-irregular-whitespace` 回避のため正規表現内に生の全角空白は置かない）。
+  - `filterEntries(entries, parsed)`: 全キーワード（title/description/tag名に部分一致・大文字小文字非区別＝R-4）**かつ** 全タグ（`Array.includes` の完全一致＝R-5）を満たす AND 検索（R-6）。空条件は真＝空クエリで全件・入力順保持。
+  - 未確定事項（全角半角・かなカナ同一視）は初期実装対象外＝仕様どおり大文字小文字の同一視のみ（[search.md §5](../spec/search.md)）。
+- **テスト**: `tests/scripts/search.test.ts`。AC-3/4/5 由来テストに `[AC-n]` 命名。`parseQuery`（分解・空白/全角空白・`#`のみ・複数併記）と `filterEntries`（AC-3 部分一致3対象と大小非区別・AC-4 タグ完全一致で部分一致除外・AC-5 AND と片側のみ除外・空クエリ全件）を最小フィクスチャで検証（純関数のためモックなし）。
+- **検証**: `npm run check`（format/lint/typecheck/test 124件）・`npx astro build`（115ページ）ともに成功。
+- **コミット**:
+  - `feat: 検索クエリパーサとフィルタ純関数を追加`
 
 ### T5-3
 
