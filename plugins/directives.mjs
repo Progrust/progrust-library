@@ -86,12 +86,19 @@ export const directives = defineMdastPlugin({
         });
       } else if (type) {
         // タイトル省略時、種別付きは種別名をデフォルトタイトルにする（rule.md「タイトルを指定する」）。
-        // 種別なしはタイトル行を生成しない。
-        ctx.prependChild(node, {
+        // 種別なしはタイトル行を生成しない。satteriのノード別Data型は hName を
+        // 許容しないため、unknown 経由で橋渡しする（code-filename.mjs と同じ回避策）。
+        const title = {
           type: "paragraph",
           data: { hName: "p", hProperties: { class: "message-title" } },
           children: [{ type: "text", value: type }],
-        });
+        };
+        ctx.prependChild(
+          node,
+          /** @type {import('satteri').MdastContent} */ (
+            /** @type {unknown} */ (title)
+          ),
+        );
       }
       ctx.setProperty(node, "data", {
         hName: "aside",
