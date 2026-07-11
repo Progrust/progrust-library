@@ -17,9 +17,13 @@
   --color-sub: #847a6e;
   --color-accent: #c63d22;
 
-  --font-display: "Zen Kaku Gothic New", sans-serif;
-  --font-maru: "Zen Maru Gothic", sans-serif;
-  --font-mono: "JetBrains Mono", "Zen Kaku Gothic New", monospace;
+  /* フォント本体は Fonts API がセルフホストし、:root へ --font-zen-kaku 等
+     （本体+最適化フォールバック入り）を定義する（astro.config.mjs の fonts /
+     ui-design-spec「タイポグラフィ」）。ここでは役割名トークンから var() 参照する
+     （var は使用時解決のため非 inline の @theme で問題ない）。 */
+  --font-display: var(--font-zen-kaku);
+  --font-maru: var(--font-zen-maru);
+  --font-mono: var(--font-jetbrains);
 }
 
 /* ダークテーマ: 同名トークンの値のみ差し替える（bg-paper 等がそのまま追従する）。 */

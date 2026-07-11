@@ -71,14 +71,18 @@ tailwind.config = {
 | `font-maru`（本文デフォルト） | Zen Maru Gothic | 400/500/700 | 本文（bodyに指定） |
 | `font-mono` | JetBrains Mono | 400/600 | 日付、タグ、eyebrow、件数、コード |
 
-Google Fonts読込（モック時点。コード用の全角対応等幅は本実装で別途選定の可能性あり）:
+フォント読込は **Astro Fonts API によるセルフホスト**（設定は `astro.config.mjs` の `fonts`。ビルド時にGoogleから取得して自オリジンから配信する。Firefoxのフォントスワップ時全画面再レイアウトによる点滅の緩和・表示速度・プライバシーが目的）。CSS変数のマッピング:
 
-```html
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=Zen+Maru+Gothic:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-```
+| Astro側変数（`cssVariable`） | Tailwind `@theme` トークン |
+| --- | --- |
+| `--font-zen-kaku` | `--font-display` |
+| `--font-zen-maru` | `--font-maru` |
+| `--font-jetbrains` | `--font-mono` |
+
+`<Font />` コンポーネントは `BaseLayout.astro` の `<head>` に置く。コード用の全角対応等幅は本実装で別途選定の可能性あり（P6 T6-3）。
 
 - サイトロゴは `Progrust Library` + アクセント色のピリオド（`<span class="text-accent dark:text-naccent">.</span>`）。大見出しの末尾ピリオドも同じ文法
-- 日本語monoのフォールバックとして `"Zen Kaku Gothic New"` をmonoスタックに含める
+- 日本語monoのフォールバックとして `"Zen Kaku Gothic New"` をmonoスタックに含める（Fonts APIの `fallbacks` で指定）
 
 ## 共通ルール
 

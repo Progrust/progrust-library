@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
 import { transformerNotationDiff } from "@shikijs/transformers";
 import tailwindcss from "@tailwindcss/vite";
@@ -29,6 +29,42 @@ validateWikilinks(dictIndex, new URL("./content/", import.meta.url));
 // directivesプラグインに同梱した復元visitorとセットで有効化する（directives.md）。
 export default defineConfig({
   site: "https://progrust.com",
+  // フォントはFonts APIでセルフホストする（ui-design-spec「タイポグラフィ」）。ビルド時に
+  // Googleから取得し自オリジン配信にする（Firefoxのフォントスワップ時全画面再レイアウトによる
+  // 点滅の緩和）。日本語スライス（unicode-range分割）はGoogle css2応答でコメントなしの
+  // @font-face のため unifont の subsets フィルタを素通りして常に含まれる（subsets には
+  // 名前付きサブセットのみ列挙すればよい）。weights / styles はデフォルトが [400] /
+  // ["normal","italic"] のため明示指定が必須。
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: "Zen Kaku Gothic New",
+      cssVariable: "--font-zen-kaku",
+      weights: [500, 700, 900],
+      styles: ["normal"],
+      subsets: ["latin", "latin-ext"],
+      fallbacks: ["sans-serif"],
+    },
+    {
+      provider: fontProviders.google(),
+      name: "Zen Maru Gothic",
+      cssVariable: "--font-zen-maru",
+      weights: [400, 500, 700],
+      styles: ["normal"],
+      subsets: ["latin", "latin-ext"],
+      fallbacks: ["sans-serif"],
+    },
+    {
+      provider: fontProviders.google(),
+      name: "JetBrains Mono",
+      cssVariable: "--font-jetbrains",
+      weights: [400, 600],
+      styles: ["normal"],
+      subsets: ["latin", "latin-ext"],
+      // 日本語monoのフォールバック連鎖（ui-design-spec）を維持する
+      fallbacks: ["Zen Kaku Gothic New", "monospace"],
+    },
+  ],
   markdown: {
     // mermaid は Shiki除外する（★satteri()引数ではなく markdown 直下）。除外しないと
     // mermaid が Shiki でハイライトされ raw ノード化し、mermaidプラグインの element visitor に
