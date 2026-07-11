@@ -44,7 +44,7 @@
 - **テスト**: `tests/scripts/search.test.ts`。AC-3/4/5 由来テストに `[AC-n]` 命名。`parseQuery`（分解・空白/全角空白・`#`のみ・複数併記）と `filterEntries`（AC-3 部分一致3対象と大小非区別・AC-4 タグ完全一致で部分一致除外・AC-5 AND と片側のみ除外・空クエリ全件）を最小フィクスチャで検証（純関数のためモックなし）。
 - **検証**: `npm run check`（format/lint/typecheck/test 124件）・`npx astro build`（115ページ）ともに成功。
 - **コミット**:
-  - `feat: 検索クエリパーサとフィルタ純関数を追加`
+  - `fae44ba` feat: 検索クエリパーサとフィルタ純関数を追加
 
 ### T5-3
 
