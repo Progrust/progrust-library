@@ -8,7 +8,7 @@
 
 ## タスク
 
-- [ ] **T5-1: 検索インデックス生成**
+- [x] **T5-1: 検索インデックス生成**
   `search-index.json.js` + `src/lib/search-index.ts`（エントリ変換・公開フィルタ・章含む）。
   完了条件: search.md AC-1 を満たし、変換ロジックのvitestが通る。
 - [ ] **T5-2: クエリパーサ+フィルタ（純関数）**
@@ -24,6 +24,16 @@
 ## 実施履歴
 
 ### T5-1
+
+- **実装**: `src/lib/search-index.ts`（変換ロジック・vitest対象）と `src/pages/search-index.json.js`（エンドポイント）を追加。`wikilink-graph.ts` と同型の「純関数 + `getPublic*` 集約ラッパ」構成（architecture §7）。
+  - 純関数 `buildSearchEntries(sources)`: `SearchSource[]` を `SearchEntry[]`（[search.md §3](../spec/search.md) スキーマ）に変換。URL は種別ごとに導出（章 id `[本slug]/[章slug]` を `/books/[本]/[章]` に分解）。入力順を保持。
+  - ラッパ `buildContentSearchIndex()`: `getPublicDict/Articles/Books/Chapters` を集約（非公開除外は上流に委譲＝R-1、章含む）。
+  - エンドポイント: static 出力のため build 時に `dist/search-index.json` として prerender される。
+- **テスト**: `tests/lib/search-index.test.ts`（AC-1由来テストに `[AC-1]` 命名。4種別の type/URL・章分解・章含有・data素通し・入力順）。
+- **知見の還流**: `.js` エンドポイントは eslint の globals 設定対象外で `no-undef` が `Response` を誤検出したため、`eslint.config.js` に `src/pages/**/*.js` → `globals.nodeBuiltin` のオーバーライドを追加（後続の RSS 等エンドポイントも同スコープでカバー）。lint 対象の拡張だが implementation-rules §1 は「lint 対象＝プロジェクト所有コード」の方針記述に留まり個別 globals 配線は列挙していないため、同§への追記は不要と判断。
+- **検証**: `npm run check`（format/lint/typecheck/test 114件）・`npx astro build`（115ページ）ともに成功。`dist/search-index.json` を実測し AC-1 を確認（全33エントリ: dict 23・article 6・book 1・chapter 3。非公開辞書 `mutex`/`error-handling` は不在。dict総数25−非公開2=23 と一致）。
+- **コミット**:
+  - `bf054b8` feat: 検索インデックス生成を追加
 
 ### T5-2
 
