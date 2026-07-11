@@ -3,6 +3,7 @@ import { describe, it, expect } from "vitest";
 import {
   extractWikilinkSlugs,
   buildWikilinkGraph,
+  forwardKey,
   type GraphSource,
 } from "../../src/lib/wikilink-graph";
 
@@ -64,7 +65,7 @@ describe("buildWikilinkGraph（使用辞書一覧 forward・逆リンク backwar
 
     const { forward } = buildWikilinkGraph(sources);
 
-    expect(forward.get("rust-intro")).toEqual([
+    expect(forward.get(forwardKey("article", "rust-intro"))).toEqual([
       { slug: "ownership", title: "所有権", href: "/dict/ownership" },
     ]);
   });
@@ -84,10 +85,33 @@ describe("buildWikilinkGraph（使用辞書一覧 forward・逆リンク backwar
 
     const { forward } = buildWikilinkGraph(sources);
 
-    expect(forward.get("rust-intro")?.map((d) => d.slug)).toEqual([
-      "borrowing",
-      "ownership",
-    ]);
+    expect(
+      forward.get(forwardKey("article", "rust-intro"))?.map((d) => d.slug),
+    ).toEqual(["borrowing", "ownership"]);
+  });
+
+  it("forward キーは sourceKind 接頭辞付きで、コレクション横断の同名 slug が衝突しない", () => {
+    const sources = [
+      dict("ownership", "所有権", "[[borrowing]]"),
+      dict("borrowing", "借用"),
+      {
+        id: "ownership",
+        sourceKind: "article" as const,
+        title: "所有権の記事",
+        href: "/articles/ownership",
+        body: "[[borrowing]]",
+      },
+    ];
+
+    const { forward } = buildWikilinkGraph(sources);
+
+    // 同名 slug "ownership" でも dict/article が別キーで共存する（後勝ちの上書きが起きない）
+    expect(
+      forward.get(forwardKey("dict", "ownership"))?.map((d) => d.slug),
+    ).toEqual(["borrowing"]);
+    expect(
+      forward.get(forwardKey("article", "ownership"))?.map((d) => d.slug),
+    ).toEqual(["borrowing"]);
   });
 
   it("[AC-7] 公開記事・公開章が辞書をリンクすると逆リンクにバッジ付き・章 bookTitle・決定的順で載る", () => {
@@ -170,7 +194,9 @@ describe("buildWikilinkGraph（使用辞書一覧 forward・逆リンク backwar
 
     const { forward, backward } = buildWikilinkGraph(sources);
 
-    expect(forward.get("rust-web")?.map((d) => d.slug)).toEqual(["ownership"]);
+    expect(
+      forward.get(forwardKey("book", "rust-web"))?.map((d) => d.slug),
+    ).toEqual(["ownership"]);
     expect(backward.get("ownership")).toBeUndefined();
   });
 
@@ -179,7 +205,7 @@ describe("buildWikilinkGraph（使用辞書一覧 forward・逆リンク backwar
 
     const { forward, backward } = buildWikilinkGraph(sources);
 
-    expect(forward.get("ownership")).toEqual([]);
+    expect(forward.get(forwardKey("dict", "ownership"))).toEqual([]);
     expect(backward.get("ownership")).toBeUndefined();
   });
 });

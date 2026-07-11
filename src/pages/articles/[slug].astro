@@ -4,7 +4,10 @@
 // ヘッダ画像は詳細ページには表示しない（R-12 が規定するのはタイトル/タグ/更新日/本文のみ）。
 import { render } from "astro:content";
 import { getPublicArticles } from "../../lib/content";
-import { buildContentWikilinkGraph } from "../../lib/wikilink-graph";
+import {
+  buildContentWikilinkGraph,
+  forwardKey,
+} from "../../lib/wikilink-graph";
 import DetailLayout from "../../layouts/DetailLayout.astro";
 
 export async function getStaticPaths() {
@@ -14,7 +17,10 @@ export async function getStaticPaths() {
   ]);
   return articles.map((entry) => ({
     params: { slug: entry.id },
-    props: { entry, linkedDicts: graph.forward.get(entry.id) ?? [] },
+    props: {
+      entry,
+      linkedDicts: graph.forward.get(forwardKey("article", entry.id)) ?? [],
+    },
   }));
 }
 

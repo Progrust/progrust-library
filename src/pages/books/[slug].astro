@@ -9,7 +9,10 @@ import {
   sortChapters,
   chapterLedger,
 } from "../../lib/content";
-import { buildContentWikilinkGraph } from "../../lib/wikilink-graph";
+import {
+  buildContentWikilinkGraph,
+  forwardKey,
+} from "../../lib/wikilink-graph";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import ChapterToc from "../../components/ChapterToc.astro";
 import LinkedDictList from "../../components/LinkedDictList.astro";
@@ -28,7 +31,11 @@ export async function getStaticPaths() {
     const ledger = chapterLedger(bookChapters, book.id);
     return {
       params: { slug: book.id },
-      props: { book, ledger, linkedDicts: graph.forward.get(book.id) ?? [] },
+      props: {
+        book,
+        ledger,
+        linkedDicts: graph.forward.get(forwardKey("book", book.id)) ?? [],
+      },
     };
   });
 }

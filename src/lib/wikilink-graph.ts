@@ -18,7 +18,8 @@ export type SourceKind = "dict" | "article" | "chapter" | "book";
 
 /** グラフ構築に必要なソースの最小構造（各コレクションエントリから組み立てる） */
 export interface GraphSource {
-  /** ページを一意に識別するID（forward マップのキー。dict/article=slug, chapter=book/chapter, book=slug） */
+  /** コレクション内でのID（dict/article=slug, chapter=book/chapter, book=slug）。
+   *  forward マップのキーは衝突回避のため sourceKind 接頭辞付き（forwardKey）にする */
   id: string;
   sourceKind: SourceKind;
   title: string;
@@ -46,10 +47,19 @@ export interface WikilinkRef {
   bookTitle?: string;
 }
 
-/** wikilink グラフ。forward=ページID→使用辞書、backward=辞書slug→逆リンク元 */
+/** wikilink グラフ。forward=ページ（forwardKey）→使用辞書、backward=辞書slug→逆リンク元 */
 export interface WikilinkGraph {
   forward: Map<string, DictTarget[]>;
   backward: Map<string, WikilinkRef[]>;
+}
+
+/**
+ * forward マップのキー。素の slug はコレクションをまたいで衝突しうる（content-model R-6 の
+ * 一意性保証は dict コレクション内のみ。URL 空間は分かれるが forward の Map キーは分かれない）ため、
+ * sourceKind を接頭辞にしてページを一意に識別する。呼び出し側（各ページの forward.get）も本関数を使う。
+ */
+export function forwardKey(sourceKind: SourceKind, id: string): string {
+  return `${sourceKind}:${id}`;
 }
 
 /** ソース種別を種別バッジの ContentKind に写す（章・本トップはともに「本」表示） */
@@ -132,7 +142,7 @@ export function buildWikilinkGraph(sources: GraphSource[]): WikilinkGraph {
       });
       backward.set(slug, refs);
     }
-    forward.set(source.id, targets);
+    forward.set(forwardKey(source.sourceKind, source.id), targets);
   }
 
   for (const refs of backward.values()) {

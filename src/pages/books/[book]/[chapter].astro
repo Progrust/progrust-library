@@ -11,7 +11,10 @@ import {
   chapterNav,
   chapterOrderLabel,
 } from "../../../lib/content";
-import { buildContentWikilinkGraph } from "../../../lib/wikilink-graph";
+import {
+  buildContentWikilinkGraph,
+  forwardKey,
+} from "../../../lib/wikilink-graph";
 import ChapterLayout from "../../../layouts/ChapterLayout.astro";
 
 export async function getStaticPaths() {
@@ -55,7 +58,8 @@ export async function getStaticPaths() {
           currentSlug: chapterSlug,
           prev: toTarget(prev),
           next: toTarget(next),
-          linkedDicts: graph.forward.get(chapter.id) ?? [],
+          linkedDicts:
+            graph.forward.get(forwardKey("chapter", chapter.id)) ?? [],
         },
       },
     ];

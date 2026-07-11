@@ -4,7 +4,10 @@
 // 逆リンク一覧（R-18）・使用辞書一覧（R-17）は wikilink グラフから算出する（T4-4）。
 import { render } from "astro:content";
 import { getPublicDict } from "../../lib/content";
-import { buildContentWikilinkGraph } from "../../lib/wikilink-graph";
+import {
+  buildContentWikilinkGraph,
+  forwardKey,
+} from "../../lib/wikilink-graph";
 import DetailLayout from "../../layouts/DetailLayout.astro";
 import Backlinks from "../../components/Backlinks.astro";
 
@@ -17,7 +20,7 @@ export async function getStaticPaths() {
     params: { slug: entry.id },
     props: {
       entry,
-      linkedDicts: graph.forward.get(entry.id) ?? [],
+      linkedDicts: graph.forward.get(forwardKey("dict", entry.id)) ?? [],
       backlinks: graph.backward.get(entry.id) ?? [],
     },
   }));

@@ -82,7 +82,8 @@ wikilinkグラフを構築し逆リンク・使用辞書一覧を実装（完了
   - `docs/architecture.md` §5: 実装確定事項（純関数分離・getStaticPaths構築・自己リンク/本トップ除外・ソート順・使用辞書一覧の挙動）を追記。
 - **満たしたAC**: AC-7（逆リンクに公開記事・公開章がバッジ付きで表示・非公開ソース除外。R-18/R-19）・AC-8（使用辞書一覧が本文の wikilink 先と一致。R-17）。
 - **設計判断**: グラフは生bodyの正規表現走査（architecture §5）。使用辞書一覧のクリック挙動（spec §5 未確定）は「本文 wikilink と同じ（ペイン＋プレビュー）」に確定（ユーザー選択）。DOM配線はビルド生成物で検証し、テストは純ロジックのみ（architecture §10。`content.ts` の前例に合わせる）。
-- **検証**: `npm run check`（format/lint/typecheck/vitest 109 tests）・`npx astro build`（115ページ）ともに成功。生成物確認で `dist/dict/ownership/index.html` の逆リンクが辞書×2→記事×2→本×2 の決定的順・章は「本 › 章」表示、使用辞書一覧 `[borrowing, lifetime]` が本文 wikilink と一致、`rust-performance-tuning` の TOML `[[bench]]` 誤検出が使用辞書一覧に出ないこと（`iterator` のみ）、逆リンクに非公開ソース由来のリンク切れが無いことを確認。
+- **検証**: `npm run check`（format/lint/typecheck/vitest 110 tests）・`npx astro build`（115ページ）ともに成功。生成物確認で `dist/dict/ownership/index.html` の逆リンクが辞書×2→記事×2→本×2 の決定的順・章は「本 › 章」表示、使用辞書一覧 `[borrowing, lifetime]` が本文 wikilink と一致、`rust-performance-tuning` の TOML `[[bench]]` 誤検出が使用辞書一覧に出ないこと（`iterator` のみ）、逆リンクに非公開ソース由来のリンク切れが無いことを確認。
+- **レビュー対応**: [レビュー結果](../archive/review/T4-4.md)（承認・要修正なし）の推奨1・軽微2をすべて対応。(1) forward マップのキーをコレクション横断で衝突しうる素の slug から `forwardKey(sourceKind, id)`（`sourceKind:` 接頭辞）に変更し、同名 slug の後勝ち上書きを防止（呼び出し側4ページも追随・衝突回避テスト追加）、(2) spec §5 の未確定2項目（プレビュー遅延・使用辞書一覧クリック挙動）を確定済みに更新、(3) R-17 に右レール無しページ（本トップ）は本文下部配置の一文を追記。
 - **コミット**: 下記「作成したコミット」を参照。
 
 ## フェーズ完了条件
