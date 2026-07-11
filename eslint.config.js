@@ -24,4 +24,12 @@ export default defineConfig([
       globals: globals.node,
     },
   },
+  {
+    // ビルド時に評価される静的エンドポイント（src/pages/*.json.js 等）。
+    // Web 標準 global（Response）を使うため nodeBuiltin を有効化し no-undef を防ぐ。
+    files: ["src/pages/**/*.js"],
+    languageOptions: {
+      globals: globals.nodeBuiltin,
+    },
+  },
 ]);
