@@ -583,9 +583,24 @@ html.dark .message-warning .message-title {
 .message-danger .message-title {
   color: var(--color-accent);
 }
-/* ネスト時（::::details 内など card 面の上）は面の重なりを避け背景を paper に落とす */
-.prose details .message {
+/* card 面の上（::::details 内・辞書ペイン内・ホバープレビュー内）は面の重なりを避け
+   背景を paper に落とす */
+.prose details .message,
+[data-dict-pane-content] .message,
+[data-dict-preview] .message {
   background: var(--color-paper);
+}
+/* paper 面に落とした message 内ではインラインコード背景（head 系）が paper と近接して
+   埋没するため、一段深い面に調整する */
+.prose details .message :not(pre) > code,
+[data-dict-pane-content] .message :not(pre) > code,
+[data-dict-preview] .message :not(pre) > code {
+  background: #e2dcd1;
+}
+html.dark .prose details .message :not(pre) > code,
+html.dark [data-dict-pane-content] .message :not(pre) > code,
+html.dark [data-dict-preview] .message :not(pre) > code {
+  background: #110e0b;
 }
 
 /* =========================================================================
@@ -637,6 +652,8 @@ html.dark .message-warning .message-title {
   > :not(
     summary,
     details,
+    ul,
+    ol,
     .message,
     .astro-code,
     .code-block,
@@ -645,6 +662,14 @@ html.dark .message-warning .message-title {
     .table-wrap
   ) {
   padding-inline: 1rem;
+}
+/* リストは内側余白 1rem にリスト自身のインデントを加える */
+.prose details > :is(ul, ol) {
+  padding-left: 2.5rem;
+  padding-right: 1rem;
+}
+.prose details > ul.contains-task-list {
+  padding-left: 1.25rem;
 }
 .prose
   details

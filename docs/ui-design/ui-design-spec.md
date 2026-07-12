@@ -429,7 +429,8 @@ html.dark .dict-link { color: #F0684A; }
   - warning: `<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>`
   - danger: `<path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"/>`
 - **タイトル指定（`:::message[タイトル]{type}`）はeyebrow置換方式**: eyebrowの種別名をタイトルに差し替えて `// タイトルテキスト` と表示する。行数は増やさず、種別はアイコンと色で判別する。タイトルなしの場合はeyebrow = 種別名（`// info` 等）のデフォルト表示
-- **ネスト時**（`::::details`内など、card面の上に置かれる場合）は面の重なりを避けるため、メッセージ背景を `bg-paper dark:bg-npaper` に落とす
+- **card面の上に置かれる場合**（`::::details`内・辞書サイドペイン/モバイルシート内・ホバープレビュー内）は面の重なりを避けるため、メッセージ背景を `bg-paper dark:bg-npaper` に落とす
+  - このときインラインコードの背景（`head` 系）が paper と近接して埋没するため、paper面上のmessage内に限りインラインコード背景を一段深い light `#E2DCD1` / dark `#110E0B` に調整する（文字色・枠線は通常のインラインコードと共通）
 
 ### `:::details` の変換後スタイル
 
@@ -449,6 +450,7 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 ```
 
 - **枠・背景を持つボックス直下子**（ネストしたdetails / message / コードブロック（ファイル名付きのラッパー含む） / リンクカード / blockquote / テーブル（`.table-wrap` ラッパ））: 直下子要素へのpaddingはボックスの内部パディングになるだけで周囲に余白を作らないため、**paddingではなくmarginで余白を表現する**（margin-inline: 1rem、先頭margin-top / 末尾margin-bottomも同様）。ボックス自身の内部パディング（messageの1.25rem等）は単体配置時と同じまま保つ。`figure`は`width: fit-content; margin-inline: auto`の中央寄せがpadding方式で成立しているため対象外
+- **直下子のリスト（`ul` / `ol`）**は padding-inline: 1rem の対象から除外し、`padding-left: 2.5rem`（内側余白1rem + リストインデント1.5rem）+ `padding-right: 1rem` とする（一律の padding-inline: 1rem ではリスト本来のインデントが上書きされて消えるため）。チェックリスト（`ul.contains-task-list`）はインデントが0.25remなので `padding-left: 1.25rem`
 - **ネストしたdetailsの背景**はネスト時のメッセージと同じく `bg-paper dark:bg-npaper` に落とす（card面の重なり回避）
 
 ### `:::figure` の変換後スタイル
