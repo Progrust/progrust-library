@@ -37,6 +37,50 @@
   --color-accent: #f0684a;
 }
 
+/* サイト共通のスクロールバー（ui-design-spec「共通ルール」）。
+   WebKit は疑似要素で幅6px・トラック透明・角丸サム。Firefox は標準プロパティで細幅化。
+   ガード必須: Chrome 121+ は scrollbar-color 指定時に ::-webkit-scrollbar を無視するため、
+   標準プロパティは非対応環境（Firefox）にのみ適用する。 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sub);
+}
+@supports not selector(::-webkit-scrollbar) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+  }
+}
+/* 辞書サイドペイン/ホバープレビューは表示幅自体が狭いため、さらに細くして
+   本文の横幅を確保する（ui-design-spec「共通ルール」） */
+:is(
+  [data-dict-pane-default],
+  [data-dict-pane-content],
+  [data-dict-preview]
+)::-webkit-scrollbar {
+  width: 4px;
+}
+:is(
+  [data-dict-pane-default],
+  [data-dict-pane-content],
+  [data-dict-preview]
+)::-webkit-scrollbar-thumb {
+  border-radius: 2px;
+}
+
 /* =========================================================================
    詳細ページ本文（prose）のスタイル。
    architecture.md §9: Markdown 変換結果（コードブロック・diff・メッセージ・
@@ -296,6 +340,28 @@ html.dark .astro-code {
   background: #171411;
   border-color: var(--color-line);
 }
+/* コード面はライトでもダーク背景のため、スクロールバーのサムは共通の --color-line
+   （ライト値は明るいベージュ）だと逆に目立つ。枠線色と同じペアに切り替える。
+   hover はダーク面でも --color-sub が通常時より明るい中間トーンになるため共通と同じ色。
+   ここの上書きは共通の hover 規則より詳細度が高く後勝ちするので、hover も明示する。 */
+.astro-code::-webkit-scrollbar-thumb {
+  background: #4a4238;
+}
+html.dark .astro-code::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+}
+.astro-code::-webkit-scrollbar-thumb:hover,
+html.dark .astro-code::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sub);
+}
+@supports not selector(::-webkit-scrollbar) {
+  .astro-code {
+    scrollbar-color: #4a4238 transparent;
+  }
+  html.dark .astro-code {
+    scrollbar-color: var(--color-line) transparent;
+  }
+}
 /* 全コードブロック共通: 左右 padding は行スパン側 */
 .astro-code .line {
   display: inline-block;
@@ -539,18 +605,45 @@ html.dark .message-warning .message-title {
    「:::details の変換後スタイル」） */
 .prose
   details
-  > :not(summary, details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
+  > :not(
+    summary,
+    details,
+    .message,
+    .astro-code,
+    .code-block,
+    .link-card-wrap,
+    blockquote,
+    table
+  ) {
   padding-inline: 1rem;
 }
 .prose
   details
   > summary
-  + :not(summary, details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
+  + :not(
+    summary,
+    details,
+    .message,
+    .astro-code,
+    .code-block,
+    .link-card-wrap,
+    blockquote,
+    table
+  ) {
   padding-top: 0.75rem;
 }
 .prose
   details
-  > :not(summary, details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table):last-child {
+  > :not(
+    summary,
+    details,
+    .message,
+    .astro-code,
+    .code-block,
+    .link-card-wrap,
+    blockquote,
+    table
+  ):last-child {
   padding-bottom: 0.9rem;
 }
 .prose details > :not(summary) + :not(summary) {
@@ -560,18 +653,42 @@ html.dark .message-warning .message-title {
    内部パディングは単体配置時と同じまま保つ） */
 .prose
   details
-  > :is(details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
+  > :is(
+    details,
+    .message,
+    .astro-code,
+    .code-block,
+    .link-card-wrap,
+    blockquote,
+    table
+  ) {
   margin-inline: 1rem;
 }
 .prose
   details
   > summary
-  + :is(details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table) {
+  + :is(
+    details,
+    .message,
+    .astro-code,
+    .code-block,
+    .link-card-wrap,
+    blockquote,
+    table
+  ) {
   margin-top: 0.75rem;
 }
 .prose
   details
-  > :is(details, .message, .astro-code, .code-block, .link-card-wrap, blockquote, table):last-child {
+  > :is(
+    details,
+    .message,
+    .astro-code,
+    .code-block,
+    .link-card-wrap,
+    blockquote,
+    table
+  ):last-child {
   margin-bottom: 0.9rem;
 }
 /* ネスト時は面の重なりを避け背景を paper に落とす（.prose details .message と同じ扱い） */
