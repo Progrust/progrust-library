@@ -58,6 +58,7 @@
 - **R-15**: 辞書詳細では、本文下にその辞書の逆リンク一覧を表示する（[`wikilink-ui.md`](wikilink-ui.md)）。
 - **R-16**: 章詳細では、本文下に前の章 / 次の章のナビゲーションを表示する。順序はファイル名連番の昇順（[`content-model.md`](content-model.md) R-7）。非公開の章はスキップして次の公開章へつなぐ。先頭章に「前の章」、最終章に「次の章」は表示しない。
 - **R-22**: 本文のGFMテーブルは、横スクロールコンテナとなるラッパ要素（`.table-wrap`）で包んで出力する。テーブル幅が本文幅を超える場合はラッパ内で横スクロールし、ページ全体には横スクロールを発生させない。見た目（カード面フレーム・水平罫線のみ）は [`ui-design-spec.md`](../ui-design/ui-design-spec.md)「テーブル」に従う。
+- **R-23**: フェンスメタに `playground` を指定したRustコードブロック（` ```rust playground `。記法は [`rule.md`](../markdown-notation/rule.md)）には、コードブロック右上に半透明の「Playgroundで開く」リンクボタンを重ねて表示する。押下で `https://play.rust-lang.org/?version=stable&edition=2024&code=<URLエンコードしたコード全文>` を新規タブ（`target="_blank" rel="noopener noreferrer"`）で開く。URLはビルド時に静的生成する（クライアントJSなし）。対象は `rust` 言語のブロックのみで、`lang:ファイル名` 記法と併用できる。ボタンは `<pre>` の横スクロールに追従せず右上に固定される。実装方式は [`playground.md`](../markdown-pipeline/playground.md) に従う。
 
 ### 本トップページ（`/books/[slug]`）
 
@@ -88,6 +89,8 @@
 - **AC-8**: 存在しないURLへアクセスすると共通デザインの404ページが表示される。（R-21）
 - **AC-9**: 本文のGFMテーブルが `<div class="table-wrap"><table>…</table></div>` の構造で出力される（details内のテーブルも同様）。（R-22）
 - **AC-10**: 本文幅を超える幅広テーブルでラッパ内の横スクロールが機能し、ページ全体の横スクロールが発生しない。（R-22）※目視確認
+- **AC-11**: ` ```rust playground ` のコードブロックが `<div class="code-playground"><pre>…</pre><a class="playground-open" href="https://play.rust-lang.org/?version=stable&edition=2024&code=<エンコード済みコード>" target="_blank" rel="noopener noreferrer">Playgroundで開く</a></div>` の構造で出力され、メタなしの ` ```rust ` や `rust` 以外の言語にはボタンが付かない。（R-23）
+- **AC-12**: ボタン押下でRust Playgroundが新規タブで開き、エディタに当該コードが入っている。ボタンは右上に半透明で表示され、hoverで濃くなり、コードの横スクロールに追従しない。（R-23）※目視確認
 
 ## 5. 未確定事項
 

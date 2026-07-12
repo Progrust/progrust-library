@@ -216,13 +216,13 @@
 }
 
 /* 通常リンク（辞書リンク .wikilink・リンクカード .link-card は別扱い） */
-.prose a:not(.wikilink):not(.link-card) {
+.prose a:not(.wikilink):not(.link-card):not(.playground-open) {
   color: var(--color-accent);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
 }
-.prose a:not(.wikilink):not(.link-card):hover {
+.prose a:not(.wikilink):not(.link-card):not(.playground-open):hover {
   text-decoration-thickness: 2px;
 }
 
@@ -447,6 +447,38 @@ html.dark .code-filename {
   color: var(--color-sub);
 }
 
+/* Playgroundで開くボタン（```rust playground → <div class="code-playground"><pre>+<a>）。
+   pre の外側に置いて横スクロールに追従させず、右上に半透明で重ねる（spec/pages.md R-23）。
+   コード面はライトテーマでもダーク面（E案）のため、配色は両テーマともダーク面基準。 */
+.code-playground {
+  position: relative;
+}
+.code-playground .playground-open {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid #4a4238;
+  border-radius: 4px;
+  background: #332c25;
+  color: #9c9186;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  text-decoration: none;
+  opacity: 0.55;
+  transition: opacity 0.15s ease;
+}
+.code-playground .playground-open:hover,
+.code-playground .playground-open:focus-visible {
+  opacity: 1;
+}
+html.dark .code-playground .playground-open {
+  background: var(--color-card);
+  border-color: var(--color-line);
+  color: var(--color-sub);
+}
+
 /* =========================================================================
    :::message（ui-design-spec「:::message の変換後スタイル」）。左ボーダー・eyebrow・
    種別色だけを種別で変え、背景は card 面で統一。通常はニュートラル（sub 色）。
@@ -657,6 +689,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .message,
     .astro-code,
     .code-block,
+    .code-playground,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -680,6 +713,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .message,
     .astro-code,
     .code-block,
+    .code-playground,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -694,6 +728,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .message,
     .astro-code,
     .code-block,
+    .code-playground,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -712,6 +747,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .message,
     .astro-code,
     .code-block,
+    .code-playground,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -726,6 +762,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .message,
     .astro-code,
     .code-block,
+    .code-playground,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -739,6 +776,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .message,
     .astro-code,
     .code-block,
+    .code-playground,
     .link-card-wrap,
     blockquote,
     .table-wrap

@@ -104,6 +104,19 @@ https://www.google.com/
 > 
 > \```
 
+### Rust Playgroundで開くボタンを表示する
+
+> \```rust playground
+>
+> \```
+
+言語指定の後ろに空白区切りで `playground` を付けると、コードブロック右上に「Playgroundで開く」ボタンが表示される。押下でRust Playground（play.rust-lang.org）が新規タブで開き、エディタにコード全文が入る（stable / edition 2024）。
+`rust` 以外の言語に付けても無視される。ファイル名表示との併用も可能:
+
+> \```rust:main.rs playground
+>
+> \```
+
 ### diff のシンタックスハイライト
 
 ```rust

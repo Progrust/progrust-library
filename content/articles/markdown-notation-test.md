@@ -95,6 +95,22 @@ fn main() {
 }
 ```
 
+### Rust Playgroundで開くボタンを表示する
+
+```rust playground
+fn main() {
+    println!("Hello, Playground!");
+}
+```
+
+ファイル名表示との併用:
+
+```rust:main.rs playground
+fn main() {
+    println!("Hello, main.rs on Playground!");
+}
+```
+
 ### diff のシンタックスハイライト
 
 ```rust

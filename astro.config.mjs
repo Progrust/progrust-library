@@ -8,6 +8,7 @@ import { loadDictIndex } from "./plugins/dict-index.mjs";
 import { wikilink } from "./plugins/wikilink.mjs";
 import { directives } from "./plugins/directives.mjs";
 import { codeFilename } from "./plugins/code-filename.mjs";
+import { playgroundLink } from "./plugins/playground-link.mjs";
 import { linkCard } from "./plugins/link-card.mjs";
 import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
@@ -85,8 +86,15 @@ export default defineConfig({
     processor: satteri({
       features: { directive: true },
       // codeFilename は ```lang:file のlang補正のため他プラグインより前に置く（shiki.md）。
-      // linkCard は末尾（順序: codeFilename → wikilink → directives → linkCard。architecture.md §4）。
-      mdastPlugins: [codeFilename, wikilink(dictIndex), directives, linkCard()],
+      // playgroundLink はlang補正後のmetaを読むため codeFilename の直後（playground.md）。
+      // linkCard は末尾（順序: codeFilename → playgroundLink → wikilink → directives → linkCard。architecture.md §4）。
+      mdastPlugins: [
+        codeFilename,
+        playgroundLink,
+        wikilink(dictIndex),
+        directives,
+        linkCard(),
+      ],
       // mermaid はビルド時SVG化のhastプラグイン（ファクトリ形式・文書ごとの図カウンタを持つ）。
       // Shiki実行後のhast段階で素の <pre><code data.lang=mermaid> を捕捉する（mermaid.md）。
       // tableWrap はGFMテーブルを .table-wrap で包む（pre/tableで捕捉対象が異なり相互作用なし。table-wrap.md）。
