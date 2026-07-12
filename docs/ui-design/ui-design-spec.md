@@ -2,6 +2,8 @@
 
 claude designでのモック検討で確定したデザイン仕様。本実装（Astro + Tailwind）時はこの資料とモック本体を参照する。
 
+**モックHTML本体はリポジトリに含まれない**。以下の claude design プロジェクト上にあり、他文書（spec等）が参照するモックファイル名もすべてここを指す。
+
 - claude designプロジェクト: [Progrust Library UI](https://claude.ai/design/p/2c5de680-9b98-45ee-a6ab-39dfc30a2230)
 - 確定モック
   - トップページ: `top-b-sharp.html`

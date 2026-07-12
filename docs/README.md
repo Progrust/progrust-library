@@ -10,7 +10,7 @@
 | [`plan/`](plan/README.md) | 実装者 | フェーズ分割した実装計画（1タスク=1セッション・完了条件付き。全フェーズ完了で凍結→archive） |
 | [`markdown-notation/`](markdown-notation/rule.md) | 執筆者 | 本サイトで利用可能なMarkdown記法の一覧（書き方のみ。実装の話は書かない） |
 | [`markdown-pipeline/`](markdown-pipeline/README.md) | 実装者 | Sätteriカスタムプラグインの機能別実装リファレンス（実装方式・雛形コード・落とし穴・残課題） |
-| `ui-design/` | 実装者 | UIデザインの仕様・計画（+ モック用ダミーコンテンツ） |
+| `ui-design/` | 実装者 | UIデザインの仕様・計画（+ モック用ダミーコンテンツ）。モックHTML本体はリポジトリ外・claude design 上（[`ui-design/ui-design-spec.md`](ui-design/ui-design-spec.md) 冒頭にリンク） |
 | `archive/` | — | クローズ済み文書の凍結アーカイブ（歴史的記録。更新しない） |
 
 リポジトリ直下の `CLAUDE.md` はアプリ概要と本ディレクトリへの地図（詳細仕様は持たない）。
