@@ -459,6 +459,25 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 - `<figure>`は`width: fit-content; max-width: 100%`で**画像幅に収縮**させ、`margin-inline: auto`で本文幅の中央に置く。これによりキャプションの中央寄せも**本文全幅ではなく画像幅が基準**になる
 - `<figcaption>`は`width: 0; min-width: 100%`で、長いキャプションがfigureのintrinsic幅（=画像幅）を広げずに画像幅で折り返すようにする。sub色・0.8rem・中央寄せ
 
+### mermaid図（★枠なしで確定）
+
+ビルド時SVG化の仕組みは [`docs/markdown-pipeline/mermaid.md`](../markdown-pipeline/mermaid.md) 参照。ここでは見た目の確定仕様のみ。
+
+- **外枠なし**: カード枠（border・背景・padding）は付けず、紙背景（paper）の上に図を直接置く。横幅超過時は `figure.mermaid-diagram` 自体が横スクロールコンテナになる（`overflow-x: auto`）
+- **横幅は「自然幅を上限にコンテナ幅までフィット」**: figureは全幅（`.prose figure` の fit-content を打ち消す。SVGは `width="100%"` で固有幅を持たず、fit-content 下では置換要素デフォルトの300pxに潰れるため）。SVGは `width: 100%` + ビルド時に焼き込まれるインライン `max-width`（自然幅）により、自然幅が狭い図（小さなflowchart等）はそのまま・広い図（sequence等）は本文カラム幅に収まるよう縮小される
+- **フォント**: 本文と同じ **Zen Maru Gothic / 15px**。ビルド用ChromiumにGoogle FontsのCSSを注入し、テキスト幅の計測もこのフォントで行う（ノード箱がラベル幅に正しく追従する）
+- **配色**: mermaid `theme: "base"` + `themeVariables` でサイトトークンにマッピングし、light/darkの2回レンダにそれぞれのhex値を焼き込む
+
+| 図中の役割 | トークン（light / dark） |
+| --- | --- |
+| 図の背景・エッジラベルの抜き | paper |
+| ノード / actor の塗り | card |
+| テキスト | ink |
+| ノード枠線・note枠線 | line |
+| エッジ・矢印・ライフライン | sub |
+| subgraph・副次塗り・note背景 | head（light）/ card（dark） |
+| タイトル | strong |
+
 ## 意思決定の履歴（要約）
 
 1. トップページを3案（warm / sharp / balance）で比較 → **sharp系を採用**。sharp派生2案（サイドバー型・カタログ型）も比較したが元のtop-b-sharpで確定

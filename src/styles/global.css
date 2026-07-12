@@ -215,6 +215,35 @@
   color: var(--color-sub);
 }
 
+/* mermaid図（ui-design-spec「mermaid図」・枠なしで紙背景に直置き）。
+   配色はビルド時に plugins/mermaid.mjs が themeVariables でSVGに焼き込むため、
+   ここでは横スクロール・SVGの収まり・フォントの差し替えのみ面倒を見る。 */
+.prose figure.mermaid-diagram {
+  /* mermaidのSVGは width="100%" で固有幅を持たず、.prose figure の fit-content 下では
+     置換要素のデフォルト幅300pxに潰れる。figureを全幅にし、SVG側の width:100% ＋
+     焼き込み済みインライン max-width（自然幅）で「自然幅を上限にコンテナ幅までフィット」させる
+     （自然幅が狭い図はそのまま・広い図はコンテナ幅に縮小）。 */
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto; /* useMaxWidth:false な巨大図の保険 */
+}
+.prose .mermaid-diagram svg {
+  display: block;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 100%; /* インラインの max-width(自然幅) が優先される。これは保険 */
+  height: auto;
+}
+/* SVGに焼き込まれた font-family は "Zen Maru Gothic"（素の名前）だが、Fonts API が
+   セルフホストするファミリ名はハッシュ付き（"Zen Maru Gothic-<hash>"）のため、そのままでは
+   sans-serif にフォールバックし、ビルド時計測（本物のZMG）より広い幅で描画されて文字末尾が
+   見切れる（mermaid.md 落とし穴4）。サイトの実フォントスタック（--font-maru）で上書きして
+   計測時とメトリクスを一致させる。SVG内のインライン style 指定に勝つため !important が必要。 */
+.prose .mermaid-diagram svg,
+.prose .mermaid-diagram svg * {
+  font-family: var(--font-maru) !important;
+}
+
 /* 通常リンク（辞書リンク .wikilink・リンクカード .link-card は別扱い） */
 .prose a:not(.wikilink):not(.link-card):not(.playground-open) {
   color: var(--color-accent);

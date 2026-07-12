@@ -5,6 +5,7 @@ import {
   compileWithMermaid,
   fakeRenderer,
   rejectingRenderer,
+  type RenderCall,
 } from "../helpers/mermaid";
 
 /** SVG中の id="..." 定義をすべて集める（順不同・重複排除）。 */
@@ -154,6 +155,65 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
       expect(html).not.toContain("mermaid-diagram");
       expect(html).toContain("<pre>");
       expect(html).toContain("hello");
+    });
+  });
+
+  describe("テーマ設定（サイトトークン反映・ui-design-spec「mermaid図」）", () => {
+    const svgFor = (_theme: string, prefix: string) =>
+      `<svg id="${prefix}"><rect id="r0"></rect></svg>`;
+
+    /** 1図ぶんレンダしてレンダラ呼び出し（light/darkの2回）を記録して返す。 */
+    async function renderCalls(): Promise<{
+      light: RenderCall;
+      dark: RenderCall;
+    }> {
+      const calls: RenderCall[] = [];
+      await compileWithMermaid(
+        "```mermaid\nflowchart TD\n  A --> B\n```\n",
+        fakeRenderer(svgFor, calls),
+      );
+      expect(calls).toHaveLength(2);
+      const light = calls.find((c) => c.options?.prefix?.endsWith("l"));
+      const dark = calls.find((c) => c.options?.prefix?.endsWith("d"));
+      if (!light || !dark) throw new Error("light/dark 両方の呼び出しが必要");
+      return { light, dark };
+    }
+
+    it('light/dark とも theme: "base" + 本文フォント（Zen Maru Gothic / 15px）で呼ぶ', async () => {
+      const { light, dark } = await renderCalls();
+      for (const call of [light, dark]) {
+        const config = call.options?.mermaidConfig;
+        expect(config?.theme).toBe("base");
+        // トップレベルは数値(px)、themeVariables 側は文字列の二重指定（mermaidの型都合）。
+        expect(config?.fontFamily).toContain("Zen Maru Gothic");
+        expect(config?.fontSize).toBe(15);
+        expect(config?.themeVariables?.fontFamily).toContain("Zen Maru Gothic");
+        expect(config?.themeVariables?.fontSize).toBe("15px");
+      }
+    });
+
+    it("light/dark それぞれのサイトトークン（hex）を themeVariables に焼き込む", async () => {
+      const { light, dark } = await renderCalls();
+      const lightVars = light.options?.mermaidConfig?.themeVariables;
+      expect(lightVars?.darkMode).toBe(false);
+      expect(lightVars?.background).toBe("#f2f0ec"); // paper（枠なし＝紙背景）
+      expect(lightVars?.primaryColor).toBe("#fbf9f6"); // card
+      expect(lightVars?.edgeLabelBackground).toBe("#f2f0ec"); // 抜き色=実背景
+
+      const darkVars = dark.options?.mermaidConfig?.themeVariables;
+      expect(darkVars?.darkMode).toBe(true);
+      expect(darkVars?.background).toBe("#1e1b18"); // paper
+      expect(darkVars?.primaryColor).toBe("#26221e"); // card
+      expect(darkVars?.edgeLabelBackground).toBe("#1e1b18");
+    });
+
+    it("css オプションで Zen Maru Gothic のフォントCSS URLをレンダページに注入する", async () => {
+      const { light, dark } = await renderCalls();
+      for (const call of [light, dark]) {
+        expect(String(call.options?.css)).toContain(
+          "fonts.googleapis.com/css2?family=Zen+Maru+Gothic",
+        );
+      }
     });
   });
 

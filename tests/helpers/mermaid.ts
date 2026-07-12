@@ -3,13 +3,31 @@ import { markdownToHtml } from "satteri";
 
 import { mermaid } from "../../plugins/mermaid.mjs";
 
+/** プラグインがレンダラに渡すオプション（テストで検証する部分集合）。 */
+export interface RenderOptions {
+  prefix?: string;
+  css?: unknown;
+  mermaidConfig?: {
+    theme?: string;
+    fontFamily?: string;
+    fontSize?: number;
+    themeVariables?: Record<string, unknown>;
+  };
+}
+
+/** レンダラ呼び出しの記録（テーマ設定のアサーション用）。 */
+export interface RenderCall {
+  diagrams: string[];
+  options?: RenderOptions;
+}
+
 /**
  * mermaid-isomorphic の MermaidRenderer 互換の最小 fake レンダラ型。
- * theme（default/dark）ごとに固定のSVG文字列を返し、実ブラウザ（Chromium）を起動しない。
+ * variant（light/dark）ごとに固定のSVG文字列を返し、実ブラウザ（Chromium）を起動しない。
  */
 type FakeRenderer = (
   diagrams: string[],
-  options?: { prefix?: string; mermaidConfig?: { theme?: string } },
+  options?: RenderOptions,
 ) => Promise<
   (
     | { status: "fulfilled"; value: { svg: string } }
@@ -18,17 +36,25 @@ type FakeRenderer = (
 >;
 
 /**
- * theme に応じたSVG文字列を返す fake レンダラを生成する。
+ * variant に応じたSVG文字列を返す fake レンダラを生成する。
  *
  * `svgFor(theme, prefix)` は各テーマ・各図の prefix を受けてSVG本文を組み立てる。
+ * variant は themeVariables.darkMode から判定する（プラグインは light/dark 両方とも
+ * theme: "base" で呼ぶため、theme からは判別できない）。svgFor には従来どおり
+ * "default"（light）/ "dark" を渡し、既存テストのシグネチャを維持する。
  * prefix（mermaidが svgルートid等に使う）を埋め込むことで、プラグイン側の
  * namespaceSvgIds が light/dark 間の id 衝突を消すことを検証できる。
+ *
+ * `calls` を渡すと呼び出しごとの `{ diagrams, options }` を記録する。
  */
 export function fakeRenderer(
   svgFor: (theme: string, prefix: string) => string,
+  calls?: RenderCall[],
 ): FakeRenderer {
   return async (diagrams, options) => {
-    const theme = options?.mermaidConfig?.theme ?? "default";
+    calls?.push({ diagrams, options });
+    const darkMode = options?.mermaidConfig?.themeVariables?.darkMode === true;
+    const theme = darkMode ? "dark" : "default";
     const prefix = options?.prefix ?? "mmd";
     return diagrams.map(() => ({
       status: "fulfilled" as const,

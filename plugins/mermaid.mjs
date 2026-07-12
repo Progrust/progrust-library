@@ -20,6 +20,92 @@ import { createMermaidRenderer } from "mermaid-isomorphic";
 /** @type {MermaidRenderer} */
 const defaultRenderer = createMermaidRenderer();
 
+// 図中テキストを本文と同じ Zen Maru Gothic / 15px にする（ui-design-spec.md「mermaid図」）。
+// フォントCSSはレンダページ（ビルド用Chromium）に注入され、mermaid-isomorphic がレンダ前に
+// document.fonts を全ロードして待つため、テキスト幅の計測も実フォントで行われる。
+// weight は 400（ラベル）/ 700（タイトル・actor名の太字）のみに絞り和文woff2取得を軽減。
+const FONT_CSS_URL =
+  "https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap";
+const FONT_FAMILY = '"Zen Maru Gothic", sans-serif';
+
+// theme: "base" + themeVariables でサイトのカラートークンを焼き込む（変数→トークンの対応は
+// ui-design-spec.md「mermaid図」の表が正）。base テーマは未指定変数を primaryColor からの
+// 色相回転等で導出し近無彩色では不自然な色になるため、flowchart/sequence が使う変数は明示指定する。
+// 図は枠なしで紙背景（--color-paper）に直置きするため、background / edgeLabelBackground は paper。
+// ★fontSize はここ（themeVariables）では文字列、config トップレベルでは数値の二重指定が必要。
+const THEME_VARIABLES = {
+  light: {
+    darkMode: false,
+    fontFamily: FONT_FAMILY,
+    fontSize: "15px",
+    background: "#f2f0ec", // paper
+    primaryColor: "#fbf9f6", // card
+    mainBkg: "#fbf9f6",
+    actorBkg: "#fbf9f6",
+    primaryTextColor: "#3a342d", // ink
+    textColor: "#3a342d",
+    actorTextColor: "#3a342d",
+    nodeTextColor: "#3a342d",
+    signalTextColor: "#3a342d",
+    labelTextColor: "#3a342d",
+    loopTextColor: "#3a342d",
+    primaryBorderColor: "#d9d3ca", // line
+    nodeBorder: "#d9d3ca",
+    actorBorder: "#d9d3ca",
+    clusterBorder: "#d9d3ca",
+    lineColor: "#847a6e", // sub
+    signalColor: "#847a6e",
+    actorLineColor: "#847a6e",
+    labelBoxBorderColor: "#847a6e",
+    activationBorderColor: "#847a6e",
+    secondaryColor: "#ebe7df", // head
+    labelBoxBkgColor: "#ebe7df",
+    activationBkgColor: "#ebe7df",
+    tertiaryColor: "#ebe7df",
+    clusterBkg: "#ebe7df",
+    titleColor: "#29241f", // strong
+    edgeLabelBackground: "#f2f0ec", // paper（枠なし＝図の実背景と一致させる）
+    noteBkgColor: "#ebe7df",
+    noteTextColor: "#3a342d",
+    noteBorderColor: "#d9d3ca",
+  },
+  dark: {
+    darkMode: true,
+    fontFamily: FONT_FAMILY,
+    fontSize: "15px",
+    background: "#1e1b18", // paper
+    primaryColor: "#26221e", // card
+    mainBkg: "#26221e",
+    actorBkg: "#26221e",
+    primaryTextColor: "#e4dcd1", // ink
+    textColor: "#e4dcd1",
+    actorTextColor: "#e4dcd1",
+    nodeTextColor: "#e4dcd1",
+    signalTextColor: "#e4dcd1",
+    labelTextColor: "#e4dcd1",
+    loopTextColor: "#e4dcd1",
+    primaryBorderColor: "#3e3831", // line
+    nodeBorder: "#3e3831",
+    actorBorder: "#3e3831",
+    clusterBorder: "#3e3831",
+    lineColor: "#9c9186", // sub
+    signalColor: "#9c9186",
+    actorLineColor: "#9c9186",
+    labelBoxBorderColor: "#9c9186",
+    activationBorderColor: "#9c9186",
+    secondaryColor: "#26221e", // card
+    labelBoxBkgColor: "#26221e",
+    activationBkgColor: "#26221e",
+    tertiaryColor: "#26221e",
+    clusterBkg: "#26221e",
+    titleColor: "#f1eae1", // strong
+    edgeLabelBackground: "#1e1b18", // paper
+    noteBkgColor: "#26221e",
+    noteTextColor: "#e4dcd1",
+    noteBorderColor: "#3e3831",
+  },
+};
+
 // mermaid の prefix は svg ルート id とマーカー/グラデーション id しか名前空間化しない。
 // フローチャートのエッジ id（L_A_B_0）やシーケンス図の actor0 / S / U 等の内部 id は
 // 無名前空間のままで、同一図の light/dark 2枚で衝突する。→ SVG 文字列内の内部 id と参照
@@ -69,14 +155,20 @@ export function namespaceSvgIds(svg, ns) {
  * 1テーマ分をレンダして id を名前空間化したSVG文字列を返す。
  * @param {MermaidRenderer} renderer
  * @param {string} source
- * @param {'default' | 'dark'} theme
+ * @param {'light' | 'dark'} variant
  * @param {string} ns
  * @returns {Promise<string>}
  */
-async function renderTheme(renderer, source, theme, ns) {
+async function renderTheme(renderer, source, variant, ns) {
   const [result] = await renderer([source], {
     prefix: ns,
-    mermaidConfig: { theme },
+    css: FONT_CSS_URL,
+    mermaidConfig: {
+      theme: "base",
+      fontFamily: FONT_FAMILY, // sequence図等は themeVariables でなくトップレベルを読む
+      fontSize: 15, // トップレベルは数値(px)。themeVariables 側は文字列（上記★）
+      themeVariables: THEME_VARIABLES[variant],
+    },
   });
   if (result.status !== "fulfilled") {
     const reason = result.reason;
@@ -117,7 +209,7 @@ export function mermaid({ renderer = defaultRenderer } = {}) {
         let darkSvg;
         try {
           [lightSvg, darkSvg] = await Promise.all([
-            renderTheme(renderer, source, "default", `mmd${index}l`),
+            renderTheme(renderer, source, "light", `mmd${index}l`),
             renderTheme(renderer, source, "dark", `mmd${index}d`),
           ]);
         } catch (err) {
@@ -138,7 +230,8 @@ export function mermaid({ renderer = defaultRenderer } = {}) {
         }
 
         // Tailwind ダークモード（html.dark クラス切替）で出し分け。
-        // light を既定表示、dark を dark: で表示する。切替CSSはP6で入れる。
+        // light を既定表示、dark を dark: で表示する。figure まわりのCSSは
+        // global.css の .mermaid-diagram ブロック（枠なし・横スクロール）。
         const wrapper =
           `<figure class="mermaid-diagram">` +
           `<div class="mermaid-light block dark:hidden">${lightSvg}</div>` +

@@ -12,7 +12,7 @@
 
 1. **Shikiから除外**: `markdown.syntaxHighlight.excludeLangs: ['mermaid']`（★`satteri()`の引数ではなく`markdown`直下。`math`は`defaultExcludeLanguages`で常時除外されるためmermaidだけ足せばよい）。除外されたmermaidはhastに**素の`element`（`<pre><code>`）**として届く（非除外言語はShiki済み`raw`ノードになり`element` filterには来ない）
 2. **検出**: hastの`element` visitor `filter: ['pre']`で捕捉し、子`code`の`code.data.lang === 'mermaid'`で判定（`className: ['language-mermaid']`も付いている）。`<pre>`ごと`replaceNode`するため**filterは`pre`が正解**（`code`ではない）
-3. **レンダ**: `createMermaidRenderer()`を**モジュールレベルで1回だけ**生成しブラウザインスタンスを使い回す。async visitorから`renderer([source], { prefix, mermaidConfig: { theme } })`を呼ぶ。`theme: 'default'`（light）/`'dark'`の2回レンダ
+3. **レンダ**: `createMermaidRenderer()`を**モジュールレベルで1回だけ**生成しブラウザインスタンスを使い回す。async visitorから`renderer([source], { prefix, css, mermaidConfig })`を呼び、light/darkの2回レンダする。テーマは`theme: 'base'` + variant別`themeVariables`でサイトトークン（[ui-design-spec.md「mermaid図」](../ui-design/ui-design-spec.md)のマッピング表）をhexで焼き込む。フォントは本文と同じZen Maru Gothic 15px — `css`オプションでGoogle FontsのCSS URLをレンダページに注入する（mermaid-isomorphicはレンダ前に`document.fonts`を全ロードして待つため、テキスト幅計測も実フォントで行われる）。`fontSize`は**configトップレベルが数値（15）・themeVariables内が文字列（"15px"）**の二重指定が必要
 4. **id一意化**: `prefix`だけでは不十分（下記「落とし穴」1）。**SVG文字列の全idと参照を後処理で名前空間化する**（`namespaceSvgIds`）。nsは「図index × テーマ」でper-SVG一意（例: `mmd0l` / `mmd0d`）
 5. **埋め込み**: `ctx.replaceNode(node, { type: 'raw', value: wrapper })`でエスケープなし出力。ラッパは`<figure>` + light/dark 2つの`<div>`（Tailwindの`dark:`クラスで出し分け）
 6. **プラグイン本体はファクトリ形式**（文書ごとの図カウンタを持つため）
@@ -25,6 +25,7 @@
 - **レンダラDI**: `mermaid({ renderer } = {})` にし既定はモジュールレベル `createMermaidRenderer()`（`link-card.mjs` の `linkCard({ cacheDir })` 前例）。テストは fake レンダラを注入し実ブラウザ起動・実SVG生成を避ける（[implementation-rules.md](../implementation-rules.md) §5）。
 - **`namespaceSvgIds` を named export**して純関数として単体テスト（AC「id重複がなく」の本丸検証）。
 - **`@ts-check` 対応**: `code.data.lang`（hast標準 `Element.data` に `lang` 無し）は `getLang` ヘルパで型橋渡し、`catch (err)`/`result.reason` は `instanceof Error` 分岐（`any`不使用・§3）。throwは `{ cause: err }` 付き（lint `preserve-caught-error`）。
+- **サイトデザイン適用（2026-07）**: `theme: 'default'/'dark'` → `theme: 'base'` + variant（`'light'`/`'dark'`）別`themeVariables`に変更。`themeVariables.darkMode`で導出方向を切替。`theme: 'base'`は未指定変数を`primaryColor`からの色相回転等で導出する（近無彩色だと不自然な色になる）ため、flowchart/sequenceが使う変数は明示指定する。fakeレンダラのvariant判定も`mermaidConfig.theme`から`themeVariables.darkMode`ベースに変更。figureまわりの切替/スクロールCSSは`src/styles/global.css`の`.mermaid-diagram`ブロック（見た目の確定仕様は[ui-design-spec.md「mermaid図」](../ui-design/ui-design-spec.md)）。
 - **カウンタは実質ビルド全体で単調増加**（`hastPlugins: [mermaid()]` は config時に1回だけ生成＝インスタンス共有。かつAstroはContentコンポーネントを複数回レンダするため、出力に現れるns indexは0始まりとは限らない）。**ページ内での一意性は保たれる**（下記実ビルドで light/dark 2枚のid積集合0を実測）ので問題ない。
 
 ## 雛形コード（動作確認済み）
@@ -191,14 +192,19 @@ element tagName='pre' properties={}
 2. **ChromiumのOS依存不足でビルドが落ちる**
    - WSL2（Ubuntu 24.04）素の状態では`libnspr4.so`不足でブラウザ起動に失敗しexit 1（＝レンダ失敗がちゃんとビルドを止められることの裏取りにもなった）
    - 回避策: `sudo env "PATH=$PATH" npx playwright install-deps chromium`を**一度だけ**実行（sudoはPATHをリセットするため`env "PATH=$PATH"`が必要）。`--with-deps`ではなく`install-deps`サブコマンドで足りる。**CI（GitHub Actions）でも同等のdepsインストールステップが必要**（`npx playwright install --with-deps chromium`等。Pages組み込みビルドを使わずGitHub Actionsを採る理由がこれ）
-3. **sequence図のCSSに「定義のないグラデーション参照」が残る（無害）**
+3. **Fonts APIのファミリ名リネームでフォントが不一致になり文字末尾が見切れる**
+   - AstroのFonts APIはセルフホスト時に`@font-face`のファミリ名を**ハッシュ付き（`Zen Maru Gothic-<hash>`）にリネーム**する（`--font-zen-maru`変数経由でのみ参照できる。素の`"Zen Maru Gothic"`というファミリはサイト上に存在しない）
+   - SVGへ焼き込んだ`font-family:"Zen Maru Gothic"`はサイトでは解決できずsans-serifにフォールバックする。ビルド用Chromiumでは本物のZen Maru Gothic（Google Fonts注入）で**テキスト幅を計測してボックス寸法を確定**しているため、フォールバック描画（Latin字形はZMGより広い）だとラベル末尾が見切れる（classDiagram「Animal」→「Anima」等。foreignObject幅79px vs 実描画86pxを実測）
+   - 回避策: `global.css`の`.prose .mermaid-diagram svg, .prose .mermaid-diagram svg *`で`font-family: var(--font-maru) !important`を上書きし、表示フォントを計測時と同じZen Maru Gothic（ハッシュ名）に揃える。`!important`はSVG内のインライン`style`属性（44箇所実測）に勝つため必須
+4. **sequence図のCSSに「定義のないグラデーション参照」が残る（無害）**
    - mermaidの汎用スタイルシートは`stroke:url(#...-gradient)`を含むが、polygonノードを持たないsequence図ではそのgradientが`<defs>`に定義されない。元々danglingなdead CSSであり、`namespaceSvgIds`はこれを壊していない（flowchart側の実在gradientはdef/refとも正しく一致することを確認済み）
 
 ## 制約・残課題
 
 - ライト/ダーク切替の実表示（`html.dark`トグルで入れ替わること）は未目視。プラグインはクラス付与までを確認しており、切替CSS/Tailwind設定を組んだ時点で1度ブラウザ確認する（[shiki.md](shiki.md)のdual theme CSSと同じ扱い）
 - CI環境（GitHub Actions）でのPlaywright/Chromium起動は未検証（ローカルWSL2のみ）
-- mermaidの全図種（gantt / class / state / ER / pie等）での動作は未検証（flowchart・sequenceの2種のみ）。`iconPacks`やカスタムフォント（`css`オプション）も未使用
+- mermaidの全図種（gantt / class / state / ER / pie等）での動作は未検証（flowchart・sequenceの2種のみ）。`themeVariables`のトークンマッピングもflowchart/sequenceが使う変数のみ明示指定しており、他図種は`theme: 'base'`の導出色になる。`iconPacks`は未使用
+- **ビルドにGoogle Fontsへのネットワークアクセスが必須**（`css`オプションでフォントCSSを取得。図ごとにlight/dark 2ページがCSS+和文woff2を取得するため、mermaid多用ページではビルド時間への影響がありうる。weightは400/700に絞って軽減）。オフラインビルドはmermaidを含むページで失敗する
 - `namespaceSvgIds`の参照書き換えは`url(#..)` / `href="#.."` / `aria-labelledby|describedby`のみ対応。`begin="foo.end"`（SMILアニメ参照）等の他形式は本アプリのmermaid出力に現れなかったため未対応（必要になれば追加）。**`aria-labelledby="a b"`のようなスペース区切り複数idも完全一致アンカーのため未追従**（flowchart/sequenceの実測出力にaria複数idは現れず実害なし。T2-4レビューR-3）
 - **`namespaceSvgIds`のルートid除外は「`<style>`の`#id`セレクタはルートidのみ」という前提に依存**（flowchart/sequenceで実測。全セレクタが`#<ルートid>`スコープ）。gantt/class/state等の未検証図種が**非ルートの`#id`セレクタ**を`<style>`に持つ場合、そのセレクタは死にCSS化しうる（同R-1が図種依存で再発）。図種を広げる際は`<style>`内`#id`セレクタの孤立ゼロを再確認する
 - 巨大図・多数図ページでのビルド時間/メモリ、およびレンダの並列度（現状は図ごとにlight/darkを`Promise.all`、図間はvisitor逐次）のチューニングは未検証
