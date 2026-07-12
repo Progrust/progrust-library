@@ -275,15 +275,15 @@
   padding: 0.6rem 1rem;
   text-align: left;
   vertical-align: top;
+  /* セルは自動折り返ししない（改行は執筆者が <br> で明示する運用）。
+     幅超過は .table-wrap の横スクロールで吸収する */
+  white-space: nowrap;
 }
 .prose th {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.85rem;
   color: var(--color-strong);
-  /* 列幅の下限をヘッダー幅にする。これがないと幅狭時にCJKが1文字ずつ縦に
-     折り返されてから横スクロールが始まり、列が読めなくなる */
-  white-space: nowrap;
 }
 .prose thead th {
   background: var(--color-head);

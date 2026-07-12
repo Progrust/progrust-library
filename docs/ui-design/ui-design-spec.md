@@ -301,8 +301,8 @@ tailwind.config = {
   overflow-x: auto;
 }
 .prose table { width: 100%; border-collapse: collapse; font-size: 0.9rem; line-height: 1.6; }
-.prose :is(th, td) { padding: 0.6rem 1rem; text-align: left; vertical-align: top; }
-.prose th { font-family: var(--font-display); font-weight: 700; font-size: 0.85rem; color: var(--color-strong); white-space: nowrap; /* 列幅の下限=ヘッダー幅（幅狭時のCJK縦1文字折返し防止） */ }
+.prose :is(th, td) { padding: 0.6rem 1rem; text-align: left; vertical-align: top; white-space: nowrap; /* セルは自動折り返ししない（改行は執筆者が <br> で明示）。幅超過はラッパの横スクロールで吸収 */ }
+.prose th { font-family: var(--font-display); font-weight: 700; font-size: 0.85rem; color: var(--color-strong); }
 .prose thead th { background: var(--color-head); border-bottom: 1px solid var(--color-line); }
 .prose tbody td { border-bottom: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent); }
 .prose tbody tr:last-child td { border-bottom: none; }
