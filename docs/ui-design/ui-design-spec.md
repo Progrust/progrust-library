@@ -90,6 +90,7 @@ tailwind.config = {
 - **罫線**: 構造の境界は `border-line/70 dark:border-nline/70`（薄め）、コンテンツの枠は `border-line dark:border-nline`
 - **ホバー**: リンク文字・枠が `accent`/`naccent` に変わる。リスト行は `hover:bg-card dark:hover:bg-ncard`。`transition-colors motion-reduce:transition-none` を併記
 - **eyebrow**: `<p class="font-mono text-xs text-accent dark:text-naccent">// dictionary</p>` の形式で統一（`// toc`、`// dictionary pane`、`// linked dictionaries` など）
+- **スクロールバー**: 全域で細幅（WebKit 6px / Firefox `thin`）・トラック透明。サムは `line`（hover で `sub`）・角丸は幅の半分。コードブロックはダーク面のためサムをライト `#4a4238` / ダーク `line` に切替（枠線色と同じペア。hover は共通どおり `sub` で明るくなる）。辞書サイドペイン・ホバープレビューは表示幅が狭いため WebKit 4px に上書き
 
 ## テーマ切替
 
