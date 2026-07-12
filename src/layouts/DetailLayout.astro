@@ -108,11 +108,11 @@ const gridCols = hasToc
         <slot name="below" />
       </article>
 
-      {/* 右: 使用辞書一覧（R-17・右上）+ 辞書ペイン */}
+      {/* 右: 辞書ペイン + 使用辞書一覧（R-17・ペイン下） */}
       <aside class="hidden lg:block">
         <div class="sticky top-24">
-          <LinkedDictList dicts={linkedDicts} class="mb-8" />
           <DictPane />
+          <LinkedDictList dicts={linkedDicts} class="mt-8" />
         </div>
       </aside>
     </div>
