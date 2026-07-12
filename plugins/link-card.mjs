@@ -94,7 +94,7 @@ function fullCard(url, ogp) {
     ? `<span class="link-card__desc">${escapeHtml(ogp.description)}</span>`
     : "";
   return (
-    `<div class="link-card-wrap"><a class="link-card" href="${escapeHtml(url)}">` +
+    `<div class="link-card-wrap"><a class="link-card" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">` +
     `<span class="link-card__body">` +
     `<span class="link-card__title">${escapeHtml(ogp.title ?? url)}</span>` +
     desc +
@@ -109,7 +109,7 @@ function fullCard(url, ogp) {
  * @returns {string}
  */
 function fallbackCard(url) {
-  return `<div class="link-card-wrap"><a class="link-card link-card--fallback" href="${escapeHtml(url)}">${escapeHtml(url)}</a></div>`;
+  return `<div class="link-card-wrap"><a class="link-card link-card--fallback" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a></div>`;
 }
 
 /**

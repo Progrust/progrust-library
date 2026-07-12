@@ -57,6 +57,9 @@ describe("link-card（単独ベアURLのOGPカード化・docs/markdown-pipeline
     expect(html).toContain("サンプルタイトル");
     expect(html).toContain("説明文");
     expect(html).toContain('class="link-card__host">example.com');
+    // カードは別タブで開く（spec pages.md R-24 / AC-13）。
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
     // block要素<div>開始でHTMLブロックとしてverbatim出力される（inline<a>開始だと
     // 再パースで<a>がエスケープ（&lt;a）され二重autolink化する。落とし穴1の回帰ガード）。
     expect(html).not.toContain("&lt;a");
@@ -120,6 +123,9 @@ describe("link-card（単独ベアURLのOGPカード化・docs/markdown-pipeline
     const html = await compileWithLinkCard("https://example.com/", cacheDir);
     expect(html).toContain("link-card--fallback");
     expect(html).toContain("https://example.com/");
+    // フォールバックカードも別タブで開く（spec pages.md R-24 / AC-13）。
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
   });
 
   it("非200レスポンスでも簡易カードにフォールバックする", async () => {

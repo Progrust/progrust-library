@@ -70,7 +70,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 ## 4. Markdownパイプライン構成
 
-`astro.config.mjs`は [`markdown-pipeline/README.md`](markdown-pipeline/README.md) の「astro.config.mjs の全体像」に従う（Shiki設定は`markdown`直下、`features: { directive: true }`+textDirective復元、プラグイン順序: codeFilename → playgroundLink → wikilink → directives → linkCard（mdast）/ mermaid → tableWrap（hast））。詳細・落とし穴は同文書と各機能文書を正とする。
+`astro.config.mjs`は [`markdown-pipeline/README.md`](markdown-pipeline/README.md) の「astro.config.mjs の全体像」に従う（Shiki設定は`markdown`直下、`features: { directive: true }`+textDirective復元、プラグイン順序: codeFilename → playgroundLink → wikilink → directives → linkCard → externalLinks（mdast）/ mermaid → tableWrap（hast））。詳細・落とし穴は同文書と各機能文書を正とする。
 
 ## 5. ルーティングとページ生成（src/pages/）
 

@@ -15,7 +15,7 @@
    - 通常リンクはtext子（表示名）≠ url → 対象外
    - `inlineCode`/`code`内は元々`link`にならない → 誤検出なし
 2. **取得**: async `paragraph` visitor内で`fetch`し、OGP（`og:title`/`og:description`/`og:image`、無ければ`<title>`）を正規表現抽出
-3. **埋め込み**: `ctx.replaceNode(node, { rawHtml })`。**カードHTMLは必ずblock要素（`<div>`）で開始する**（最重要。下記「落とし穴」1参照）
+3. **埋め込み**: `ctx.replaceNode(node, { rawHtml })`。**カードHTMLは必ずblock要素（`<div>`）で開始する**（最重要。下記「落とし穴」1参照）。カードの `<a>` には `target="_blank" rel="noopener noreferrer"` を直書きし別タブで開く（spec [pages.md](../spec/pages.md) R-24。段落ごとrawHtml化されるため [external-links.md](external-links.md) プラグインの対象外になる）
 4. **キャッシュ**: `.cache/link-card/ogp.json`（リポジトリ直下・**gitignore対象外＝コミット可**）にビルドを跨いで保存。ファクトリ呼び出し時に`Map`へロードし、成功fetchのたびにディスクへ書き出す。コミット運用は spec [deploy.md](../spec/deploy.md) R-4（T2-3で本番化）
 5. **失敗時**: try/catchで捕捉し、throwせず簡易カード（`link-card--fallback`）へフォールバック。非200も同様。**失敗結果はキャッシュに書かない**（成功のみ保存。コミット運用で失敗が永続化＝恒久フォールバックになるのを避ける。T2-3の決定）
 6. **内部リンク除外ガード**: fetch直前に`/^https?:\/\//`を満たさないURLはカード化せず素通り（内部パス`/…`を除外。T2-3で追加）

@@ -10,6 +10,7 @@ import { directives } from "./plugins/directives.mjs";
 import { codeFilename } from "./plugins/code-filename.mjs";
 import { playgroundLink } from "./plugins/playground-link.mjs";
 import { linkCard } from "./plugins/link-card.mjs";
+import { externalLinks } from "./plugins/external-links.mjs";
 import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
 import { mermaid } from "./plugins/mermaid.mjs";
@@ -87,13 +88,15 @@ export default defineConfig({
       features: { directive: true },
       // codeFilename は ```lang:file のlang補正のため他プラグインより前に置く（shiki.md）。
       // playgroundLink はlang補正後のmetaを読むため codeFilename の直後（playground.md）。
-      // linkCard は末尾（順序: codeFilename → playgroundLink → wikilink → directives → linkCard。architecture.md §4）。
+      // externalLinks は末尾（linkCardが段落ごとrawHtml化した後の残りのテキストリンクだけが対象。
+      // 順序: codeFilename → playgroundLink → wikilink → directives → linkCard → externalLinks。architecture.md §4）。
       mdastPlugins: [
         codeFilename,
         playgroundLink,
         wikilink(dictIndex),
         directives,
         linkCard(),
+        externalLinks,
       ],
       // mermaid はビルド時SVG化のhastプラグイン（ファクトリ形式・文書ごとの図カウンタを持つ）。
       // Shiki実行後のhast段階で素の <pre><code data.lang=mermaid> を捕捉する（mermaid.md）。

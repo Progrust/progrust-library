@@ -57,6 +57,21 @@ describe("pipeline（全プラグイン同時登録の相互作用・markdown-pi
     expect(html).toContain('href="/dict/ownership"');
     expect(html).not.toContain("link-card");
     expect(fetchFn).not.toHaveBeenCalled();
+    // wikilinkは内部パスのためexternalLinks併存下でも別タブ化されない（spec pages.md R-24）。
+    expect(html).not.toContain('target="_blank"');
+  });
+
+  it("[AC-13] 外部テキストリンクは別タブ化され、wikilinkはされない（全登録構成）", async () => {
+    stubFetchOk();
+    const html = await compileWithAllPlugins(
+      "[[ownership]]と[外部サイト](https://example.com/)を参照。",
+      { dictIndex, fileURL: PUBLIC_PAGE, cacheDir, renderer },
+    );
+    // 外部テキストリンクにのみ target/rel が付く（target出現は1件＝wikilinkアンカーには付かない）。
+    expect(html).toContain('href="https://example.com/"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html.match(/target="_blank"/g)).toHaveLength(1);
+    expect(html).toContain('class="wikilink"');
   });
 
   it("同一文書でwikilinkとベアURLが併存してもカード化はベアURLの1件だけ", async () => {
