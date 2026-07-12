@@ -42,7 +42,7 @@ const gridCols = hasToc
   : "lg:grid-cols-[minmax(0,1fr)_320px]";
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} maxWidthClass="max-w-7xl">
   <main class="mx-auto max-w-7xl px-4 py-10 sm:px-8">
     <div class={`lg:grid lg:gap-10 ${gridCols}`}>
       {/* 左: 目次（lg 以上・sticky）。目次が無いページではカラムごと省略 */}

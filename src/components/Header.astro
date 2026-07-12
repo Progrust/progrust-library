@@ -3,12 +3,21 @@
 // ロゴ + 検索ボックス（見た目のみ）+ テーマ切替の 3 点のみ。ナビリンクは置かない。
 import SearchBox from "./SearchBox.astro";
 import ThemeToggle from "./ThemeToggle.astro";
+
+interface Props {
+  /** 内側コンテナの最大幅。ページの <main> 幅に追従させる（ui-design-spec「レイアウト」） */
+  maxWidthClass?: string;
+}
+
+const { maxWidthClass = "max-w-6xl" } = Astro.props;
 ---
 
 <header
   class="sticky top-0 z-30 border-b border-line/70 bg-paper/95 backdrop-blur"
 >
-  <div class="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4 sm:px-8">
+  <div
+    class={`mx-auto flex h-14 items-center gap-6 px-4 sm:px-8 ${maxWidthClass}`}
+  >
     <a
       href="/"
       class="shrink-0 font-display text-lg font-bold text-strong transition-colors hover:text-accent motion-reduce:transition-none"

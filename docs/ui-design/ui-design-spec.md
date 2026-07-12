@@ -119,6 +119,7 @@ tailwind.config = {
 | 章詳細 | `max-w-7xl px-4 sm:px-8` | 辞書詳細と同じ3カラム。ただし左カラムは `220px` で**複合目次**（章リスト+現在章の本文見出し）に差し替え |
 | 本トップ | `max-w-5xl px-4 sm:px-8` | `lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12`（左=章目次サイドバー / 右=ヒーロー+本文、本文列は `max-w-3xl`） |
 
+- ヘッダー/フッターの内側コンテナ幅はページの `<main>` 幅に追従する（既定 `max-w-6xl`。辞書/記事/章詳細では `max-w-7xl`。本トップは `max-w-6xl` のまま）
 - 辞書一覧のカードグリッド: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`
 - 両サイドバーは `sticky top-24`、`lg` 未満では非表示にしてフローティングボタン（後述）に切替
 - 中央本文は `min-w-0`（truncate用）+ モバイル時 `max-w-2xl mx-auto`
@@ -127,7 +128,7 @@ tailwind.config = {
 
 ### ヘッダー（全ページ共通・スクロール固定）
 
-ロゴ + 検索ボックス + テーマ切替の3点のみ。ナビリンクは置かない。
+ロゴ + 検索ボックス + テーマ切替の3点のみ。ナビリンクは置かない。内側コンテナの `max-w-6xl` は既定値で、ページの `<main>` 幅に追従する（「レイアウト」参照）。
 
 ```html
 <header class="sticky top-0 z-30 bg-paper/95 dark:bg-npaper/95 backdrop-blur border-b border-line/70 dark:border-nline/70">

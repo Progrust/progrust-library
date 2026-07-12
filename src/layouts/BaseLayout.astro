@@ -4,6 +4,7 @@
 // meta / OGP / Analytics の本格拡充は P6。
 // コンテンツ幅は画面ごとに異なる（一覧=max-w-6xl / 詳細=max-w-7xl。ui-design-spec「レイアウト」）
 // ため、コンテナと <main> は各ページ / DetailLayout 側に持たせ、ここでは規定しない。
+// ヘッダー/フッターの内側コンテナ幅は maxWidthClass で <main> 幅に追従させる。
 import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
@@ -13,9 +14,11 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  /** ヘッダー/フッター内側コンテナの最大幅。ページの <main> 幅に合わせて指定する */
+  maxWidthClass?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, maxWidthClass = "max-w-6xl" } = Astro.props;
 const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
 ---
 
@@ -54,8 +57,8 @@ const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     {description && <meta name="description" content={description} />}
   </head>
   <body class="min-h-screen bg-paper font-maru text-ink">
-    <Header />
+    <Header maxWidthClass={maxWidthClass} />
     <slot />
-    <Footer />
+    <Footer maxWidthClass={maxWidthClass} />
   </body>
 </html>

@@ -2,11 +2,18 @@
 // 全ページ共通フッター（pages.md R-3 / ui-design-spec「フッター」）。
 // コピーライト（mono）+ プロフィール / GitHub / X / RSS のテキストリンク。
 import { SITE, SITE_LINKS } from "../lib/site";
+
+interface Props {
+  /** 内側コンテナの最大幅。ページの <main> 幅に追従させる（ui-design-spec「レイアウト」） */
+  maxWidthClass?: string;
+}
+
+const { maxWidthClass = "max-w-6xl" } = Astro.props;
 ---
 
 <footer class="mt-16 border-t border-line/70">
   <div
-    class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8"
+    class={`mx-auto flex flex-col gap-3 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8 ${maxWidthClass}`}
   >
     <p class="font-mono text-xs text-sub">
       © {SITE.since}
