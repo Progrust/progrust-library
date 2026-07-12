@@ -55,8 +55,10 @@ const gridCols = hasToc
       }
 
       {/* 中央: タイトル / タグ一覧 / 更新日 / 本文（pages R-12） */}
-      {/* lg 以上（グリッド時）は mx-auto を切る: グリッドアイテムに auto マージンが
-          付くと stretch が効かず fit-content 幅に縮むため（lg 未満の中央寄せ用にのみ残す） */}
+      {
+        /* lg 以上（グリッド時）は mx-auto を切る: グリッドアイテムに auto マージンが
+          付くと stretch が効かず fit-content 幅に縮むため（lg 未満の中央寄せ用にのみ残す） */
+      }
       <article class="mx-auto min-w-0 max-w-2xl lg:mx-0 lg:max-w-none">
         <header class="mb-8 border-b border-line pb-6">
           {
