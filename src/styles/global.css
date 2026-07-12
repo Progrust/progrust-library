@@ -197,7 +197,7 @@
 }
 .prose strong {
   font-weight: 700;
-  color: var(--color-strong);
+  color: var(--color-accent);
 }
 .prose img {
   max-width: 100%;
