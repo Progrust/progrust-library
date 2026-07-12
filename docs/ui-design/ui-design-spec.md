@@ -194,7 +194,7 @@ tailwind.config = {
 モックの本文コンテナ `space-y-6 leading-relaxed text-[15px]` に合わせる。
 
 - 基本: font-size 15px（0.9375rem）/ line-height 1.625（`leading-relaxed`）/ ブロック間 margin-top 1.5rem（`space-y-6`）
-- h2: `text-2xl`（1.5rem）。セクション区切りは**見出しの上**に薄罫線（`pt-6 border-t border-line/70` 相当。margin-top はブロック間の 1.5rem のまま）。見出し下線（border-bottom）は使わない
+- h2: `text-2xl`（1.5rem）。セクション区切りは**見出しの下**に薄罫線（`pb-2 border-b border-line/70` 相当）。セクション間隔を保つため margin-top はブロック間より広い 3rem（`mt-12` 相当）。見出し上罫線（border-top）は使わない
 - h3: `text-lg`（1.125rem）、罫線なし。margin-top は汎用の 1.5rem
 - h4 以下・リスト・blockquote 等はモックに対応要素がないため実装値（`global.css`）に従う
 

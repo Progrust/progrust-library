@@ -140,10 +140,12 @@
   font-weight: 900;
   letter-spacing: -0.02em;
 }
-/* h2 のセクション区切りは見出しの「上」に薄罫線（モックの pt-6 border-t border-line/70） */
+/* h2 のセクション区切りは見出しの「下」に薄罫線（pb-2 border-b border-line/70 相当）。
+   セクション間隔維持のため margin-top はブロック間より広い 3rem */
 .prose h2 {
-  padding-top: 1.5rem;
-  border-top: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent);
+  margin-top: 3rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent);
   font-size: 1.5rem;
 }
 .prose h3 {
@@ -370,7 +372,7 @@ html.dark .wikilink {
   font-size: 1.25rem;
 }
 :is([data-dict-pane-content], [data-dict-preview]) .prose h2 {
-  padding-top: 0.75rem;
+  margin-top: 2.25rem;
   font-size: 1.1rem;
 }
 :is([data-dict-pane-content], [data-dict-preview]) .prose h3 {
