@@ -12,6 +12,7 @@ import { linkCard } from "./plugins/link-card.mjs";
 import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
 import { mermaid } from "./plugins/mermaid.mjs";
+import { tableWrap } from "./plugins/table-wrap.mjs";
 
 // ビルド時検証3種はconfig評価時に実行する（content-model AC-2/AC-5/AC-9/AC-10）。
 // コレクション経由のvisitor throwはglob loaderに握り潰されexit 0になるため、
@@ -88,7 +89,8 @@ export default defineConfig({
       mdastPlugins: [codeFilename, wikilink(dictIndex), directives, linkCard()],
       // mermaid はビルド時SVG化のhastプラグイン（ファクトリ形式・文書ごとの図カウンタを持つ）。
       // Shiki実行後のhast段階で素の <pre><code data.lang=mermaid> を捕捉する（mermaid.md）。
-      hastPlugins: [mermaid()],
+      // tableWrap はGFMテーブルを .table-wrap で包む（pre/tableで捕捉対象が異なり相互作用なし。table-wrap.md）。
+      hastPlugins: [mermaid(), tableWrap],
     }),
   },
   vite: {

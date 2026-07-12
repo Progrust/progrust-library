@@ -7,6 +7,7 @@ import type { DictIndexEntry } from "../../plugins/dict-index.mjs";
 import { directives } from "../../plugins/directives.mjs";
 import { linkCard } from "../../plugins/link-card.mjs";
 import { mermaid } from "../../plugins/mermaid.mjs";
+import { tableWrap } from "../../plugins/table-wrap.mjs";
 
 /**
  * 本番と同一構成（astro.config.mjs / markdown-pipeline/README.md の登録順）で
@@ -40,7 +41,10 @@ export async function compileWithAllPlugins(
       linkCard({ cacheDir: options.cacheDir }),
     ],
     // fake レンダラは本物の MermaidRenderer の使う部分集合のみ実装するため unknown 経由で橋渡し。
-    hastPlugins: [mermaid({ renderer: options.renderer as MermaidRenderer })],
+    hastPlugins: [
+      mermaid({ renderer: options.renderer as MermaidRenderer }),
+      tableWrap,
+    ],
     // directive 有効化なしでは `:::message` 等が素通りしテストが無意味（誤ってgreen）になる。
     features: { directive: true },
     fileURL: options.fileURL,

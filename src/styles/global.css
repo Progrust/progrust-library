@@ -16,6 +16,9 @@
   --color-ink: #3a342d;
   --color-sub: #847a6e;
   --color-accent: #c63d22;
+  /* テーブルヘッダー行の面（ui-design-spec「テーブル」。light はインラインコードbgと同色、
+     dark は paper と同色） */
+  --color-head: #ebe7df;
 
   /* フォント本体は Fonts API がセルフホストし、:root へ --font-zen-kaku 等
      （本体+最適化フォールバック入り）を定義する（astro.config.mjs の fonts /
@@ -35,6 +38,7 @@
   --color-ink: #e4dcd1;
   --color-sub: #9c9186;
   --color-accent: #f0684a;
+  --color-head: #1e1b18;
 }
 
 /* サイト共通のスクロールバー（ui-design-spec「共通ルール」）。
@@ -222,21 +226,46 @@
   text-decoration-thickness: 2px;
 }
 
-/* テーブル */
+/* テーブル（案C: カード面フレーム。ui-design-spec「テーブル」・pages.md R-22）。
+   ラッパ .table-wrap は plugins/table-wrap.mjs が付与し、カード面フレームと
+   横スクロールコンテナを兼ねる。縦罫線なし・水平罫線のみ。 */
+.prose .table-wrap {
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-card);
+  overflow: hidden;
+  overflow-x: auto;
+}
 .prose table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  line-height: 1.6;
 }
 .prose :is(th, td) {
-  border: 1px solid var(--color-line);
-  padding: 0.5rem 0.75rem;
+  padding: 0.6rem 1rem;
   text-align: left;
+  vertical-align: top;
 }
 .prose th {
-  background: var(--color-card);
   font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
   color: var(--color-strong);
+  /* 列幅の下限をヘッダー幅にする。これがないと幅狭時にCJKが1文字ずつ縦に
+     折り返されてから横スクロールが始まり、列が読めなくなる */
+  white-space: nowrap;
+}
+.prose thead th {
+  background: var(--color-head);
+  border-bottom: 1px solid var(--color-line);
+}
+.prose tbody td {
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 70%, transparent);
+}
+.prose tbody tr:last-child td {
+  border-bottom: none;
 }
 
 /* 脚注 */
@@ -613,7 +642,7 @@ html.dark .message-warning .message-title {
     .code-block,
     .link-card-wrap,
     blockquote,
-    table
+    .table-wrap
   ) {
   padding-inline: 1rem;
 }
@@ -628,7 +657,7 @@ html.dark .message-warning .message-title {
     .code-block,
     .link-card-wrap,
     blockquote,
-    table
+    .table-wrap
   ) {
   padding-top: 0.75rem;
 }
@@ -642,7 +671,7 @@ html.dark .message-warning .message-title {
     .code-block,
     .link-card-wrap,
     blockquote,
-    table
+    .table-wrap
   ):last-child {
   padding-bottom: 0.9rem;
 }
@@ -660,7 +689,7 @@ html.dark .message-warning .message-title {
     .code-block,
     .link-card-wrap,
     blockquote,
-    table
+    .table-wrap
   ) {
   margin-inline: 1rem;
 }
@@ -674,7 +703,7 @@ html.dark .message-warning .message-title {
     .code-block,
     .link-card-wrap,
     blockquote,
-    table
+    .table-wrap
   ) {
   margin-top: 0.75rem;
 }
@@ -687,7 +716,7 @@ html.dark .message-warning .message-title {
     .code-block,
     .link-card-wrap,
     blockquote,
-    table
+    .table-wrap
   ):last-child {
   margin-bottom: 0.9rem;
 }

@@ -116,4 +116,28 @@ describe("pipeline（全プラグイン同時登録の相互作用・markdown-pi
     // codeFilename 前処理が併存してもmermaidブロックを巻き込まない（rustブロックは素通り）。
     expect(html).toContain("code-filename");
   });
+
+  it("[AC-9] details内のテーブルも全登録構成でラップされ、セル内のwikilinkが変換される", async () => {
+    stubFetchOk();
+    const source = [
+      "::::details[補足]",
+      "",
+      "| 概念 | 辞書 |",
+      "| --- | --- |",
+      "| 所有権 | [[ownership]] |",
+      "",
+      "::::",
+    ].join("\n");
+    const html = await compileWithAllPlugins(source, {
+      dictIndex,
+      fileURL: PUBLIC_PAGE,
+      cacheDir,
+      renderer,
+    });
+    expect(html).toContain("<details>");
+    expect(html).toContain('<div class="table-wrap"><table>');
+    expect(html).toContain("</table></div>");
+    // hast層のラップが、mdast層で変換済みのセル内wikilinkを壊さないこと。
+    expect(html).toContain('href="/dict/ownership"');
+  });
 });

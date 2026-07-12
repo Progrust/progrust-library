@@ -15,6 +15,7 @@
 | ベアURLのリンクカード | [link-card.md](link-card.md) | 単独ベアURL判定、async OGP fetch、ビルド跨ぎキャッシュ、**カードHTMLはblock要素開始必須** |
 | mermaidのビルド時SVG化 | [mermaid.md](mermaid.md) | mermaid-isomorphic、**SVG全idの自前名前空間化が必須**、ライト/ダーク2枚埋め込み |
 | コードハイライト（diff・ファイル名・dual theme） | [shiki.md](shiki.md) | **Shiki設定は`markdown.shikiConfig`直下**、transformerNotationDiff、ファイル名のmdast前処理 |
+| テーブルの横スクロールラッパ | [table-wrap.md](table-wrap.md) | hast層`wrapNode`で`<table>`を`.table-wrap`divに包むだけ、生HTMLテーブルは対象外 |
 
 各文書は統一構成: **記法 → 実装方式 → 雛形コード → 落とし穴と回避策 → 制約・残課題**
 
@@ -42,6 +43,7 @@ import { directives } from './plugins/directives.mjs';
 import { linkCard } from './plugins/link-card.mjs';
 import { codeFilename } from './plugins/code-filename.mjs';
 import { mermaid } from './plugins/mermaid.mjs';
+import { tableWrap } from './plugins/table-wrap.mjs';
 
 const dictIndex = loadDictIndex(new URL('./content/dict/', import.meta.url));
 
@@ -57,7 +59,7 @@ export default defineConfig({
     processor: satteri({
       features: { directive: true }, // ← 有効化したら textDirective 復元プラグイン（directives.md）が必須
       mdastPlugins: [codeFilename, wikilink(dictIndex), directives, linkCard()],
-      hastPlugins: [mermaid()],
+      hastPlugins: [mermaid(), tableWrap],
     }),
   },
 });
