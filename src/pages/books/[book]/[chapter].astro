@@ -1,7 +1,7 @@
 ---
 // 章詳細（pages R-1/R-12/R-13/R-16, AC-4 / ui-design-spec §309〜314）。
 // getStaticPaths は getPublicChapters 経由で列挙する（本番は公開章のみ・非公開は404）。
-// 本ごとに台帳（複合目次）と前後章ナビ（chapterNav が非公開をスキップ・AC-4）を算出する。
+// 本ごとに台帳（複合目次）と前後章ナビ（chapterNav が非公開をスキップ・pages AC-4）を算出する。
 import { render } from "astro:content";
 import {
   getPublicBooks,

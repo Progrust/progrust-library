@@ -9,8 +9,8 @@ import { wikilink } from "./wikilink.mjs";
 /** @typedef {import('./dict-index.mjs').DictIndexEntry} DictIndexEntry */
 
 /**
- * 全コンテンツmdを wikilink プラグインで単体コンパイルし、リンク切れ（R-13）・
- * 公開非対称違反（R-14）をビルドエラー化する検証パス（content-model AC-9 / AC-10）。
+ * 全コンテンツmdを wikilink プラグインで単体コンパイルし、リンク切れ（content-model R-13）・
+ * 公開非対称違反（content-model R-14）をビルドエラー化する検証パス（content-model AC-9 / AC-10）。
  *
  * コレクション経由のレンダリングでは visitor 内 throw が glob loader に握り潰され
  * exit 0 になる（[markdown-pipeline/wikilink.md] 参照）ため、レンダリングとは別に

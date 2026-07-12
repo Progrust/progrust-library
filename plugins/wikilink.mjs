@@ -1,6 +1,6 @@
 // @ts-check
 // [[slug]] を辞書詳細ページへの <a> に変換するmdastプラグイン（docs/markdown-pipeline/wikilink.md）。
-// リンク切れ（R-13）・公開ページ→非公開辞書（R-14 公開非対称ルール）はthrowでビルドエラー化する。
+// リンク切れ（content-model R-13）・公開ページ→非公開辞書（content-model R-14 公開非対称ルール）はthrowでビルドエラー化する。
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { defineMdastPlugin } from "satteri";

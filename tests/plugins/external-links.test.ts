@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 
 import { compileWithExternalLinks } from "../helpers/external-links";
 
-describe("external-links（外部テキストリンクの別タブ化・docs/markdown-pipeline/external-links.md）", () => {
+describe("external-links（外部テキストリンクの別タブ化・pages R-24 / AC-13・docs/markdown-pipeline/external-links.md）", () => {
   it("[AC-13] 外部リンク [表示名](https://…) に target=_blank と rel が付く", () => {
     const html = compileWithExternalLinks("[表示名](https://example.com/)");
     expect(html).toContain('href="https://example.com/"');

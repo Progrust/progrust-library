@@ -28,8 +28,8 @@ describe("wikilink（辞書リンク変換・content-model R-13/R-14）", () => 
   it("[AC-9] 存在しないslugへのwikilinkでビルドが失敗しリンク元ファイルとリンク先slugがエラーに含まれる", () => {
     const call = () =>
       compileWithWikilink("[[does-not-exist]]", dictIndex, PUBLIC_PAGE);
-    expect(call).toThrow(/does-not-exist/); // リンク先slug（R-15）
-    expect(call).toThrow(/public-true\.md/); // リンク元ファイル（R-15）
+    expect(call).toThrow(/does-not-exist/); // リンク先slug（content-model R-15）
+    expect(call).toThrow(/public-true\.md/); // リンク元ファイル（content-model R-15）
     expect(call).toThrow(/存在しない/);
   });
 

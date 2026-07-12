@@ -30,7 +30,7 @@ const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
       /*
       FOUC 防止（theme.md R-3）: 初期テーマの適用は他のいかなる描画よりも先に
       <head> 内の同期スクリプトで行う。localStorage 優先・未保存なら
-      prefers-color-scheme を尊重する（R-1）。切替ロジックは src/scripts/theme.ts。
+      prefers-color-scheme を尊重する（theme.md R-1）。切替ロジックは src/scripts/theme.ts。
       コンポーネント内クライアント JS の唯一の例外（implementation-rules §4）。
     */
     }

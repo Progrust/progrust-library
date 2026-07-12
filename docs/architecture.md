@@ -53,7 +53,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 `public: false`の除外判定はここに集約し、各ページ・インデックス生成から必ずこれを通す:
 
 - `isPreview()`: `import.meta.env.DEV` で開発サーバ判定（[spec/content-model.md](spec/content-model.md) R-10）
-- `getPublicDict()` / `getPublicArticles()` / `getPublicBooks()` / `getPublicChapters()`: devでは全件（`isPublic`フラグ付き）、本番では公開のみ。章は「本index非公開→章も除外」の伝播（R-12）をここで適用する
+- `getPublicDict()` / `getPublicArticles()` / `getPublicBooks()` / `getPublicChapters()`: devでは全件（`isPublic`フラグ付き）、本番では公開のみ。章は「本index非公開→章も除外」の伝播（content-model R-12）をここで適用する
 - 新着・並び順ユーティリティ（`created_at`降順・タイトル昇順タイブレーク。[spec/pages.md](spec/pages.md) R-4）
 
 ## 3. ビルド時検証の実装配置
@@ -77,13 +77,13 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | ファイル | 生成ページ | 仕様 |
 | --- | --- | --- |
 | `index.astro` | トップ | [spec/pages.md](spec/pages.md) R-5〜R-7 |
-| `dict/index.astro` / `dict/[slug].astro` | 辞書一覧・詳細 | R-8ほか |
+| `dict/index.astro` / `dict/[slug].astro` | 辞書一覧・詳細 | pages R-8ほか |
 | `dict/[slug]/embed.astro` | embedパーシャル（`export const partial = true`） | [spec/wikilink-ui.md](spec/wikilink-ui.md) R-15 |
-| `articles/index.astro` / `articles/[slug].astro` | 記事一覧・詳細 | R-9 |
-| `books/index.astro` / `books/[book].astro` / `books/[book]/[slug].astro` | 本一覧・本トップ・章詳細 | R-10, R-16, R-17 |
-| `tags/index.astro` / `tags/[tag].astro` | タグ一覧・詳細 | R-18, R-19 |
-| `profile.astro` | プロフィール（直書き） | R-20 |
-| `404.astro` | 404 | R-21 |
+| `articles/index.astro` / `articles/[slug].astro` | 記事一覧・詳細 | pages R-9 |
+| `books/index.astro` / `books/[book].astro` / `books/[book]/[slug].astro` | 本一覧・本トップ・章詳細 | pages R-10, R-16, R-17 |
+| `tags/index.astro` / `tags/[tag].astro` | タグ一覧・詳細 | pages R-18, R-19 |
+| `profile.astro` | プロフィール（直書き） | pages R-20 |
+| `404.astro` | 404 | pages R-21 |
 | `rss.xml.js` | RSS | [spec/feeds-meta.md](spec/feeds-meta.md) |
 | `search-index.json.js` | 検索インデックス | [spec/search.md](spec/search.md) |
 
@@ -101,8 +101,8 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 ```
 
 - **メタは data 属性で持ち、可視ヘッダーは描画しない**。用途別の見た目はconsumer（`dict-pane.ts`/`dict-preview.ts`）が組み立てる:
-  - プレビュー（R-7・本文全文のみ）は `.prose` をそのまま挿入する
-  - サイドペイン（R-11）は data属性から種別ラベル/タイトル/タグ/辞書リンクのヘッダーを組み立て、`.prose` を本文として挿入する
+  - プレビュー（wikilink-ui R-7・本文全文のみ）は `.prose` をそのまま挿入する
+  - サイドペイン（wikilink-ui R-11）は data属性から種別ラベル/タイトル/タグ/辞書リンクのヘッダーを組み立て、`.prose` を本文として挿入する
 - `data-tags` は `DictCard` と同じ**パイプ区切り**規約。`data-slug` は「辞書ページを開く →」リンク（`/dict/[slug]`）用の自己記述。
 - 種別ラベルは辞書embedでは常に辞書固定のため断片には持たせない（consumerが`KindBadge`相当で付与）
 - 断片自身は `global.css` を読み込まない。挿入先のホスト詳細ページのスタイルで `.prose`・`.wikilink` 等が適用される（§9の部品クラスをグローバル定義する方針の前提）
@@ -112,7 +112,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - ビルド時に全公開コンテンツのmd本文から`[[slug]]`出現を抽出し、「ページ → リンクしている辞書slug群」の対応表を構築する（レンダリングとは独立にraw bodyの正規表現走査で行う。コードブロック内の`[[...]]`誤検出はエッジケースとして許容し、問題になればmdast走査に切り替える）
 - 逆引き（辞書slug → リンク元ページ群）が逆リンク一覧（wikilink-ui R-18）、正引きが使用辞書一覧（R-17）のデータソース
 - グラフ構築も公開フィルタを通す（非公開ページからのリンクは本番で載せない）
-- 実装確定（T4-4）: 純関数 `extractWikilinkSlugs` / `buildWikilinkGraph` ＋ 薄いラッパ `buildContentWikilinkGraph`（`getPublic*` を集約）に分ける（`content.ts` と同方針。前2者が vitest 対象）。各ページの `getStaticPaths` で1回構築し `forward`/`backward` のスライスを props で配る（module-level メモ化はしない＝dev の再実行で陳腐化を避ける）。抽出トークンは辞書slugへ解決できたもののみ採用するため、コードフェンス由来の誤検出（`[[bench]]`等）は自然に落ちる。**自己リンク**（辞書が自分自身をリンク）は forward/backward いずれからも除外。**本トップ（index.md）は逆リンク源に含めない**（R-18 は辞書・記事・章のみ）が、使用辞書一覧（forward）には含める。逆リンクの並びは kind（辞書<記事<本）→ title(`localeCompare` "ja") → href で決定的。使用辞書一覧のリンクは本文 wikilink と同一挙動（`class="wikilink" data-dict-link`）にし、既存 `dict-pane.ts`/`dict-preview.ts` の委譲に乗せる（init 未配線の本トップでは素の遷移にフォールバック。wikilink-ui §5 の未確定を解消）。
+- 実装確定（T4-4）: 純関数 `extractWikilinkSlugs` / `buildWikilinkGraph` ＋ 薄いラッパ `buildContentWikilinkGraph`（`getPublic*` を集約）に分ける（`content.ts` と同方針。前2者が vitest 対象）。各ページの `getStaticPaths` で1回構築し `forward`/`backward` のスライスを props で配る（module-level メモ化はしない＝dev の再実行で陳腐化を避ける）。抽出トークンは辞書slugへ解決できたもののみ採用するため、コードフェンス由来の誤検出（`[[bench]]`等）は自然に落ちる。**自己リンク**（辞書が自分自身をリンク）は forward/backward いずれからも除外。**本トップ（index.md）は逆リンク源に含めない**（wikilink-ui R-18 は辞書・記事・章のみ）が、使用辞書一覧（forward）には含める。逆リンクの並びは kind（辞書<記事<本）→ title(`localeCompare` "ja") → href で決定的。使用辞書一覧のリンクは本文 wikilink と同一挙動（`class="wikilink" data-dict-link`）にし、既存 `dict-pane.ts`/`dict-preview.ts` の委譲に乗せる（init 未配線の本トップでは素の遷移にフォールバック。wikilink-ui §5 の未確定を解消）。
 
 ## 6. レイアウト・コンポーネント構成
 
@@ -137,10 +137,10 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | --- | --- | --- |
 | `theme.ts` | 切替ボタン（初期化はBaseLayoutのインラインスクリプト） | [spec/theme.md](spec/theme.md) |
 | `search.ts` | クエリパース+フィルタ（**純関数として分離しvitest対象**） | [spec/search.md](spec/search.md) |
-| `search-box.ts` | ヘッダー検索UI（遅延ロード・ドロップダウン） | 同上 R-2, R-7 |
-| `list-filter.ts` | 一覧絞込（タグチップ+キーワード、`data-title`/`data-description`/`data-tags`参照。keywordはR-4どおりdescriptionも対象・判定は`search.ts`の`entryMatches`を再利用） | 同上 R-9〜R-11 |
+| `search-box.ts` | ヘッダー検索UI（遅延ロード・ドロップダウン） | search R-2, R-7 |
+| `list-filter.ts` | 一覧絞込（タグチップ+キーワード、`data-title`/`data-description`/`data-tags`参照。keywordは search R-4 どおりdescriptionも対象・判定は`search.ts`の`entryMatches`を再利用） | search R-9〜R-11 |
 | `dict-pane.ts` | サイドペイン（embedフェッチ・履歴配列・ボトムシート） | [spec/wikilink-ui.md](spec/wikilink-ui.md) R-10〜R-14 |
-| `dict-preview.ts` | ホバープレビュー（フェッチ結果はペインと共有キャッシュ） | 同上 R-7〜R-9 |
+| `dict-preview.ts` | ホバープレビュー（フェッチ結果はペインと共有キャッシュ） | wikilink-ui R-7〜R-9 |
 | `toc.ts` | モバイル目次ボトムシート（+現在地追従を入れる場合） | [spec/pages.md](spec/pages.md) R-13 |
 
 - ロード戦略: テーマ初期化のみ`<head>`同期インライン、他は`<script>`（Astroのバンドル）でdefer相当。検索インデックスとembedはユーザー操作時に遅延fetch

@@ -11,7 +11,7 @@ export const partial = true;
 
 export async function getStaticPaths() {
   // getPublicDict は本番ビルドで非公開辞書を除外するため、
-  // 非公開辞書の embed は生成されない（AC-6 後段。[slug].astro と同一パターン）
+  // 非公開辞書の embed は生成されない（wikilink-ui AC-6 後段。[slug].astro と同一パターン）
   const dict = await getPublicDict();
   return dict.map((entry) => ({
     params: { slug: entry.id },

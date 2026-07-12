@@ -20,10 +20,10 @@ const [dict, articles, books, chapters] = await Promise.all([
   getPublicChapters(),
 ]);
 
-// 新着（3タイプ混在・created_at 降順・最大10件・章除外。R-5/AC-2）
+// 新着（3タイプ混在・created_at 降順・最大10件・章除外。pages R-5/AC-2）
 const recent = mergeRecent(dict, articles, books, 10);
 
-// タグ件数は本・章も対象（tags 一覧 R-18/R-19 と揃える。集計はトップ限定なのでインライン）
+// タグ件数は本・章も対象（tags 一覧 pages R-18/R-19 と揃える。集計はトップ限定なのでインライン）
 const tagCount = new Set(
   [...dict, ...articles, ...books, ...chapters].flatMap((e) => e.data.tags),
 ).size;
@@ -35,7 +35,7 @@ const DETAIL_BASE: Record<ContentKind, string> = {
   book: "/books/",
 };
 
-// 一覧への導線（R-6）。number は連番表示、count は算出件数
+// 一覧への導線（pages R-6）。number は連番表示、count は算出件数
 const collections = [
   {
     href: "/dict/",
@@ -64,7 +64,7 @@ const collections = [
 
 <BaseLayout title={SITE.title}>
   <main class="mx-auto max-w-6xl px-4 sm:px-8">
-    {/* ヒーロー（R-7: プロフィールはボタン + SNS アイコンのみ） */}
+    {/* ヒーロー（pages R-7: プロフィールはボタン + SNS アイコンのみ） */}
     <section class="border-b border-line py-14 sm:py-20">
       <p class="mb-4 font-mono text-xs text-accent">// programming in rust</p>
       <h1
@@ -148,7 +148,7 @@ const collections = [
       </div>
     </section>
 
-    {/* コレクション（R-6: 各一覧への導線） */}
+    {/* コレクション（pages R-6: 各一覧への導線） */}
     <section
       aria-label="コンテンツ一覧"
       class="grid grid-cols-2 border-b border-line lg:grid-cols-4"
@@ -177,7 +177,7 @@ const collections = [
       }
     </section>
 
-    {/* 新着（R-5/AC-2: 台帳リスト行・3タイプ混在・降順10件・章除外） */}
+    {/* 新着（pages R-5/AC-2: 台帳リスト行・3タイプ混在・降順10件・章除外） */}
     <section class="py-12 sm:py-16">
       <div class="mb-8 flex items-baseline justify-between">
         <h2

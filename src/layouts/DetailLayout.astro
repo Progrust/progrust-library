@@ -20,7 +20,7 @@ interface Props {
   tags: string[];
   updatedAt: Date;
   headings: MarkdownHeading[];
-  /** 使用辞書一覧（本文がリンクしている辞書。R-17）。ページ側で wikilink グラフから算出 */
+  /** 使用辞書一覧（本文がリンクしている辞書。wikilink-ui R-17）。ページ側で wikilink グラフから算出 */
   linkedDicts?: DictTarget[];
 }
 
@@ -98,17 +98,21 @@ const gridCols = hasToc
           <slot />
         </div>
 
-        {/* モバイル: 使用辞書一覧を本文下部に（R-17。逆リンクより上） */}
+        {
+          /* モバイル: 使用辞書一覧を本文下部に（wikilink-ui R-17。逆リンクより上） */
+        }
         <LinkedDictList
           dicts={linkedDicts}
           class="mt-12 border-t border-line pt-8 lg:hidden"
         />
 
-        {/* 逆リンク（辞書・R-18）= Backlinks / 前後章ナビ（R-16）の差込口 */}
+        {
+          /* 逆リンク（辞書・wikilink-ui R-18）= Backlinks / 前後章ナビ（pages R-16）の差込口 */
+        }
         <slot name="below" />
       </article>
 
-      {/* 右: 辞書ペイン + 使用辞書一覧（R-17・ペイン下） */}
+      {/* 右: 辞書ペイン + 使用辞書一覧（wikilink-ui R-17・ペイン下） */}
       <aside class="hidden lg:block">
         <div class="sticky top-24">
           <DictPane />

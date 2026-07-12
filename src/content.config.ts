@@ -16,7 +16,7 @@ const commonFields = {
 };
 
 // 記事・本のヘッダ画像。ダミーは remote URL のため astro:assets の image() は使わず
-// 文字列で受ける（画像最適化 R-16/R-17 は後続タスクの対象）。
+// 文字列で受ける（画像最適化 content-model R-16/R-17 は後続タスクの対象）。
 const imageField = z.object({
   url: z.string(),
   alt: z.string(),

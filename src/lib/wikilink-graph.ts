@@ -8,12 +8,12 @@ import {
 
 // wikilink グラフ（逆リンク・使用辞書一覧）の構築（architecture §5）。
 // 全公開コンテンツの生 md 本文を正規表現で走査し、「ページ → リンク辞書slug」の
-// 対応表（forward=使用辞書一覧 R-17）と、その逆引き（backward=逆リンク R-18）を作る。
+// 対応表（forward=使用辞書一覧 wikilink-ui R-17）と、その逆引き（backward=逆リンク wikilink-ui R-18）を作る。
 // レンダリング非依存。コードフェンス内の [[...]] 誤検出は辞書slug解決時に落ちる（§5）。
 // 純関数（extractWikilinkSlugs / buildWikilinkGraph）を vitest 対象とし、
 // getCollection に触れる buildContentWikilinkGraph は薄いラッパに留める（content.ts と同方針）。
 
-/** グラフのソース種別。逆リンク源の可否（本トップ除外・R-18）と種別バッジの導出に使う */
+/** グラフのソース種別。逆リンク源の可否（本トップ除外・wikilink-ui R-18）と種別バッジの導出に使う */
 export type SourceKind = "dict" | "article" | "chapter" | "book";
 
 /** グラフ構築に必要なソースの最小構造（各コレクションエントリから組み立てる） */
@@ -104,7 +104,7 @@ export function extractWikilinkSlugs(body: string): string[] {
  * wikilink グラフを構築する（純関数）。ソースの本文から辞書リンクを抽出し、
  * 辞書slugに解決できたものだけを forward（使用辞書一覧）に、その逆引きを
  * backward（逆リンク）に積む。自己リンク（辞書が自分自身をリンク）は両方向から除外。
- * 逆リンク源は R-18 に従い本トップ（sourceKind:"book"）を除く（forward には含む）。
+ * 逆リンク源は wikilink-ui R-18 に従い本トップ（sourceKind:"book"）を除く（forward には含む）。
  */
 export function buildWikilinkGraph(sources: GraphSource[]): WikilinkGraph {
   const dictBySlug = new Map<string, DictTarget>();
@@ -131,7 +131,7 @@ export function buildWikilinkGraph(sources: GraphSource[]): WikilinkGraph {
       if (source.sourceKind === "dict" && slug === source.id) continue;
       targets.push(dict);
 
-      // 逆リンク源に本トップは含めない（R-18: 辞書・記事・章のみ）
+      // 逆リンク源に本トップは含めない（wikilink-ui R-18: 辞書・記事・章のみ）
       if (source.sourceKind === "book") continue;
       const refs = backward.get(slug) ?? [];
       refs.push({
@@ -159,7 +159,7 @@ export function buildWikilinkGraph(sources: GraphSource[]): WikilinkGraph {
 
 /**
  * 公開コンテンツから wikilink グラフを構築する（ビルド時ラッパ）。公開フィルタは
- * getPublic* が担う（本番は公開のみ・dev は全件。R-19）。各ページの getStaticPaths で
+ * getPublic* が担う（本番は公開のみ・dev は全件。wikilink-ui R-19）。各ページの getStaticPaths で
  * 1回呼び、forward/backward のスライスを props で配る想定（module-level メモ化はしない）。
  */
 export async function buildContentWikilinkGraph(): Promise<WikilinkGraph> {

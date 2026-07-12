@@ -5,7 +5,7 @@ import { compileWithPlaygroundLink } from "../helpers/playground-link";
 const PLAYGROUND_URL =
   "https://play.rust-lang.org/?version=stable&edition=2024&code=";
 
-describe("playground-link（```rust playground のボタン付与・docs/markdown-pipeline/playground.md）", () => {
+describe("playground-link（```rust playground のボタン付与・pages R-23 / AC-11・docs/markdown-pipeline/playground.md）", () => {
   it("[AC-11] ```rust playground をcode-playgroundラッパー + playground-openアンカーに変換する", () => {
     const html = compileWithPlaygroundLink(
       "```rust playground\nfn main() {}\n```",

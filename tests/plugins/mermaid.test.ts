@@ -17,7 +17,8 @@ function idsOf(svg: string): Set<string> {
 
 /**
  * `<style>` 内の `#<id>` セレクタで参照されているが、対応する `id="<id>"` 定義が
- * 存在しない「孤立セレクタ（死にCSS）」の集合を返す。R-1の真の不変条件はこれが空であること。
+ * 存在しない「孤立セレクタ（死にCSS）」の集合を返す。T2-4レビュー指摘R-1（specのR番号ではない）
+ * の真の不変条件はこれが空であること。
  *
  * `#...` は id セレクタと宣言値（`fill:#333` / `border:1px solid #aaaa33` / `url(#x)`）の
  * 両方に現れる。宣言値は必ずルール本体（`{ … }` の内側）にあるので、各ルールの **`{` の手前
@@ -66,7 +67,7 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
       );
     });
 
-    it("style内の #id セレクタが孤立しない（R-1回帰＝死にCSSを作らない）", () => {
+    it("style内の #id セレクタが孤立しない（T2-4レビュー指摘R-1の回帰＝死にCSSを作らない）", () => {
       const out = namespaceSvgIds(svgWithStyle("mmd0l-0"), "mmd0l-");
       // ルートidを書き換えないため #mmd0l-0 セレクタは id="mmd0l-0" と一致し続ける。
       expect(orphanStyleSelectors(out)).toEqual([]);
@@ -141,7 +142,7 @@ describe("mermaid（ビルド時SVG化・docs/markdown-pipeline/mermaid.md）", 
       expect(svgs).toHaveLength(2);
       const shared = [...idsOf(svgs[0])].filter((id) => idsOf(svgs[1]).has(id));
       expect(shared).toEqual([]);
-      // 各SVGの <style> セレクタが自SVGの id と一致し続ける（R-1回帰）。
+      // 各SVGの <style> セレクタが自SVGの id と一致し続ける（T2-4レビュー指摘R-1の回帰）。
       expect(orphanStyleSelectors(svgs[0])).toEqual([]);
       expect(orphanStyleSelectors(svgs[1])).toEqual([]);
     });

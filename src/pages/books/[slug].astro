@@ -1,6 +1,6 @@
 ---
 // 本トップ（pages R-1/R-17, AC-5 / ui-design-spec §301〜307）。
-// 章目次サイドバー型。左=章目次（本番は公開章のみ=AC-5）/ 右=ヒーロー+本文。
+// 章目次サイドバー型。左=章目次（本番は公開章のみ=pages AC-5）/ 右=ヒーロー+本文。
 // getStaticPaths は getPublicBooks 経由で全公開本を列挙する（architecture §5）。
 import { render } from "astro:content";
 import {
@@ -24,7 +24,7 @@ export async function getStaticPaths() {
     buildContentWikilinkGraph(),
   ]);
   return books.map((book) => {
-    // 本 slug 配下の章を連番昇順で台帳化。getPublicChapters は本番で公開章のみ（AC-5）。
+    // 本 slug 配下の章を連番昇順で台帳化。getPublicChapters は本番で公開章のみ（pages AC-5）。
     const bookChapters = sortChapters(
       chapters.filter((chapter) => chapter.id.startsWith(`${book.id}/`)),
     );
@@ -109,7 +109,7 @@ const updatedIso = book.data.updated_at.toISOString().slice(0, 10);
         </div>
 
         {
-          /* 使用辞書一覧（R-17。本トップは右レールが無いため本文下部に置く・全ブレークポイント） */
+          /* 使用辞書一覧（wikilink-ui R-17。本トップは右レールが無いため本文下部に置く・全ブレークポイント） */
         }
         <LinkedDictList
           dicts={linkedDicts}

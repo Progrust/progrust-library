@@ -376,7 +376,7 @@ describe("tagLedger（タグ詳細の一覧・pages R-19/AC-6）", () => {
     ]);
   });
 
-  it("同日は title 昇順でタイブレークする（R-4）", () => {
+  it("同日は title 昇順でタイブレークする（pages R-4）", () => {
     const items = [
       item("dict", "banana", "2024-05-01", ["Rust"]),
       item("dict", "apple", "2024-05-01", ["Rust"]),

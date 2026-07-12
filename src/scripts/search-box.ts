@@ -8,7 +8,7 @@
 import type { SearchEntry, SearchType } from "../lib/search-index";
 import { parseQuery, filterEntries } from "./search";
 
-// --- 表示用の純ロジック（DOM 非依存・vitest 対象。AC-6） ----------------------
+// --- 表示用の純ロジック（DOM 非依存・vitest 対象。search.md AC-6） ----------------------
 
 /** ドロップダウンの種別バッジ表示名（search.md R-7）。章は KindBadge にない4種目。 */
 export const SEARCH_TYPE_LABEL: Record<SearchType, string> = {
@@ -57,7 +57,7 @@ const BADGE_CLASS: Record<SearchType, string> = {
 };
 
 // 遅延ロードした検索インデックス（初回フォーカスで1回だけ発火。二度目以降は再利用）。
-// fetch 失敗時は null を解決し、呼び出し側はドロップダウンを出さない（AC-2/R-2）。
+// fetch 失敗時は null を解決し、呼び出し側はドロップダウンを出さない（search.md AC-2/R-2）。
 let indexPromise: Promise<SearchEntry[] | null> | null = null;
 
 function loadIndex(): Promise<SearchEntry[] | null> {
@@ -126,7 +126,7 @@ export function initSearchBox(): void {
   // JS 有効時のみ入力を有効化する（JS 無効なら disabled 表示のまま＝PE。architecture §8）。
   input.disabled = false;
 
-  // 初回フォーカスでインデックスを遅延ロードする（AC-2/R-2）。
+  // 初回フォーカスでインデックスを遅延ロードする（search.md AC-2/R-2）。
   input.addEventListener("focus", () => void loadIndex());
 
   input.addEventListener("input", () => {

@@ -18,7 +18,7 @@ const [dict, articles, books, chapters] = await Promise.all([
   getPublicChapters(),
 ]);
 
-// 章も集計対象（R-18・トップの tagCount と同じ母集団）
+// 章も集計対象（pages R-18・トップの tagCount と同じ母集団）
 const tags = tagCounts([...dict, ...articles, ...books, ...chapters]);
 ---
 

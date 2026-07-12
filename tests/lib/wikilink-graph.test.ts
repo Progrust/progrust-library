@@ -8,6 +8,7 @@ import {
 } from "../../src/lib/wikilink-graph";
 
 // 純関数テスト。fixture は GraphSource の最小構造を手組みで用意する（getCollection 非依存）。
+// 対象spec: wikilink-ui の R-17（使用辞書一覧）/ R-18（逆リンク）/ AC-7・AC-8。
 // 辞書ソースを dictBySlug の元にするため、解決対象の辞書は必ずソースに含める。
 const dict = (id: string, title: string, body = ""): GraphSource => ({
   id,
@@ -160,7 +161,7 @@ describe("buildWikilinkGraph（使用辞書一覧 forward・逆リンク backwar
     ]);
   });
 
-  it("[AC-7] 非公開ソースを入力から除くと逆リンクに現れない（R-19 は getPublic* が担保）", () => {
+  it("[AC-7] 非公開ソースを入力から除くと逆リンクに現れない（wikilink-ui R-19 は getPublic* が担保）", () => {
     // 公開記事のみを入力に含めると、その分だけが逆リンクに載る＝上流フィルタの効果。
     const sources = [
       dict("ownership", "所有権"),
@@ -180,7 +181,7 @@ describe("buildWikilinkGraph（使用辞書一覧 forward・逆リンク backwar
     ]);
   });
 
-  it("[R-18] 本 index（sourceKind:book）は逆リンクに含めない（forward には含む）", () => {
+  it("[wikilink-ui R-18] 本 index（sourceKind:book）は逆リンクに含めない（forward には含む）", () => {
     const sources = [
       dict("ownership", "所有権"),
       {

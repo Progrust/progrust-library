@@ -1,7 +1,7 @@
 ---
 // 記事詳細（pages R-1/R-12/R-13, AC-7）。詳細レイアウトは辞書と共用（DetailLayout）。
 // getStaticPaths は公開フィルタ（getPublicArticles・新着順ソート済み）経由で列挙する。
-// ヘッダ画像は詳細ページには表示しない（R-12 が規定するのはタイトル/タグ/更新日/本文のみ）。
+// ヘッダ画像は詳細ページには表示しない（pages R-12 が規定するのはタイトル/タグ/更新日/本文のみ）。
 import { render } from "astro:content";
 import { getPublicArticles } from "../../lib/content";
 import {

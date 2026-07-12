@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { resolvePreviewPlacement } from "../../src/scripts/dict-preview";
 
 // ホバープレビュー小窓の配置（wikilink-ui AC-3 / R-7: リンク下・下端反転）の純ロジックを
-// 検証する。ホバー発火・小窓内リンク除外（R-8）・タッチ無効（R-9）は DOM/E2E 領域のため
+// 検証する。ホバー発火・小窓内リンク除外（wikilink-ui R-8）・タッチ無効（wikilink-ui R-9）は DOM/E2E 領域のため
 // ビルド + 目視で確認する（architecture §10）。
 describe("resolvePreviewPlacement", () => {
   const preview = { width: 320, height: 288 };

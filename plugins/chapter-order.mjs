@@ -64,7 +64,7 @@ export function findChapterOrderViolations(chaptersByBook) {
 }
 
 /**
- * content/books/ 配下の章ファイルを走査し、連番形式・重複を検証する（R-9 / AC-5）。
+ * content/books/ 配下の章ファイルを走査し、連番形式・重複を検証する（content-model R-9 / AC-5）。
  * 違反があれば該当ファイルパスを含めて throw する（config評価時に呼ぶので exit 1）。
  *
  * @param {URL} booksDirURL content/books/ ディレクトリのURL

@@ -1,7 +1,7 @@
 ---
 // 辞書詳細（pages R-1/R-12/R-13, AC-7）。dict-detail モックを視覚の正とする。
 // getStaticPaths は公開フィルタ（getPublicDict）経由で全公開辞書を列挙する（architecture §5）。
-// 逆リンク一覧（R-18）・使用辞書一覧（R-17）は wikilink グラフから算出する（T4-4）。
+// 逆リンク一覧（wikilink-ui R-18）・使用辞書一覧（wikilink-ui R-17）は wikilink グラフから算出する（T4-4）。
 import { render } from "astro:content";
 import { getPublicDict } from "../../lib/content";
 import {

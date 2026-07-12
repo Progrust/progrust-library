@@ -30,7 +30,7 @@ export function parseQuery(query: string): ParsedQuery {
   return { keywords, tags };
 }
 
-/** キーワードがタイトル・概要・タグ名のいずれかに部分一致するか（R-4: 大文字小文字非区別） */
+/** キーワードがタイトル・概要・タグ名のいずれかに部分一致するか（search.md R-4: 大文字小文字非区別） */
 function matchesKeyword(entry: Matchable, keyword: string): boolean {
   const needle = keyword.toLowerCase();
   if (entry.title.toLowerCase().includes(needle)) return true;
@@ -49,7 +49,7 @@ export type Matchable = Pick<SearchEntry, "title" | "description" | "tags">;
 export function entryMatches(entry: Matchable, parsed: ParsedQuery): boolean {
   return (
     parsed.keywords.every((keyword) => matchesKeyword(entry, keyword)) &&
-    // タグはタグ名の完全一致（R-5: 部分一致ではヒットさせない）。
+    // タグはタグ名の完全一致（search.md R-5: 部分一致ではヒットさせない）。
     parsed.tags.every((tag) => entry.tags.includes(tag))
   );
 }

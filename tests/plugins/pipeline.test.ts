@@ -61,7 +61,7 @@ describe("pipeline（全プラグイン同時登録の相互作用・markdown-pi
     expect(html).not.toContain('target="_blank"');
   });
 
-  it("[AC-13] 外部テキストリンクは別タブ化され、wikilinkはされない（全登録構成）", async () => {
+  it("[pages AC-13] 外部テキストリンクは別タブ化され、wikilinkはされない（全登録構成）", async () => {
     stubFetchOk();
     const html = await compileWithAllPlugins(
       "[[ownership]]と[外部サイト](https://example.com/)を参照。",
@@ -132,7 +132,7 @@ describe("pipeline（全プラグイン同時登録の相互作用・markdown-pi
     expect(html).toContain("code-filename");
   });
 
-  it("[AC-9] details内のテーブルも全登録構成でラップされ、セル内のwikilinkが変換される", async () => {
+  it("[pages AC-9] details内のテーブルも全登録構成でラップされ、セル内のwikilinkが変換される", async () => {
     stubFetchOk();
     const source = [
       "::::details[補足]",

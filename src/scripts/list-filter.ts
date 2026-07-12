@@ -7,14 +7,14 @@
 import type { ParsedQuery, Matchable } from "./search";
 import { parseQuery, entryMatches } from "./search";
 
-// --- 表示用の純ロジック（DOM 非依存・vitest 対象。AC-7） ----------------------
+// --- 表示用の純ロジック（DOM 非依存・vitest 対象。search.md AC-7） ----------------------
 
 /** 絞込判定に必要なカードの部分情報（マッチ判定が参照する title/description/tags）。 */
 export type CardModel = Matchable;
 
 /**
  * 選択タグ（AND・完全一致）とキーワード入力から各カードの可視状態を返す純関数
- * （search.md R-9。keyword は R-4 と同じ部分一致で title/description/tag 名を対象）。
+ * （search.md R-9。keyword は search.md R-4 と同じ部分一致で title/description/tag 名を対象）。
  * キーワード欄内の `#タグ` も parseQuery でタグ条件として扱い、選択タグと和集合にする。
  * 空条件は全件可視。入力順を保持する。
  */

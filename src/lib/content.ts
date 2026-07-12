@@ -153,7 +153,7 @@ export interface TagLedgerItem {
 
 /**
  * タグ詳細の一覧（pages R-19 / AC-6）。種別混在の台帳から指定タグを持つ項目だけを抜き出し、
- * created_at 降順・同日は title 昇順（R-4）で並べる。章（kind:"book"）も対象に含める。
+ * created_at 降順・同日は title 昇順（pages R-4）で並べる。章（kind:"book"）も対象に含める。
  */
 export function tagLedger(
   items: TagLedgerItem[],
@@ -191,7 +191,7 @@ export function sortChapters<T extends FilePathed>(chapters: T[]): T[] {
   return [...chapters].sort((a, b) => chapterOrder(a) - chapterOrder(b));
 }
 
-/** 章の連番ラベル（ゼロ埋め2桁文字列。ヘッダー補助行・ナビ・台帳の表示用。R-7） */
+/** 章の連番ラベル（ゼロ埋め2桁文字列。ヘッダー補助行・ナビ・台帳の表示用。content-model R-7） */
 export function chapterOrderLabel(entry: FilePathed): string {
   return String(chapterOrder(entry)).padStart(2, "0");
 }
@@ -206,7 +206,7 @@ interface Navigable {
  * 前後章ナビ（pages R-16 / AC-4）。連番昇順の章リストから現在章の前後に位置する
  * 最も近い公開章を返す。間に非公開章があってもスキップし次の公開章へつなぐ。
  * 先頭章の prev・最終章の next は null。現在章が見つからない場合も両方 null。
- * 本番ビルドでは getPublicChapters が既に公開章のみだが、dev（全章）でも R-16 通り
+ * 本番ビルドでは getPublicChapters が既に公開章のみだが、dev（全章）でも pages R-16 通り
  * 非公開をスキップするため isPublic を見る。
  */
 export function chapterNav<T extends Navigable>(

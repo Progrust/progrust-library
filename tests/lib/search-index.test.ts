@@ -17,7 +17,7 @@ const source = (
   data: { title: "", description: "", tags: [], ...data },
 });
 
-describe("buildSearchEntries（検索インデックスのエントリ変換）", () => {
+describe("buildSearchEntries（検索インデックスのエントリ変換・search.md R-1 / AC-1）", () => {
   it("[AC-1] 全4種別が対応する type と URL のエントリになる（章は本slug/章slugに分解）", () => {
     const sources = [
       source("ownership", "dict"),

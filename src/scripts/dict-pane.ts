@@ -1,7 +1,7 @@
 // 辞書サイドペインのクライアント JS（wikilink-ui R-10〜R-14 / AC-2・AC-4・AC-5）。
 // 本文・ペイン内の辞書リンク（a.wikilink[data-dict-link]）クリックで embed 断片を
 // fetch し、画面遷移せず右ペイン（モバイルはボトムシート）に内容を差し替え表示する。
-// JS 無効時は素の <a href="/dict/[slug]"> による通常遷移で機能する（R-3 / AC-2）。
+// JS 無効時は素の <a href="/dict/[slug]"> による通常遷移で機能する（wikilink-ui R-3 / AC-2）。
 // クライアント JS はコンポーネントに書かない規約（§4）に従い本モジュールへ分離する。
 
 /** embed 断片から抽出したペイン表示用データ。 */
@@ -19,7 +19,7 @@ export interface PaneHistory {
   cursor: number;
 }
 
-// --- 履歴の純ロジック（DOM 非依存・vitest 対象。AC-5） ------------------------
+// --- 履歴の純ロジック（DOM 非依存・vitest 対象。wikilink-ui AC-5） ------------------------
 
 /** 空のデフォルト履歴を生成する。ページ遷移ごとにモジュールが再初期化されリセットされる。 */
 export function createHistory(): PaneHistory {
@@ -85,7 +85,7 @@ async function requestEmbed(slug: string): Promise<DictEmbed | null> {
       bodyHtml: prose.outerHTML,
     };
   } catch {
-    // ネットワーク失敗等。呼び出し側で通常遷移にフォールバックする（R-16）。
+    // ネットワーク失敗等。呼び出し側で通常遷移にフォールバックする（wikilink-ui R-16）。
     return null;
   }
 }
@@ -148,7 +148,7 @@ export function dictMarkup(embed: DictEmbed, compact: boolean): string {
 }
 
 // ペイン単体の履歴。モジュールスコープで保持し、ページ遷移（フルリロード）で自然にリセットされる。
-// （ブラウザの window.history とは無関係。R-13）
+// （ブラウザの window.history とは無関係。wikilink-ui R-13）
 let paneHistory = createHistory();
 
 // 描画要求ごとに採番し、fetch 解決時に最新の要求だけを描画する世代トークン。
@@ -220,7 +220,7 @@ async function showCurrent(): Promise<void> {
 
 const mobileQuery = "(max-width: 1023px)";
 
-/** モバイル幅なら辞書ボトムシートを開く（R-14）。 */
+/** モバイル幅なら辞書ボトムシートを開く（wikilink-ui R-14）。 */
 function openSheetIfMobile(): void {
   if (!window.matchMedia(mobileQuery).matches) return;
   document
@@ -228,14 +228,14 @@ function openSheetIfMobile(): void {
     ?.classList.remove("hidden");
 }
 
-/** 辞書リンククリック時: embed を取得し履歴に積んで表示する（R-11 / R-12）。 */
+/** 辞書リンククリック時: embed を取得し履歴に積んで表示する（wikilink-ui R-11 / R-12）。 */
 async function navigateTo(slug: string): Promise<void> {
   const gen = ++renderGeneration;
   const embed = await fetchDictEmbed(slug);
   // 別の辞書クリックに追い越されていたら破棄する（後勝ち・履歴逆順の防止）。
   if (gen !== renderGeneration) return;
   if (!embed) {
-    // 取得失敗時はペイン表示を諦め、リンク本来の遷移を保つ（R-16）。
+    // 取得失敗時はペイン表示を諦め、リンク本来の遷移を保つ（wikilink-ui R-16）。
     window.location.assign(`/dict/${encodeURIComponent(slug)}`);
     return;
   }

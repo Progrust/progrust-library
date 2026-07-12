@@ -28,7 +28,7 @@ const cards: CardModel[] = [
   },
 ];
 
-describe("computeCardVisibility", () => {
+describe("computeCardVisibility（一覧絞込の可視判定・search.md R-9〜R-11 / AC-7）", () => {
   it("[AC-7] タグを2つ選択すると両タグを持つカードのみ可視になる", () => {
     // #Rust基礎 かつ #所有権 の AND。両方持つ「所有権」のみ true。
     expect(computeCardVisibility(cards, ["Rust基礎", "所有権"], "")).toEqual([
@@ -46,7 +46,7 @@ describe("computeCardVisibility", () => {
     ]);
   });
 
-  it("選択タグとキーワードは AND で絞り込む（R-9）", () => {
+  it("選択タグとキーワードは AND で絞り込む（search.md R-9）", () => {
     // #Rust基礎 のうちキーワード「所有権」を含む（借用は概要に「所有権」）。
     expect(computeCardVisibility(cards, ["Rust基礎"], "所有権")).toEqual([
       true,
@@ -55,7 +55,7 @@ describe("computeCardVisibility", () => {
     ]);
   });
 
-  it("キーワードは title/description/tag 名に部分一致・大小非区別（R-4）", () => {
+  it("キーワードは title/description/tag 名に部分一致・大小非区別（search.md R-4）", () => {
     // 「rust」小文字がタグ名/タイトルに部分一致する全カードが可視。
     expect(computeCardVisibility(cards, [], "rust")).toEqual([
       true,

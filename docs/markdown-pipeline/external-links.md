@@ -50,4 +50,4 @@ export const externalLinks = defineMdastPlugin({
 
 ## 制約・残課題
 
-- `mailto:` 等の非http(s)スキームは対象外（同一タブ）。必要になったら仕様（R-24）を更新してから対応する
+- `mailto:` 等の非http(s)スキームは対象外（同一タブ）。必要になったら仕様（pages R-24）を更新してから対応する

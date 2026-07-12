@@ -2,12 +2,12 @@
 // 辞書リンク（a.wikilink[data-dict-link]）にマウスホバーすると、辞書の内容
 // （バッジ・タイトル・タグ・本文全文の compact 形。ui-design-spec「ペイン/プレビューの
 // 内容表示」）をプレビュー小窓に表示する。フェッチ結果は dict-pane.ts の fetchDictEmbed と共有し、
-// 同一辞書を二重 fetch しない（architecture §8）。タッチ環境では動作しない（R-9）。
+// 同一辞書を二重 fetch しない（architecture §8）。タッチ環境では動作しない（wikilink-ui R-9）。
 // クライアント JS はコンポーネントに書かない規約（§4）に従い本モジュールへ分離する。
 
 import { dictMarkup, fetchDictEmbed, type DictEmbed } from "./dict-pane";
 
-// --- 位置決めの純ロジック（DOM 非依存・vitest 対象。AC-3） --------------------
+// --- 位置決めの純ロジック（DOM 非依存・vitest 対象。wikilink-ui AC-3） --------------------
 
 /** 小窓を出す対象リンクの矩形（getBoundingClientRect 相当の必要フィールドのみ）。 */
 export interface LinkRect {
@@ -41,7 +41,7 @@ const MARGIN = 8;
 
 /**
  * ホバー中リンクの下（既定）に小窓を配置する座標を求める。下に出すと画面下端を
- * はみ出す場合はリンク上へ反転する（R-7）。left はビューポート幅にクランプする。
+ * はみ出す場合はリンク上へ反転する（wikilink-ui R-7）。left はビューポート幅にクランプする。
  */
 export function resolvePreviewPlacement(
   link: LinkRect,
@@ -63,7 +63,7 @@ export function resolvePreviewPlacement(
 
 // --- DOM 配線 ----------------------------------------------------------------
 
-// hover 可能な環境か（R-9: タッチ端末では small window を出さない）。
+// hover 可能な環境か（wikilink-ui R-9: タッチ端末では small window を出さない）。
 const HOVER_QUERY = "(hover: hover) and (pointer: fine)";
 
 // 表示/非表示のディレイ（spec §5 は未確定 → 妥当な既定値）。離脱時は小窓へマウスを
@@ -134,7 +134,7 @@ function showPreview(
   el.style.left = `${placement.left}px`;
 }
 
-/** リンクホバー時: embed を取得し、最新ホバーなら小窓を表示する（R-7 / R-16）。 */
+/** リンクホバー時: embed を取得し、最新ホバーなら小窓を表示する（wikilink-ui R-7 / R-16）。 */
 function requestPreview(link: HTMLElement, slug: string): void {
   const gen = ++hoverGeneration;
   void fetchDictEmbed(slug).then((embed) => {
@@ -142,7 +142,7 @@ function requestPreview(link: HTMLElement, slug: string): void {
     // （後者は座標が全0になり左上に誤表示されるのを防ぐ）。
     if (gen !== hoverGeneration || !link.isConnected) return;
     if (!embed) {
-      // fetch 失敗（R-16）。直前まで別辞書を表示していた小窓が残らないよう隠す。
+      // fetch 失敗（wikilink-ui R-16）。直前まで別辞書を表示していた小窓が残らないよう隠す。
       hidePreview();
       return;
     }
@@ -150,17 +150,17 @@ function requestPreview(link: HTMLElement, slug: string): void {
   });
 }
 
-/** 対象辞書リンクを返す。小窓内リンク（R-8）は対象外。 */
+/** 対象辞書リンクを返す。小窓内リンク（wikilink-ui R-8）は対象外。 */
 function dictLinkFrom(target: EventTarget | null): HTMLAnchorElement | null {
   if (!(target instanceof Element)) return null;
   const link = target.closest<HTMLAnchorElement>("a.wikilink[data-dict-link]");
   if (!link) return null;
-  // 小窓内の辞書リンクはさらにプレビューしない（R-8）。
+  // 小窓内の辞書リンクはさらにプレビューしない（wikilink-ui R-8）。
   if (link.closest("[data-dict-preview]")) return null;
   return link;
 }
 
-/** 本文・ペイン内の辞書リンクへのホバーを 1 つの委譲ハンドラで捕捉する（R-6）。 */
+/** 本文・ペイン内の辞書リンクへのホバーを 1 つの委譲ハンドラで捕捉する（wikilink-ui R-6）。 */
 function initHoverDelegation(): void {
   document.addEventListener("pointerover", (event) => {
     const link = dictLinkFrom(event.target);
@@ -185,7 +185,7 @@ function initHoverDelegation(): void {
   });
 }
 
-/** 辞書ホバープレビューを初期化する（hover 非対応環境では何もしない・R-9）。 */
+/** 辞書ホバープレビューを初期化する（hover 非対応環境では何もしない・wikilink-ui R-9）。 */
 export function initDictPreview(): void {
   if (!window.matchMedia(HOVER_QUERY).matches) return;
   initHoverDelegation();
