@@ -47,6 +47,7 @@ export const externalLinks = defineMdastPlugin({
 
 - **linkCardより前に置いても壊れない**が意味がない: 単独ベアURL段落はlinkCardが段落ごと `rawHtml` に差し替えるため、先に付与した `hProperties` は捨てられる。順序はどこでも動作するが、意図を明確にするため末尾に置く
 - playgroundLink のアンカーは `link` ノードではなく `data.hName: "a"` の paragraph のため、本プラグインの visitor には来ない（`target` の二重付与は起きない）
+- **`node.data.hProperties` は型に存在しない**: mdast の `LinkData` は空インターフェースで、`hProperties` は `mdast-util-to-hast` の宣言マージ前提の拡張プロパティ（本プロジェクトは同パッケージ非依存）。既存 `data` を読むときは JSDoc キャスト（`{ hProperties?: Record<string, unknown> } | undefined`）を通す（`astro check` エラー回避。実装参照）
 
 ## 制約・残課題
 

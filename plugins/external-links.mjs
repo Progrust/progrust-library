@@ -14,10 +14,17 @@ export const externalLinks = defineMdastPlugin({
     if (!/^https?:\/\//i.test(node.url)) return;
     // ノードは読み取り専用（Rust側参照）のため、直接ミューテーションではなく
     // setProperty で data ごと差し替える（satteri-plugin-api.md「ノード操作API」）。
+    // mdast の LinkData は hProperties を宣言しない（mdast-util-to-hast の宣言マージ
+    // 前提の拡張プロパティで、本プロジェクトは同パッケージに依存しない）ため、
+    // JSDoc キャストで既存 data の hProperties を型付きで引き継ぐ。
+    const data =
+      /** @type {{ hProperties?: Record<string, unknown> } | undefined} */ (
+        node.data
+      );
     ctx.setProperty(node, "data", {
-      ...node.data,
+      ...data,
       hProperties: {
-        ...node.data?.hProperties,
+        ...data?.hProperties,
         target: "_blank",
         rel: "noopener noreferrer",
       },
