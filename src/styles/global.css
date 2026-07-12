@@ -523,7 +523,7 @@ html.dark .code-playground .playground-open {
   margin-top: 0.4rem;
 }
 .message-title {
-  /* flex は種別アイコン（::after）を order で先頭へ並べ替えるため。
+  /* flex は種別アイコン（::after）を order でタイトルテキストより前へ並べ替えるため。
      擬似要素は ::before（// eyebrow）と ::after（アイコン）で使い切っている */
   display: flex;
   align-items: center;
@@ -534,10 +534,11 @@ html.dark .code-playground .playground-open {
 }
 .message-title::before {
   content: "//"; /* eyebrow 形式（ui-design-spec「共通ルール」の // 記法）。後続の空白は gap で表現 */
+  order: -2;
 }
 /* 種別アイコン（ui-design-spec「:::message の変換後スタイル」のSVGパスが正）。
    wikilink アイコンと同じ CSS mask 方式で、currentColor により種別色・ダークに自動追従。
-   アイコン → // → タイトル の順にするため order で ::before より前へ出す */
+   // → アイコン → タイトル の順にするため ::before(order:-2) と タイトルテキスト(order:0) の間へ入れる */
 :is(
     .message-info,
     .message-tip,

@@ -402,8 +402,9 @@ html.dark .dict-link { color: #F0684A; }
 ```html
 <div class="rounded border-l-2 border-{種別色} bg-card dark:bg-ncard px-5 py-4 text-sm space-y-1">
   <p class="flex items-center gap-1.5 font-mono text-[11px] text-{種別色}">
+    //
     <svg width="13" height="13">（種別アイコン、stroke系・currentColor。通常のみアイコンなし）</svg>
-    // message（種別名 or タイトル）
+    message（種別名 or タイトル）
   </p>
   <p>本文...</p>
 </div>
