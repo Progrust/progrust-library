@@ -127,7 +127,23 @@ export const directives = defineMdastPlugin({
       // labelがあればfigcaption化し、無ければfigcaptionなしのfigureにする。
       const label = labelChild(node);
       ctx.setProperty(node, "data", { hName: "figure" });
-      if (label) {
+      if (label && node.children.length > 1) {
+        // キャプションは画像の下に表示するため、labelを末尾へ移動しつつfigcaption化する。
+        // removeNode+insertAfterで元ノードを直接移動するとsetPropertyによるrelabelが
+        // dropされるため、cloneにdataを直付けして挿入する（directives.md「落とし穴と回避策」）
+        const copy = {
+          ...structuredClone(label),
+          data: { directiveLabel: true, hName: "figcaption" },
+        };
+        ctx.removeNode(label);
+        ctx.insertAfter(
+          node.children[node.children.length - 1],
+          /** @type {import('satteri').MdastContent} */ (
+            /** @type {unknown} */ (copy)
+          ),
+        );
+      } else if (label) {
+        // labelしかない縮退ケースは移動不要、relabelのみ
         ctx.setProperty(label, "data", {
           directiveLabel: true,
           hName: "figcaption",

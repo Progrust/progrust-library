@@ -142,12 +142,23 @@ export const c6Directives = defineMdastPlugin({
     }
 
     if (node.name === 'figure') {
+      // キャプション（label）は省略可（rule.md「画像サイズやキャプションは省略可能」）
       const label = labelChild(node);
-      if (!label) {
-        throw new Error(`:::figure にキャプションがありません（:::figure[キャプション] と書く） (${posOf(node, ctx)})`);
-      }
       ctx.setProperty(node, 'data', { hName: 'figure' });
-      ctx.setProperty(label, 'data', { directiveLabel: true, hName: 'figcaption' });
+      // キャプションは画像の下に表示するため、labelを末尾へ移動しつつfigcaption化する。
+      // 既存ノードの移動+relabelは「removeNode後のsetPropertyがdropされる」ため、
+      // structuredCloneしたコピーに data を直付けして挿入する（下記「落とし穴と回避策」参照）
+      if (label && node.children.length > 1) {
+        const copy = {
+          ...structuredClone(label),
+          data: { directiveLabel: true, hName: 'figcaption' },
+        };
+        ctx.removeNode(label);
+        ctx.insertAfter(node.children[node.children.length - 1], copy);
+      } else if (label) {
+        // labelしかない縮退ケースは移動不要、relabelのみ
+        ctx.setProperty(label, 'data', { directiveLabel: true, hName: 'figcaption' });
+      }
       // width属性を中のimgへ反映
       if (attrs.width) {
         for (const child of node.children) {
@@ -236,7 +247,7 @@ if (node.name === 'message') {
 <aside class="message"><p>補足メッセージの本文です。</p><pre class="astro-code github-dark" ...>（Shikiハイライト済みコード）</pre><p><img src="..." alt="サンプル画像"></p></aside>
 <aside class="message message-alert"><p>注意・警告メッセージです。</p></aside>
 <details><summary>折りたたみのタイトル</summary><p>折りたたまれる内容です。</p></details>
-<figure><figcaption>図1: キャプションのテキスト</figcaption><p><img src="..." alt="図のalt" width="480"></p></figure>
+<figure><p><img src="..." alt="図のalt" width="480"></p><figcaption>図1: キャプションのテキスト</figcaption></figure>
 <aside class="message"><p>外側のメッセージ。</p><details><summary>ネストされたdetails</summary><p>ネストの中身。</p></details><p>外側の続き。</p></aside>
 ```
 
@@ -249,13 +260,14 @@ if (node.name === 'message') {
 2. **`directive: true`で本文の`x:y`が消える** → textDirective/leafDirective復元visitorを必ずセットで入れる（入れないとデータ破壊）
 3. **`node.position`の`offset`はUTF-8バイトオフセット** → `Buffer`でスライスする
 4. **directiveノードはデフォルトのHTML出力が「無」**: 変換プラグインを入れないとブロック全体が警告なしで消える。未知のdirective名も同様 → 未知の名前はthrow
+5. **既存ノードの「移動」はremove+insertではrelabelが効かない**（figureのキャプション後置で実測）: `ctx.removeNode(label)` → `ctx.insertAfter(last, label)` とすると移動自体は成功するが、その前後どちらで `ctx.setProperty(label, ...)` を呼んでも**relabelがdropされて`<p>`のまま**出力される → `structuredClone(label)` したコピーに `data`（`hName`等）を**リテラル時点で直付け**して挿入し、元ノードを`removeNode`する
 
 ## 制約・残課題
 
 - `data`は`setProperty`で丸ごと置き換わる。labelパラグラフに設定するときは`directiveLabel: true`を含め直すこと
 - labelの取得は「先頭childが`data.directiveLabel === true`のparagraph」で判定する
 - ネストの内側directiveは「外側のchildrenの一部」と「単独visit」の**2回訪問される**。「childrenを再帰的に自前変換する」実装にすると二重変換になる（各ノードは自分のvisitでのみ変換すれば自然に守られる）
-- figureの出力は`<figure><figcaption>…</figcaption><p><img…></p></figure>`で**imgが`<p>`に包まれたまま**。剥がす場合はhastプラグイン等で追加処理（表示はCSSで対処可能なので必須ではない）
+- figureの出力は`<figure><p><img…></p><figcaption>…</figcaption></figure>`（キャプションは画像の**下**。labelを末尾へ移動して実現）で**imgが`<p>`に包まれたまま**。剥がす場合はhastプラグイン等で追加処理（表示はCSSで対処可能なので必須ではない）
 - `\:`によるコロンのエスケープが可能かは未検証（復元プラグインで実害がないため不要と判断）
 - `:::message{.alert}`（class shorthand）は`attributes: { class: 'alert' }`に入ることまで確認済みだが、変換プラグインは`{alert}`方式のみ対応（class方式は採用しない）
 - **messageの種別属性のタイポは検出しない**（`:::message{warnig}` 等）。`MESSAGE_TYPES.find((t) => t in attrs)` が `undefined` になり、種別なしの `class="message"` として静かにレンダリングされる（本文は消えない）。未知のdirective**名**はthrowするのと非対称だが、属性値の網羅的バリデーションは行わない（落とし穴1の「スペース区切り引数の書き間違いはプラグインで検出不能」と同じ割り切り）。将来throw検出へ変える場合は、`type` が未定義かつ `attrs` に想定外キーがあるときにthrowする分岐を追加する

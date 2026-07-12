@@ -153,6 +153,6 @@ export const counterPlugin = () => {
 
 - `ctx.report(error)`が効かないのはAstroが診断を読まないため
 - throw方式のエラーが`astro dev`（開発サーバー）でどう表示されるかは未検証（`astro build`のexit 1のみ確認）
-- `structuredClone(node)`によるノード保持は未実測（型定義・ドキュメント記載のみ）
+- `structuredClone(node)`によるノード保持は**実測済み**: cloneに`data`を直付けして`insertAfter`で挿入すれば、既存ノードの「移動」に使える（figureのキャプション後置で使用。remove+insertで元ノードを直接移動すると`setProperty`によるrelabelがdropされるため、この方式が必須。[directives.md](directives.md)「落とし穴と回避策」参照）
 - `ctx.data`のmdast→hast間共有は型定義での確認のみ（実測は必要になった時点で行う）
 - コンテンツコレクション（Content Layer API）経由の実ビルドは**wikilinkで検証済み**（T1-3）: `ctx.fileURL`は実ファイルを指す（OK）・visitor内throwはビルドを失敗させない（NG・上記）・非公開エントリもsync時に全件コンパイルされる。結果の詳細は[wikilink.md](wikilink.md)。他プラグイン（directives / link-card / mermaid）のコレクション経由動作はP2で各々確認する

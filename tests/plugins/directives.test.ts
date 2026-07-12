@@ -81,6 +81,14 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       expect(html).toContain('alt="alt"');
     });
 
+    it("キャプションは画像の後（下）に出力される", () => {
+      const html = compileWithDirectives(
+        ":::figure[図1: キャプション]{width=480}\n![alt](/img.png)\n:::",
+      );
+      expect(html.indexOf("<img")).toBeGreaterThan(-1);
+      expect(html.indexOf("<img")).toBeLessThan(html.indexOf("<figcaption>"));
+    });
+
     it("キャプションなしのfigureはfigcaptionなしのfigureになる（rule.md: キャプション省略可）", () => {
       const html = compileWithDirectives(
         ":::figure{width=480}\n![alt](/img.png)\n:::",
