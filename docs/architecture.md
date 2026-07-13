@@ -129,6 +129,11 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - `src/pages/search-index.json.js`で全公開コレクション（章含む）からJSON配列を生成（スキーマは [spec/search.md](spec/search.md) 3章）
 - 生成ロジック（エントリ変換）は`src/lib/search-index.ts`に置き、vitest対象とする
 
+### RSS・sitemap生成（T6-1）
+
+- RSSは`src/pages/rss.xml.js`が`@astrojs/rss`で生成（[spec/feeds-meta.md](spec/feeds-meta.md) R-1〜R-3）。アイテム変換は`src/lib/feed.ts`に置き、純関数`buildFeedItems`（vitest対象）＋`getPublic*`集約ラッパ`buildContentFeed`に分ける（`search-index.ts`と同方針）。全4種別混在・`created_at`降順（`content.ts`の`compareNewest`共有）・最大20件・本文なし
+- sitemapは`@astrojs/sitemap`インテグレーション（`astro.config.mjs`の`integrations`）が自動生成する。非公開は本番ビルドでページ生成されず自然に除外（content-model R-11）
+
 ## 8. クライアントJS構成（src/scripts/）
 
 バニラTSのモジュール分割。状態管理ライブラリは使わずDOMベース。
