@@ -462,6 +462,15 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 - `<figure>`は`width: fit-content; max-width: 100%`で**画像幅に収縮**させ、`margin-inline: auto`で本文幅の中央に置く。これによりキャプションの中央寄せも**本文全幅ではなく画像幅が基準**になる
 - `<figcaption>`は`width: 0; min-width: 100%`で、長いキャプションがfigureのintrinsic幅（=画像幅）を広げずに画像幅で折り返すようにする。sub色・0.8rem・中央寄せ
 
+### リンクカード（ベアURLのOGPカード）
+
+変換の仕組みは [`docs/markdown-pipeline/link-card.md`](../markdown-pipeline/link-card.md) 参照。ここでは見た目の確定仕様のみ。
+
+- **カード高さは可変・最大 8.75rem**: テキスト量（タイトル最大2行・説明文最大2行のクランプ）に応じて縮む。ホスト名は下端寄せ
+- **画像はOGP標準比率 1.91:1 固定**: カード右端に上下・右フラッシュの**絶対配置**（`position: absolute; height: 100%; aspect-ratio: 1.91 / 1`）で、カード高さに追従してサイズが変わっても比率は常に正確。フロー内に置くと画像の固有サイズがカード高さを max-height まで押し上げてしまうため絶対配置とし、本文側は `:has(.link-card__image)` で `margin-right: 45%` を予約して重なりを防ぐ（画像なしカードは全幅を本文に使う）
+- **狭幅時**は画像に `max-width: 45%` を適用し、本文の可読性を比率維持より優先（はみ出す分は `object-fit: cover` でトリミング）
+- **フォールバックカード**（OGP取得失敗時のURLのみ表示）は padding のみの自然な高さ
+
 ### mermaid図（★枠なしで確定）
 
 ビルド時SVG化の仕組みは [`docs/markdown-pipeline/mermaid.md`](../markdown-pipeline/mermaid.md) 参照。ここでは見た目の確定仕様のみ。
