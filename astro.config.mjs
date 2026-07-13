@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig, fontProviders } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
+import sitemap from "@astrojs/sitemap";
 import { transformerNotationDiff } from "@shikijs/transformers";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -32,6 +33,9 @@ validateWikilinks(dictIndex, new URL("./content/", import.meta.url));
 // directivesプラグインに同梱した復元visitorとセットで有効化する（directives.md）。
 export default defineConfig({
   site: "https://progrust.com",
+  // sitemap.xml を自動生成する（feeds-meta R-4 / AC-2）。非公開コンテンツは本番ビルドで
+  // ページ生成されないため sitemap にも自然に含まれない（content-model R-11）。
+  integrations: [sitemap()],
   // フォントはFonts APIでセルフホストする（ui-design-spec「タイポグラフィ」）。ビルド時に
   // Googleから取得し自オリジン配信にする（Firefoxのフォントスワップ時全画面再レイアウトによる
   // 点滅の緩和）。日本語スライス（unicode-range分割）はGoogle css2応答でコメントなしの
