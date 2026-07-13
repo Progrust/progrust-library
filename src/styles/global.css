@@ -145,7 +145,8 @@
 .prose h2 {
   margin-top: 3rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 70%, transparent);
   font-size: 1.5rem;
 }
 .prose h3 {
