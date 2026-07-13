@@ -73,7 +73,7 @@ const HIDE_DELAY_MS = 150;
 
 // プレビュー小窓のスタイル（ui-design-spec「辞書リンク」の挙動）。fixed 配置・初期非表示。
 const PREVIEW_CLASS =
-  "hidden fixed z-50 w-80 max-h-72 overflow-y-auto rounded border border-line " +
+  "hidden fixed z-50 w-96 max-h-72 overflow-y-auto rounded border border-line " +
   "bg-card p-4 shadow-xl";
 
 let previewEl: HTMLElement | null = null;

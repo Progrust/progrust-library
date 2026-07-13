@@ -2,7 +2,7 @@
 // 全ページ共通レイアウト（architecture.md 6章）。
 // <head>（meta / テーマ初期化スクリプト / フォント）+ ヘッダー + フッター。
 // meta / OGP / Analytics の本格拡充は P6。
-// コンテンツ幅は画面ごとに異なる（一覧=max-w-6xl / 詳細=max-w-7xl。ui-design-spec「レイアウト」）
+// コンテンツ幅は画面ごとに異なる（一覧=max-w-6xl / 詳細=max-w-[96rem]。ui-design-spec「レイアウト」）
 // ため、コンテナと <main> は各ページ / DetailLayout 側に持たせ、ここでは規定しない。
 // ヘッダー/フッターの内側コンテナ幅は maxWidthClass で <main> 幅に追従させる。
 import { Font } from "astro:assets";

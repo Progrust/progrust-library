@@ -65,9 +65,13 @@ const createdIso = createdAt.toISOString().slice(0, 10);
 const updatedIso = updatedAt.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={title} description={description} maxWidthClass="max-w-7xl">
-  <main class="mx-auto max-w-7xl px-4 py-10 sm:px-8">
-    <div class="lg:grid lg:grid-cols-[220px_minmax(0,1fr)_320px] lg:gap-10">
+<BaseLayout
+  title={title}
+  description={description}
+  maxWidthClass="max-w-[96rem]"
+>
+  <main class="mx-auto max-w-[96rem] px-4 py-10 sm:px-8">
+    <div class="lg:grid lg:grid-cols-[264px_minmax(0,1fr)_384px] lg:gap-10">
       {/* 左: 複合目次（章リスト + 現在章の見出し・lg 以上・sticky） */}
       <aside class="hidden lg:block">
         <ChapterToc
