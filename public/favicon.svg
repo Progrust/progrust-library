@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- eyebrowのコードコメント記法「//」がモチーフ・背景透過（spec/feeds-meta.md R-8）。
+       配色はOS/ブラウザテーマに追従（サイト内のhtml.dark切替には追従しない） -->
+  <style>
+    svg { --glyph:#C63D22; }
+    @media (prefers-color-scheme: dark) {
+      svg { --glyph:#F0684A; }
+    }
+  </style>
+  <path d="M31 8 14 56M50 8 33 56" fill="none" stroke="var(--glyph)" stroke-width="9.5"/>
+</svg>
