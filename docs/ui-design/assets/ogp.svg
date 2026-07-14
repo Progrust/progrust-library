@@ -1,0 +1,7 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#F2F0EC"/>
+  <path d="M1010 -80 780 720M1250 -80 1020 720" fill="none" stroke="#C63D22" stroke-width="130"/>
+  <text x="96" y="168" font-family="JetBrains Mono" font-size="30" fill="#C63D22">// programming in rust</text>
+  <text x="90" y="318" font-family="Zen Kaku Gothic New" font-weight="900" font-size="128" fill="#29241F" letter-spacing="-1">Progrust</text>
+  <text x="90" y="456" font-family="Zen Kaku Gothic New" font-weight="900" font-size="128" fill="#29241F" letter-spacing="-1">Library<tspan fill="#C63D22">.</tspan></text>
+</svg>
