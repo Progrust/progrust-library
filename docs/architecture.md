@@ -82,7 +82,6 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | `articles/index.astro` / `articles/[slug].astro` | 記事一覧・詳細 | pages R-9 |
 | `books/index.astro` / `books/[book].astro` / `books/[book]/[slug].astro` | 本一覧・本トップ・章詳細 | pages R-10, R-16, R-17 |
 | `tags/index.astro` / `tags/[tag].astro` | タグ一覧・詳細 | pages R-18, R-19 |
-| `profile.astro` | プロフィール（直書き） | pages R-20 |
 | `404.astro` | 404 | pages R-21 |
 | `rss.xml.js` | RSS | [spec/feeds-meta.md](spec/feeds-meta.md) |
 | `search-index.json.js` | 検索インデックス | [spec/search.md](spec/search.md) |

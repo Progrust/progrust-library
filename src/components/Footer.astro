@@ -1,6 +1,6 @@
 ---
 // 全ページ共通フッター（pages.md R-3 / ui-design-spec「フッター」）。
-// コピーライト（mono）+ プロフィール / GitHub / X / RSS のテキストリンク。
+// コピーライト（mono）+ GitHub / X / RSS のテキストリンク。
 import { SITE, SITE_LINKS } from "../lib/site";
 
 interface Props {
@@ -20,11 +20,6 @@ const { maxWidthClass = "max-w-6xl" } = Astro.props;
       {SITE.author}
     </p>
     <nav class="flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-sub">
-      <a
-        href={SITE_LINKS.profile}
-        class="transition-colors hover:text-accent motion-reduce:transition-none"
-        >Profile</a
-      >
       <a
         href={SITE_LINKS.github}
         class="transition-colors hover:text-accent motion-reduce:transition-none"
