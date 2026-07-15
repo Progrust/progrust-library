@@ -60,6 +60,28 @@ const collections = [
   },
   { href: "/tags/", number: "04", en: "TAGS", label: "タグ", count: tagCount },
 ];
+
+// 「このサイトについて」の3形式カード（辞書・記事・本）
+const formats = [
+  {
+    kind: "dict" as const,
+    number: "01 / DICTIONARY",
+    title: "単語を引くように",
+    body: "所有権・ライフタイムなど、1つの用語を短くまとめたページ。記事や本の中からリンクで参照されます。",
+  },
+  {
+    kind: "article" as const,
+    number: "02 / ARTICLES",
+    title: "1つのテーマを1ページで",
+    body: "特定のテーマを掘り下げる技術ブログ形式のページ。手を動かした記録や考察を残します。",
+  },
+  {
+    kind: "book" as const,
+    number: "03 / BOOKS",
+    title: "体系立てて章で読む",
+    body: "複数の章で構成されたまとまったコンテンツ。入門から実践まで、順を追って読める形にまとめます。",
+  },
+];
 ---
 
 <BaseLayout title={SITE.title}>
@@ -215,6 +237,41 @@ const collections = [
           ))
         }
       </ol>
+    </section>
+
+    {/* このサイトについて（pages R-25: ページ最下部にサイト紹介 + 3形式カード） */}
+    <section class="border-t border-line py-12 sm:py-16">
+      <p class="mb-4 font-mono text-xs text-accent">// about this site</p>
+      <h2
+        class="mb-6 font-display text-2xl font-black tracking-tight text-strong sm:text-3xl"
+      >
+        このサイトについて<span class="text-accent">.</span>
+      </h2>
+      <div
+        class="mb-10 max-w-2xl space-y-3 text-sm leading-relaxed sm:text-base"
+      >
+        <p>
+          Progrust
+          Libraryは、Rustプログラミングについて学んだことを「蔵書」していく個人の技術ライブラリです。読んで終わりではなく、あとから引いて使える形で残すことを目指しています。（ダミーテキスト）
+        </p>
+        <p class="text-sub">
+          コンテンツは粒度に応じて次の3つの形式に分けて整理しています。（ダミーテキスト）
+        </p>
+      </div>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {
+          formats.map((f) => (
+            <div class="flex flex-col gap-3 rounded border border-line bg-card p-5">
+              <div class="flex items-center justify-between">
+                <KindBadge kind={f.kind} />
+                <span class="font-mono text-[11px] text-sub">{f.number}</span>
+              </div>
+              <p class="font-display font-bold text-strong">{f.title}</p>
+              <p class="text-sm leading-relaxed text-sub">{f.body}</p>
+            </div>
+          ))
+        }
+      </div>
     </section>
   </main>
 </BaseLayout>
