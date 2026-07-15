@@ -11,7 +11,7 @@
 - [x] **T6-1: RSS・sitemap**
   `@astrojs/rss`（全タイプ混在・直近20件・概要のみ）と`@astrojs/sitemap`。フッターからRSSへリンク。
   完了条件: feeds-meta AC-1 / AC-2 を満たす。
-- [ ] **T6-2: OGP・meta・favicon・Analytics**
+- [x] **T6-2: OGP・meta・favicon・Analytics**
   BaseLayoutのmeta/OGP出力（タイトル形式・共通OGP画像・canonical）・favicon・Cloudflare Web Analyticsタグ。OGP画像とfaviconの素材を用意する。
   完了条件: feeds-meta AC-3 / AC-4 を満たす。
 - [ ] **T6-3: コードフォント・Shikiテーマ確定（デザイン残課題）**
@@ -46,6 +46,18 @@
   - （本履歴を含むdocsコミットは後続）
 
 ### T6-2
+
+`BaseLayout.astro` の `<head>` にメタ情報群を集約実装し、feeds-meta AC-3 / AC-4（および AC-5 を確定）を満たした。全ページ共通の一元出力なので詳細ページ側の個別対応は最小。
+
+- 変更ファイル: `src/layouts/BaseLayout.astro`（OGP `og:*`・Twitter Card・canonical・`meta description` 常時出力・RSS自動検出 `<link rel="alternate">`・Cloudflare Web Analytics beacon。`ogType` Props 追加・`canonicalURL`/`metaDescription`/`ogImage`/`beaconToken` 導出）/ `src/layouts/DetailLayout.astro`・`ChapterLayout.astro`・`src/pages/books/[slug].astro`（`ogType="article"` を伝播）/ 一覧・トップ・タグ・404 各ページ（`src/pages/{index,articles/index,books/index,dict/index,tags/index,tags/[tag],404}.astro` にページ固有の固定 `description`）/ spec・plan（[spec/feeds-meta.md](../spec/feeds-meta.md) §5・R-8 の決定反映）。
+- 決定事項（[spec/feeds-meta.md](../spec/feeds-meta.md) に反映）: ①Analytics トークンは環境変数 `PUBLIC_CF_BEACON_TOKEN` の条件レンダリング（未設定ビルドは beacon 非出力・実トークンは T6-4 で Cloudflare Secrets 登録）。②favicon は SVG のみ（PNGフォールバック・`apple-touch-icon` は不要と決定）。
+- T6-1 が委譲した head の RSS 自動検出 `<link rel="alternate" type="application/rss+xml">` を本タスクで実装（[spec/feeds-meta.md](../spec/feeds-meta.md) R-1〜R-3）。
+- `og:image`/canonical は `astro.config.mjs` の `site`（`Astro.site`）で絶対URL化。素材 `public/ogp.png`（1200×630）・`public/favicon.svg` は用意済みで流用。
+- 完了条件充足: architecture §10 によりページ/レイアウトは vitest 非対象のため、実 `astro build` の dist 実測で確認。**AC-3**（記事詳細に `og:title`/`og:description`/`og:image`=`https://progrust.com/ogp.png`/canonical 出力）・**AC-4**（`PUBLIC_CF_BEACON_TOKEN=dummy` ビルドで全92ページに `beacon.min.js` タグ＋`data-cf-beacon` token・未設定ビルドで 0 件）・**AC-5**（全92ページに `<link rel="icon" type="image/svg+xml" href="/favicon.svg">`）＋ RSS alternate 全ページ出力を確認（embed断片23件は `<head>` を持たない部分HTMLのため対象外）。
+- 検証結果: `npm run check`（format:check + lint + typecheck〔hint1件は既存〕 + vitest 166件）green / `NODE_OPTIONS=--dns-result-order=ipv4first npx astro build` 成功（トークン有/無の2通り）。
+- コミット:
+  - `bc30f56` feat: OGP・meta・canonical・RSS自動検出・Cloudflare Web Analyticsを追加
+  - （本履歴を含む docs コミットは後続）
 
 ### T6-3
 
