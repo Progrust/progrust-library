@@ -22,7 +22,7 @@ const [dict, articles, books, chapters] = await Promise.all([
 const tags = tagCounts([...dict, ...articles, ...books, ...chapters]);
 ---
 
-<BaseLayout title="タグ一覧">
+<BaseLayout title="タグ一覧" description="タグから記事・辞書・本を探す。">
   <main class="mx-auto max-w-6xl px-4 sm:px-8">
     <section class="border-b border-line pb-8 pt-12 sm:pt-16">
       <p class="mb-3 font-mono text-xs text-accent">// tags</p>

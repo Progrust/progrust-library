@@ -1,32 +1,59 @@
 ---
 // 全ページ共通レイアウト（architecture.md 6章）。
-// <head>（meta / テーマ初期化スクリプト / フォント）+ ヘッダー + フッター。
-// meta / OGP / Analytics の本格拡充は P6。
+// <head>（meta / OGP / canonical / RSS自動検出 / テーマ初期化スクリプト / フォント /
+// Cloudflare Web Analytics）+ ヘッダー + フッター（meta系は feeds-meta.md R-5〜R-9。T6-2）。
 // コンテンツ幅は画面ごとに異なる（一覧=max-w-6xl / 詳細=max-w-[96rem]。ui-design-spec「レイアウト」）
 // ため、コンテナと <main> は各ページ / DetailLayout 側に持たせ、ここでは規定しない。
 // ヘッダー/フッターの内側コンテナ幅は maxWidthClass で <main> 幅に追従させる。
 import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { SITE } from "../lib/site";
+import { SITE, SITE_LINKS } from "../lib/site";
 import "../styles/global.css";
 
 interface Props {
   title: string;
   description?: string;
+  /** OGPの og:type（feeds-meta.md R-5）。詳細系ページは "article" を渡す。既定は "website" */
+  ogType?: string;
   /** ヘッダー/フッター内側コンテナの最大幅。ページの <main> 幅に合わせて指定する */
   maxWidthClass?: string;
 }
 
-const { title, description, maxWidthClass = "max-w-6xl" } = Astro.props;
+const {
+  title,
+  description,
+  ogType = "website",
+  maxWidthClass = "max-w-6xl",
+} = Astro.props;
 const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
+// canonical / OGP用の絶対URL（feeds-meta.md R-7）。Astro.site は astro.config.mjs の site。
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// description 未指定ページ（一覧・トップ等）はサイト固定文にフォールバックし常時出力する（feeds-meta.md R-5）。
+const metaDescription = description ?? SITE.description;
+// 全ページ共通のOGP画像（feeds-meta.md R-6。public/ogp.png・1200×630）。
+const ogImage = new URL("/ogp.png", Astro.site);
+// Cloudflare Web Analytics のトークン（feeds-meta.md R-9）。実トークンは T6-4 で Secrets 登録。
+const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 ---
 
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {
+      /* favicon はSVGのみ（feeds-meta.md R-8。PNGフォールバック・apple-touch-icon は不要と決定） */
+    }
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {
+      /* RSS自動検出（feeds-meta.md R-1〜R-3。T6-1 から head meta の領分として委譲） */
+    }
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={SITE.title}
+      href={SITE_LINKS.rss}
+    />
     {
       /*
       FOUC 防止（theme.md R-3）: 初期テーマの適用は他のいかなる描画よりも先に
@@ -55,7 +82,39 @@ const fullTitle = title === SITE.title ? title : `${title} | ${SITE.title}`;
     <Font cssVariable="--font-zen-maru" />
     <Font cssVariable="--font-jetbrains" />
     <title>{fullTitle}</title>
-    {description && <meta name="description" content={description} />}
+    {/* meta / canonical / OGP（feeds-meta.md R-5〜R-7） */}
+    <meta name="description" content={metaDescription} />
+    <link rel="canonical" href={canonicalURL} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={metaDescription} />
+    <meta property="og:image" content={ogImage} />
+    {
+      /* Twitter Card（feeds-meta.md R-5「等」。OGP画像 1200×630 のため large image） */
+    }
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={metaDescription} />
+    <meta name="twitter:image" content={ogImage} />
+    {
+      /*
+      Cloudflare Web Analytics（feeds-meta.md R-9）: PUBLIC_CF_BEACON_TOKEN が
+      設定されているときのみ出力する。実トークンは T6-4 で Cloudflare Secrets に登録する
+      （未設定のローカル/PRビルドではタグを出さない）。
+    */
+    }
+    {
+      beaconToken && (
+        <script
+          is:inline
+          defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({ token: beaconToken })}
+        />
+      )
+    }
   </head>
   <body class="min-h-screen bg-paper font-maru text-ink">
     <Header maxWidthClass={maxWidthClass} />

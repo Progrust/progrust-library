@@ -11,7 +11,10 @@ const articles = await getPublicArticles();
 const tags = tagCounts(articles);
 ---
 
-<BaseLayout title="記事一覧">
+<BaseLayout
+  title="記事一覧"
+  description="Rustプログラミングに関する技術記事の一覧。"
+>
   <main class="mx-auto max-w-6xl px-4 sm:px-8 py-12 sm:py-16">
     <section class="mb-8">
       <p class="mb-3 font-mono text-xs text-accent">// articles</p>

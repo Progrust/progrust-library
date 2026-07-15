@@ -78,7 +78,10 @@ const { tag, entries } = Astro.props;
 const isoDate = (d: Date) => d.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={`#${tag} のページ一覧`}>
+<BaseLayout
+  title={`#${tag} のページ一覧`}
+  description={`#${tag} に関する記事・辞書・本の一覧。`}
+>
   <main class="mx-auto max-w-6xl px-4 sm:px-8">
     <section class="pb-8 pt-10 sm:pt-14">
       <a

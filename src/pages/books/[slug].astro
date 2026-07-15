@@ -46,7 +46,11 @@ const createdIso = book.data.created_at.toISOString().slice(0, 10);
 const updatedIso = book.data.updated_at.toISOString().slice(0, 10);
 ---
 
-<BaseLayout title={book.data.title} description={book.data.description}>
+<BaseLayout
+  title={book.data.title}
+  description={book.data.description}
+  ogType="article"
+>
   <main class="mx-auto max-w-5xl px-4 py-10 sm:px-8">
     <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
       {/* 左: 章目次サイドバー（lg 以上・sticky） */}
