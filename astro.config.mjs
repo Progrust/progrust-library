@@ -16,6 +16,10 @@ import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
 import { mermaid } from "./plugins/mermaid.mjs";
 import { tableWrap } from "./plugins/table-wrap.mjs";
+import {
+  progrustCodeTheme,
+  transformerCodeBg,
+} from "./plugins/shiki-theme.mjs";
 
 // ビルド時検証3種はconfig評価時に実行する（content-model AC-2/AC-5/AC-9/AC-10）。
 // コレクション経由のvisitor throwはglob loaderに握り潰されexit 0になるため、
@@ -80,13 +84,13 @@ export default defineConfig({
     // Shiki設定は satteri() の引数ではなく markdown 直下に置く（satteri()は shikiConfig を
     // 黙って無視し、Astroが createRenderer 経由で別途Sätteriへ渡すため）。詳細は shiki.md。
     shikiConfig: {
-      // dual theme。defaultColor:false でトークンは実colorを持たず
-      // --shiki-light / --shiki-dark のCSS変数のみ出力する。
-      // html.dark切替CSSは T3-1 で src/styles/global.css に実装済み（theme.md AC-4）。
-      themes: { light: "github-light", dark: "github-dark" },
-      defaultColor: false,
+      // カスタムsingle theme（確定4色パレット。plugins/shiki-theme.mjs）。
+      // E案によりシンタックス配色は両テーマ共通のためdual themeは使わない（theme.md R-5）。
+      // preに焼き込まれるインラインの背景・前景は transformerCodeBg で除去し、
+      // 背景・枠線のテーマ切替は global.css の .astro-code 側で行う。
+      theme: progrustCodeTheme,
       // diff表示: // [!code ++] / [!code --] を除去し diff add/remove クラスを付与する。
-      transformers: [transformerNotationDiff()],
+      transformers: [transformerNotationDiff(), transformerCodeBg],
     },
     processor: satteri({
       features: { directive: true },

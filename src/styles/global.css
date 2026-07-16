@@ -385,10 +385,10 @@ html.dark .wikilink {
 
 /* =========================================================================
    コードブロック（ui-design-spec「コードブロック（★E案・ダーク反転で確定）」）。
-   Shiki dual theme（defaultColor:false）はトークンに --shiki-light / --shiki-dark の
-   CSS 変数のみ出力する。E案は「ライトでもコードだけダーク面」にするため、前景トークンは
-   常に dark 側（--shiki-dark）を使い、背景・枠線だけ E案の値にする（theme.md AC-4 の
-   切替は背景/枠のダーク差のみ）。トークンのカスタムパレット化は ui-design-spec「未確定」項。
+   シンタックスはカスタムsingle theme（plugins/shiki-theme.mjs・確定4色）で、
+   トークンspanが実colorを持つ。E案によりシンタックス配色は両テーマ共通のため、
+   テーマ切替（theme.md AC-4）は背景・枠線のダーク差のみ。preのインライン背景・前景は
+   transformerCodeBg が除去済みで、地の文字色・背景はここで管理する。
    ========================================================================= */
 .astro-code {
   overflow-x: auto;
@@ -396,12 +396,10 @@ html.dark .wikilink {
   padding: 1rem 0; /* 左右 padding は .line 側に持たせる（diff の tint を端まで伸ばすため） */
   background: #2a241f;
   border: 1px solid #4a4238;
+  color: #e4dcd1; /* 地の文字色（テーマ未マッチのトークンはこの色を継承する） */
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.7;
-}
-.astro-code span {
-  color: var(--shiki-dark);
 }
 html.dark .astro-code {
   background: #171411;
