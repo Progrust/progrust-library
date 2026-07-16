@@ -208,12 +208,12 @@ tailwind.config = {
 | 枠線 | #4A4238 | `nline` |
 | ファイル名タブ背景/文字 | #332C25 / #9C9186 | `ncard` / `nsub` |
 
-シンタックスハイライトは**両テーマ共通**（Shikiのdual themeでも同系の配色になるテーマを選ぶか、カスタムテーマを作る）:
+シンタックスハイライトは**両テーマ共通**（★確定: 既成テーマではなく**自作カスタムテーマ（single theme）**で実装する。配色が両テーマ共通のためdual themeは使わない。スコープ割当・実装方式は [`../markdown-pipeline/shiki.md`](../markdown-pipeline/shiki.md)）:
 
 - キーワード: `#F0684A`
 - ライフタイム・数値系: `#D9B25E`
 - 文字列: `#D08A72`
-- コメント: 地の文字色 + opacity 60%
+- コメント: 地の文字色 + opacity 60%（実装はalpha付きhex `#E4DCD199`）
 
 ```html
 <pre class="rounded overflow-x-auto p-4 font-mono text-[13px] leading-relaxed bg-[#2A241F] dark:bg-[#171411] text-[#E4DCD1] dark:text-nink border border-[#4A4238] dark:border-nline"><code>...</code></pre>
@@ -507,4 +507,3 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 ## 未確定・本実装時の課題
 
 - コード用の全角対応等幅フォント（UDEV Gothic等）の選定（モックはJetBrains Mono + Zen Kaku Gothic Newフォールバック）
-- Shikiのdual themeを上記配色に合わせる方法（既成テーマ選定 or カスタムテーマ）
