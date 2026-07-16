@@ -1,6 +1,7 @@
 ---
-// モバイル（lg 未満）のフローティングボタン + 目次ボトムシート
-// （ui-design-spec「モバイル（lg未満）」/ pages R-13）。
+// フローティングボタン + ボトムシート。段階的に切り替える: 目次は xl 未満、
+// 辞書は lg 未満で有効（lg〜xl 未満の2カラム帯では目次ボタンのみ表示される。
+// ui-design-spec「モバイル・中間幅」/ pages R-13）。
 // 目次ボタン → 下からボトムシートで目次を再掲（開閉は src/scripts/toc.ts）。
 // デフォルトは Toc（辞書・記事）。default slot を渡すとシート本体を差し替える
 // （章詳細は ChapterToc の複合目次を渡す。ui-design-spec §314）。
@@ -21,9 +22,9 @@ const hasSheetSlot = Astro.slots.has("default");
 const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
 ---
 
-<div class="lg:hidden">
-  {/* 右下フローティングボタン */}
-  <div class="fixed bottom-5 right-5 z-30 flex flex-col gap-3">
+<div>
+  {/* 右下フローティングボタン（xl 以上は両ボタンとも不要） */}
+  <div class="fixed bottom-5 right-5 z-30 flex flex-col gap-3 xl:hidden">
     {
       hasToc && (
         <button
@@ -40,7 +41,7 @@ const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
       type="button"
       data-dict-open
       aria-label="辞書ペインを開く"
-      class="grid h-12 w-12 place-items-center rounded border border-accent bg-card font-display text-[10px] font-bold text-accent shadow-lg disabled:opacity-60"
+      class="grid h-12 w-12 place-items-center rounded border border-accent bg-card font-display text-[10px] font-bold text-accent shadow-lg disabled:opacity-60 lg:hidden"
     >
       辞書
     </button>
@@ -49,7 +50,7 @@ const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
   {/* 目次ボトムシート */}
   {
     hasToc && (
-      <div data-toc-sheet class="fixed inset-0 z-40 hidden">
+      <div data-toc-sheet class="fixed inset-0 z-40 hidden xl:hidden">
         <div data-toc-backdrop class="absolute inset-0 bg-black/40" />
         <div class="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-md border-t border-line bg-paper p-5">
           <div class="mb-2 flex items-center justify-between">
@@ -85,7 +86,7 @@ const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
   {
     /* 辞書ボトムシート（辞書ボタン・辞書リンククリックで開く。wikilink-ui R-14） */
   }
-  <div data-dict-sheet class="fixed inset-0 z-40 hidden">
+  <div data-dict-sheet class="fixed inset-0 z-40 hidden lg:hidden">
     <div data-dict-backdrop class="absolute inset-0 bg-black/40"></div>
     <div
       class="absolute inset-x-0 bottom-0 max-h-[70vh] overflow-y-auto rounded-t-md border-t border-line bg-paper p-5"

@@ -218,6 +218,8 @@ async function showCurrent(): Promise<void> {
   if (embed) renderEmbed(embed);
 }
 
+// 辞書ボトムシートは lg（1024px）未満のみ（サイドペインは lg 以上で常設表示）。
+// 目次ボトムシートの切替は xl 未満で、この判定とは異なる（MobileNav.astro 参照）。
 const mobileQuery = "(max-width: 1023px)";
 
 /** モバイル幅なら辞書ボトムシートを開く（wikilink-ui R-14）。 */

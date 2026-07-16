@@ -72,9 +72,16 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
   maxWidthClass="max-w-[96rem]"
 >
   <main class="mx-auto max-w-[96rem] px-4 py-10 sm:px-8">
-    <div class="lg:grid lg:grid-cols-[264px_minmax(0,1fr)_384px] lg:gap-10">
-      {/* 左: 複合目次（章リスト + 現在章の見出し・lg 以上・sticky） */}
-      <aside class="hidden lg:block">
+    {
+      /* 段階的レスポンシブ（ui-design-spec「レイアウト」）: xl 以上=3カラム /
+      lg〜xl 未満=複合目次カラムを省略した2カラム / lg 未満=1カラム。
+      左右カラム幅は clamp() で画面幅に連続追従（1536px で最大値・1280px で最小値） */
+    }
+    <div
+      class="lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)] lg:gap-10 xl:grid-cols-[clamp(220px,17.1875vw,264px)_minmax(0,1fr)_clamp(320px,25vw,384px)]"
+    >
+      {/* 左: 複合目次（章リスト + 現在章の見出し・xl 以上・sticky） */}
+      <aside class="hidden xl:block">
         <ChapterToc
           bookTitle={bookTitle}
           bookHref={bookHref}
@@ -135,7 +142,7 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
   </main>
 
   {
-    /* モバイル: フローティング目次ボタン + ボトムシート（複合目次を差し込む・§314） */
+    /* フローティングボタン + ボトムシート（目次: xl 未満 / 辞書: lg 未満。複合目次を差し込む・§314） */
   }
   <MobileNav headings={headings}>
     <ChapterToc

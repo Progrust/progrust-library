@@ -34,12 +34,16 @@ const {
   linkedDicts = [],
 } = Astro.props;
 const updatedIso = updatedAt.toISOString().slice(0, 10);
-// 目次対象見出しが無いページは左カラム（240px）を省略して2カラムにする
-// （Toc.astro の表示条件と同じ tocHeadings で判定。ui-design-spec「レイアウト」）
+// 段階的レスポンシブ（ui-design-spec「レイアウト」）: xl 以上=3カラム / lg〜xl 未満=
+// 目次カラムを省略した2カラム（目次はフローティングボタン） / lg 未満=1カラム。
+// 左右カラム幅は clamp() で画面幅に連続追従させ、本文が過剰に狭くならないようにする
+// （コンテナ最大幅 1536px で最大値、1280px で最小値に到達する係数）。
+// 目次対象見出しが無いページは lg 以上で常に2カラムにする
+// （Toc.astro の表示条件と同じ tocHeadings で判定）。
 const hasToc = tocHeadings(headings).length > 0;
 const gridCols = hasToc
-  ? "lg:grid-cols-[240px_minmax(0,1fr)_384px]"
-  : "lg:grid-cols-[minmax(0,1fr)_384px]";
+  ? "lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)] xl:grid-cols-[clamp(200px,15.625vw,240px)_minmax(0,1fr)_clamp(320px,25vw,384px)]"
+  : "lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)]";
 ---
 
 <BaseLayout
@@ -50,10 +54,10 @@ const gridCols = hasToc
 >
   <main class="mx-auto max-w-[96rem] px-4 py-10 sm:px-8">
     <div class={`lg:grid lg:gap-10 ${gridCols}`}>
-      {/* 左: 目次（lg 以上・sticky）。目次が無いページではカラムごと省略 */}
+      {/* 左: 目次（xl 以上・sticky）。目次が無いページではカラムごと省略 */}
       {
         hasToc && (
-          <aside class="hidden lg:block">
+          <aside class="hidden xl:block">
             <Toc headings={headings} class="sticky top-24" />
           </aside>
         )
@@ -127,7 +131,7 @@ const gridCols = hasToc
     </div>
   </main>
 
-  {/* モバイル: フローティング目次ボタン + 目次ボトムシート */}
+  {/* フローティングボタン + ボトムシート（目次: xl 未満 / 辞書: lg 未満） */}
   <MobileNav headings={headings} />
 
   <script>
