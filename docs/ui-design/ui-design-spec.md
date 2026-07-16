@@ -218,10 +218,17 @@ tailwind.config = {
 
 シンタックスハイライトは**両テーマ共通**（★確定: 既成テーマではなく**自作カスタムテーマ（single theme）**で実装する。配色が両テーマ共通のためdual themeは使わない。スコープ割当・実装方式は [`../markdown-pipeline/shiki.md`](../markdown-pipeline/shiki.md)）:
 
-- キーワード: `#F0684A`
-- ライフタイム・数値系: `#D9B25E`
+- キーワード（+ HTMLタグ名）: `#F0684A`
+- 関数・メソッド・マクロ・シェルコマンド・TOMLキー: `#A9B665`（グレイッシュグリーン）
+- 型・名前空間・enum バリアント（`Some`/`Ok` 等）・環境変数: `#7FB5A3`（グレイッシュティール）
+- ライフタイム・数値系・`self`/`this`・エスケープ・文字列補間・シェルフラグ・属性名: `#D9B25E`
 - 文字列: `#D08A72`
 - コメント: 地の文字色 + opacity 60%（実装はalpha付きhex `#E4DCD199`）
+
+> [!info] 6色への拡張（T6-3後の追加確定）
+> 当初の確定4色では色数が少なくコードが読みにくいというフィードバックにより、
+> 新規2色（グリーン/ティール。暖色背景に馴染むグレイッシュトーン）を追加し金色の適用範囲を拡大した。
+> 既存4色の値と割当は不変。実出力比較で承認済み。
 
 ```html
 <pre class="rounded overflow-x-auto p-4 font-mono text-[13px] leading-relaxed bg-[#2A241F] dark:bg-[#171411] text-[#E4DCD1] dark:text-nink border border-[#4A4238] dark:border-nline"><code>...</code></pre>

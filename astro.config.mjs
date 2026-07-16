@@ -113,7 +113,7 @@ export default defineConfig({
     // Shiki設定は satteri() の引数ではなく markdown 直下に置く（satteri()は shikiConfig を
     // 黙って無視し、Astroが createRenderer 経由で別途Sätteriへ渡すため）。詳細は shiki.md。
     shikiConfig: {
-      // カスタムsingle theme（確定4色パレット。plugins/shiki-theme.mjs）。
+      // カスタムsingle theme（確定パレット6色。plugins/shiki-theme.mjs）。
       // E案によりシンタックス配色は両テーマ共通のためdual themeは使わない（theme.md R-5）。
       // preに焼き込まれるインラインの背景・前景は transformerCodeBg で除去し、
       // 背景・枠線のテーマ切替は global.css の .astro-code 側で行う。

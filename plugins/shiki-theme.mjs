@@ -1,19 +1,21 @@
 // @ts-check
 // コードハイライトのカスタムShikiテーマとpreインラインスタイル除去transformer。
-// 配色は docs/ui-design/ui-design-spec.md「コードブロック」の確定4色
-// （キーワード #F0684A / ライフタイム・数値系 #D9B25E / 文字列 #D08A72 /
-// コメント = 地の文字色 #E4DCD1 の opacity 60% ≒ alpha付きhex #E4DCD199）。
+// 配色は docs/ui-design/ui-design-spec.md「コードブロック」の確定パレット（6色）
+// （キーワード #F0684A / 関数 #A9B665 / 型 #7FB5A3 / ライフタイム・数値系 #D9B25E /
+// 文字列 #D08A72 / コメント = 地の文字色 #E4DCD1 の opacity 60% ≒ alpha付きhex #E4DCD199）。
 // E案（ライトでもコードだけダーク面）により配色は両テーマ共通のため、
 // dual themeではなくsingle themeで運用する（docs/markdown-pipeline/shiki.md）。
 
 /**
- * 確定4色パレットのカスタムテーマ（single theme用）。
+ * 確定パレット（6色）のカスタムテーマ（single theme用）。
  *
  * スコープ設計の注意（Rust文法の実測に基づく。shiki.md参照）:
  * - bare `keyword` は使わない（`->` や `&` 等の演算子が `keyword.operator.*` で
  *   マッチしてキーワード色になってしまうため、`keyword.control` / `keyword.other` に限定する）
  * - Rustのライフタイムは `entity.name.type.lifetime` + `punctuation.definition.lifetime`
  *   （`storage.modifier.lifetime` ではない。後者は他文法向けの保険として残す）
+ * - `entity.name.type.lifetime`（金）と `entity.name.type`（ティール）はセレクタの
+ *   具体度で前者が勝つため、ライフタイムが型色に食われることはない
  *
  * @type {import("shiki").ThemeRegistration}
  */
@@ -28,23 +30,54 @@ export const progrustCodeTheme = {
   },
   tokenColors: [
     {
-      // キーワード（fn / let / if / return / const / import 等）
+      // キーワード（fn / let / if / return / const / import 等）+ HTMLタグ名
       scope: [
         "keyword.control",
         "keyword.other",
         "storage.type",
         "storage.modifier",
+        "entity.name.tag",
       ],
       settings: { foreground: "#F0684A" },
     },
     {
-      // ライフタイム・数値・言語定数（true / false / None 等）
+      // 関数・メソッド・マクロ（println! 等）・シェルコマンド・TOMLキー
+      scope: [
+        "entity.name.function",
+        "support.function",
+        "entity.name.command",
+        "variable.other.key",
+      ],
+      settings: { foreground: "#A9B665" },
+    },
+    {
+      // 型・名前空間・enumバリアント（Some / Ok 等）・環境変数・
+      // プロパティキー（CSSプロパティ / JSONキー）
+      scope: [
+        "entity.name.type",
+        "entity.name.namespace",
+        "support.type",
+        "support.class",
+        "variable.other.assignment",
+      ],
+      settings: { foreground: "#7FB5A3" },
+    },
+    {
+      // ライフタイム・数値・言語定数（true / false / None 等）に加え、
+      // self / this・エスケープ・文字列補間の括弧・シェルフラグ・属性名・TOMLセクション
       scope: [
         "entity.name.type.lifetime",
         "punctuation.definition.lifetime",
         "storage.modifier.lifetime",
         "constant.numeric",
         "constant.language",
+        "variable.language",
+        "constant.character.escape",
+        "punctuation.definition.interpolation",
+        "punctuation.definition.template-expression",
+        "constant.other.option",
+        "entity.other.attribute-name",
+        "entity.name.section",
       ],
       settings: { foreground: "#D9B25E" },
     },

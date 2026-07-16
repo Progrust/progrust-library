@@ -1,6 +1,6 @@
 # Shiki連携（diff表示・ファイル名表示・カスタムテーマ）
 
-コードハイライトの3要件（diff表示・` ```lang:file `のファイル名表示・確定4色のカスタムテーマ）の実装方式。3要件とも**記法の変更なし**で実現できることを確認済み。
+コードハイライトの3要件（diff表示・` ```lang:file `のファイル名表示・確定パレット（6色）のカスタムテーマ）の実装方式。3要件とも**記法の変更なし**で実現できることを確認済み。
 
 > [!info] dual theme → カスタムsingle themeへの変更（T6-3）
 > 技術検証〜T3-1時点はdual theme（github-light/dark + `defaultColor:false`）だったが、E案（ライトでもコードだけダーク面）によりシンタックス配色は両テーマ共通のため、T6-3で**自作カスタムテーマのsingle theme**に確定した（`plugins/shiki-theme.mjs`）。dual時代のレシピは「dual theme方式（旧・参考）」節に残す。
@@ -16,8 +16,9 @@
 **最重要**: Shiki設定（`shikiConfig` / `syntaxHighlight`）は**`satteri({...})`の引数ではなく`astro.config`の`markdown`直下**に書く。`satteri()`ファクトリは`mdastPlugins` / `hastPlugins` / `features`しか拾わず、`shikiConfig`を渡しても黙って無視される。Astroが`createRenderer({ syntaxHighlight, shikiConfig, gfm, smartypants })`として別経路でSätteriへ渡す（node_modules実読 + 実ビルドで確認）。
 
 1. **diff表示**: `@shikijs/transformers`の`transformerNotationDiff()`を`shikiConfig.transformers`に入れるだけ。`// [!code ++]` / `// [!code --]`が除去され、該当`<span class="line">`に`diff add` / `diff remove`クラス、`<pre>`に`has-diff`が付く
-2. **カスタムsingle theme**: `theme: progrustCodeTheme`（`plugins/shiki-theme.mjs`のテーマオブジェクト直渡し。確定4色は [ui-design-spec「コードブロック」](../ui-design/ui-design-spec.md)）。トークンspanは実`color`を持つため切替CSSは不要。ただし`<pre>`にテーマの`background-color`/`color`がインライン出力され、`html.dark`の背景切替CSSが**負ける**ため、同ファイルの`transformerCodeBg`で除去し背景・地の文字色は`global.css`（`.astro-code`）側で管理する
+2. **カスタムsingle theme**: `theme: progrustCodeTheme`（`plugins/shiki-theme.mjs`のテーマオブジェクト直渡し。確定パレット（6色）は [ui-design-spec「コードブロック」](../ui-design/ui-design-spec.md)）。トークンspanは実`color`を持つため切替CSSは不要。ただし`<pre>`にテーマの`background-color`/`color`がインライン出力され、`html.dark`の背景切替CSSが**負ける**ため、同ファイルの`transformerCodeBg`で除去し背景・地の文字色は`global.css`（`.astro-code`）側で管理する
    - スコープ設計の実測知見: bare `keyword` は**使わない**（`->`・`&`・`=`等が`keyword.operator.*`にマッチしてキーワード色になる）。Rustのライフタイムは `entity.name.type.lifetime` + `punctuation.definition.lifetime`（`storage.modifier.lifetime`ではない）。コメントの「地の色60%」はalpha付きhex `#E4DCD199` がそのままインライン出力されることを確認済み
+   - 6色拡張時の追加知見: 複数ルールがマッチする場合は**より具体的なセレクタが勝つ**ため、`entity.name.type.lifetime`（金）は `entity.name.type`（型のティール）に食われない。Rustの`Some`/`Ok`/`Err`は`entity.name.type.option/result`（型色）、`self`/`Self`は`variable.language.self`、マクロは`entity.name.function.macro`（関数色に含まれる）、bashのコマンド名は`entity.name.command`＋ビルトインが`support.function.builtin`。スコープの実測は`codeToTokens(code, { includeExplanation: true })`で行う
 3. **ファイル名表示**: ` ```rust:index.rs `は素の状態では`lang="rust:index.rs"`のままcodeノードになり、Shikiが**plaintextへ黙ってフォールバック**する（エラーにならず気づけない）→ **mdast前処理プラグイン**で`lang`を`:`で分割し、ファイル名ラベル + 補正済みcodeノードにラップする。`replaceNode`で新規生成したcodeノードも下流のハイライトが正常に効く
 
 ## 雛形コード（動作確認済み）

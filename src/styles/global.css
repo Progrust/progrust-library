@@ -389,7 +389,7 @@ html.dark .wikilink {
 
 /* =========================================================================
    コードブロック（ui-design-spec「コードブロック（★E案・ダーク反転で確定）」）。
-   シンタックスはカスタムsingle theme（plugins/shiki-theme.mjs・確定4色）で、
+   シンタックスはカスタムsingle theme（plugins/shiki-theme.mjs・確定パレット6色）で、
    トークンspanが実colorを持つ。E案によりシンタックス配色は両テーマ共通のため、
    テーマ切替（theme.md AC-4）は背景・枠線のダーク差のみ。preのインライン背景・前景は
    transformerCodeBg が除去済みで、地の文字色・背景はここで管理する。

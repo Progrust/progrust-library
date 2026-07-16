@@ -89,6 +89,12 @@
 - `abbfaba` feat: コード用日本語等幅フォント（UDEV Gothicサブセット）をハイブリッド配信
 - （本履歴を含むdocsコミットは後続）
 
+**追記: パレットを6色へ拡張（T6-3完了後のフィードバック対応）**
+
+- 「4色では色数が少なくコードが読みにくい」とのフィードバックにより、既存4色は不変のまま関数系 `#A9B665`・型系 `#7FB5A3` の2色を追加し、金色 `#D9B25E` の適用範囲を`self`/エスケープ/文字列補間/シェルフラグ等へ拡大（確定値と割当は [ui-design-spec「コードブロック」](../ui-design/ui-design-spec.md)、スコープ実測の知見は [markdown-pipeline/shiki.md](../markdown-pipeline/shiki.md)）。Rust/TS/bash/TOMLの実出力比較をArtifactで提示しユーザー承認済み
+- 変更ファイル: `plugins/shiki-theme.mjs` / `tests/plugins/shiki-theme.test.ts`（+4件で計11件）/ ui-design-spec・shiki.md・architecture.md・global.css/astro.config.mjsのコメント
+- 検証: `npm run check`（vitest 177件）green / build成功・distに新2色の実colorを確認
+
 ### T6-4
 
 ### T6-6

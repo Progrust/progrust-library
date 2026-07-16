@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest";
 import { highlight } from "../helpers/shiki-theme";
 
 // 対象spec: docs/spec/theme.md（AC番号は同文書）。
-// 配色の期待値は docs/ui-design/ui-design-spec.md「コードブロック」の確定4色。
+// 配色の期待値は docs/ui-design/ui-design-spec.md「コードブロック」の確定パレット（6色）。
 const RUST = `// 所有権を移動する
 fn take<'a>(s: &'a mut String) -> usize {
     let n: usize = 42;
@@ -11,7 +11,7 @@ fn take<'a>(s: &'a mut String) -> usize {
     if true { s.len() + n } else { 0 }
 }`;
 
-describe("shiki-theme（カスタムsingle theme・確定4色パレット）", () => {
+describe("shiki-theme（カスタムsingle theme・確定パレット6色）", () => {
   it("キーワード（fn / let / mut）が #F0684A になる", async () => {
     const html = await highlight(RUST, "rust");
     // 同色の隣接トークンは1スパンに結合され、先行空白を含むことがある
@@ -37,6 +37,41 @@ describe("shiki-theme（カスタムsingle theme・確定4色パレット）", (
     expect(html).toMatch(
       /<span style="color:#E4DCD199">[^<]*所有権を移動する<\/span>/,
     );
+  });
+
+  it("関数名・メソッド呼び出し・マクロが #A9B665 になる", async () => {
+    const html = await highlight(
+      `fn take(s: &String) -> usize { println!("{}", s); s.len() }`,
+      "rust",
+    );
+    expect(html).toMatch(/<span style="color:#A9B665">\s*take<\/span>/);
+    expect(html).toContain('<span style="color:#A9B665">len</span>');
+    expect(html).toMatch(/<span style="color:#A9B665">\s*println!<\/span>/);
+  });
+
+  it("型名・enumバリアント（Some / Ok）が #7FB5A3 になる", async () => {
+    const html = await highlight(
+      `fn get() -> Option<Vec<u8>> { Some(Vec::new()) }`,
+      "rust",
+    );
+    expect(html).toMatch(/<span style="color:#7FB5A3">\s*Option<\/span>/);
+    expect(html).toContain('<span style="color:#7FB5A3">Vec</span>');
+    expect(html).toMatch(/<span style="color:#7FB5A3">\s*Some<\/span>/);
+  });
+
+  it("self / Self は型色ではなく #D9B25E になる", async () => {
+    const html = await highlight(
+      `impl P { fn id(&self) -> Self { Self }}`,
+      "rust",
+    );
+    expect(html).toMatch(/<span style="color:#D9B25E">\s*self<\/span>/);
+    expect(html).toMatch(/<span style="color:#D9B25E">\s*Self<\/span>/);
+  });
+
+  it("ライフタイムは型色（#7FB5A3）に食われず #D9B25E のまま", async () => {
+    const html = await highlight(RUST, "rust");
+    expect(html).not.toContain('<span style="color:#7FB5A3">\'a</span>');
+    expect(html).toContain('<span style="color:#D9B25E">\'a</span>');
   });
 
   it("演算子（->）はキーワード色にならない", async () => {
