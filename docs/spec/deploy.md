@@ -13,7 +13,7 @@ Pages組み込みビルドを使わない理由: mermaidのビルド時SVG化に
 - **R-1**: 以下のCloudflare側セットアップを行う（独自ドメイン `progrust.com` はCloudflareで管理済み）。
   1. Cloudflare Pagesプロジェクトの作成（Direct Upload用）
   2. APIトークンの発行（Pages編集権限）とGitHub Secretsへの登録（`CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID`）
-  3. Pagesプロジェクトへのカスタムドメイン `progrust.com` の割当
+  3. Pagesプロジェクトへのカスタムドメイン `blog.progrust.com` の割当（apexの `progrust.com` は使わない）
 
 ### ワークフロー
 
@@ -28,7 +28,7 @@ Pages組み込みビルドを使わない理由: mermaidのビルド時SVG化に
 
 ## 4. 受入基準
 
-- **AC-1**: `main` へpushすると、テスト→ビルド→デプロイが自動実行され、`https://progrust.com` に反映される。（R-1〜R-3）
+- **AC-1**: `main` へpushすると、テスト→ビルド→デプロイが自動実行され、`https://blog.progrust.com` に反映される。（R-1〜R-3）
 - **AC-2**: wikilinkのリンク切れを含むコミットをpushすると、ワークフローが失敗しデプロイされない。（R-5）
 - **AC-3**: vitestが失敗するコミットをpushすると、デプロイされない。（R-6）
 - **AC-4**: PRを作成してもデプロイは実行されない。（R-2）

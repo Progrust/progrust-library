@@ -36,7 +36,7 @@ validateWikilinks(dictIndex, new URL("./content/", import.meta.url));
 // directive: true は本文中の「x:y」等をtextDirective化して消す副作用があるため、
 // directivesプラグインに同梱した復元visitorとセットで有効化する（directives.md）。
 export default defineConfig({
-  site: "https://progrust.com",
+  site: "https://blog.progrust.com",
   // sitemap.xml を自動生成する（feeds-meta R-4 / AC-2）。非公開コンテンツは本番ビルドで
   // ページ生成されないため sitemap にも自然に含まれない（content-model R-11）。
   integrations: [sitemap()],
