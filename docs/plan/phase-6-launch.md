@@ -14,7 +14,7 @@
 - [x] **T6-2: OGP・meta・favicon・Analytics**
   BaseLayoutのmeta/OGP出力（タイトル形式・共通OGP画像・canonical）・favicon・Cloudflare Web Analyticsタグ。OGP画像とfaviconの素材を用意する。
   完了条件: feeds-meta AC-3 / AC-4 を満たす。
-- [ ] **T6-3: コードフォント・Shikiテーマ確定（デザイン残課題）**
+- [x] **T6-3: コードフォント・Shikiテーマ確定（デザイン残課題）**
   全角対応等幅フォント（UDEV Gothic / Moralerspace等）を実表示で比較して選定・差し替える（基本3フォントはP5でAstro Fonts APIによるセルフホスト済み。ui-design-spec「タイポグラフィ」参照）。Shiki dual themeを確定配色（[ui-design-spec.md](../ui-design/ui-design-spec.md)のコードブロック配色）に合わせる（既成テーマ選定 or カスタム）。
   完了条件: 決定内容がui-design-spec.mdの「未確定・本実装時の課題」から本文へ反映され、実表示で確認済み。
 - [ ] **T6-4: Cloudflareセットアップ + GitHub Actions**
@@ -60,6 +60,34 @@
   - （本履歴を含む docs コミットは後続）
 
 ### T6-3
+
+デザイン残課題2件を確定し実装した。決定内容は [ui-design-spec.md](../ui-design/ui-design-spec.md)（「タイポグラフィ > monoの日本語」「コードブロック」）へ反映済みで「未確定・本実装時の課題」は解消。
+
+**① Shikiカスタムテーマ（single theme化）**
+
+- 確定4色に一致する既成テーマはないため自作。配色が両テーマ共通（E案）のためdual themeを廃止しsingle themeへ（全spanの`--shiki-light/dark`重複変数によるHTML肥大を回避）。preに焼き込まれるインライン背景・前景は自作transformer`transformerCodeBg`で除去（`html.dark`切替CSSが負けるため）。実装方式・スコープ設計の実測知見（bare `keyword`不可・ライフタイムの実スコープ・alpha hex可）は [markdown-pipeline/shiki.md](../markdown-pipeline/shiki.md) 参照
+- spec先行更新: [spec/theme.md](../spec/theme.md) R-5/AC-4を「切替対象=背景・枠線とmermaidのみ、シンタックス配色は両テーマ共通」に改訂
+- 変更ファイル: `plugins/shiki-theme.mjs`（新規）/ `astro.config.mjs` / `src/styles/global.css` / `tests/plugins/shiki-theme.test.ts`・`tests/helpers/shiki-theme.ts`（新規、`shiki`をdevDepに明示追加）/ spec・設計文書
+
+**② コードフォント（ハイブリッド: JetBrains Mono + UDEV Gothic和文サブセット）**
+
+- 実表示比較6案（現状 / UDEV和文3:5 / UDEV和文size-adjust1:2 / Moralerspace和文 / UDEV・Moralerspaceフル差し替え）をスクリーンショット提示し、ユーザー選定で**B案: 欧文=JetBrains Mono続投+和文=UDEV Gothic和文グリフ（半角:全角=3:5、UDEV Gothic 35と同比率）**に確定
+- 実測知見: UDEV Gothic無印は欧文（JBM派生）を0.5emに縮小して1:2を実現しており、JBM(0.6em)続投のハイブリッドでは3:5になる。また**Fonts APIの`fallbacks`に他fontsエントリ名を書いても生成ファミリ名がハッシュ付きのため一致せず機能しない**（従来のmono用Zen Kakuフォールバックもこの理由で不動作だった）→ 連鎖は`global.css`の`--font-mono: var(--font-code-jp), var(--font-jetbrains)`変数合成で実現
+- サブセット生成の再現手順（fonttools 4.x）: UDEVGothic-Regular.ttf v2.2.0 から `U+3000-303F,U+3041-309F,U+30A0-30FF,U+4E00-9FFF,U+FF01-FF60,U+FFE0-FFE6` をsubset+woff2化し、OFLのRFN（"UDEV Gothic"）回避のためname table（ID 1/3/4/6/16）を「Progrust Code JP」へ変更（`fontTools.subset`＋name書き換えのPythonスクリプト。約1.4MB。詳細は `src/assets/fonts/README.md`）
+- 変更ファイル: `src/assets/fonts/`（woff2・LICENSE・README新規）/ `astro.config.mjs`（localプロバイダ+unicodeRange追加・JBMのfallbacks修正）/ `src/layouts/BaseLayout.astro`（`<Font cssVariable="--font-code-jp">`）/ `src/styles/global.css` / ui-design-spec
+
+**検証結果**
+
+- `npm run check`（format:check + lint + typecheck + vitest 173件〔テーマテスト7件含む〕）green / `NODE_OPTIONS=--dns-result-order=ipv4first npx astro build` 成功
+- dist実測: 全span実color4色・`--shiki-light/dark`消滅・preインライン背景なし・`has-diff`/`diff add|remove`維持・mermaid SVG従来どおり・unicodeRange付き@font-face出力・`--font-mono`合成
+- 実ブラウザ（Playwright・preview）: 日本語コメントがUDEV Gothic（かな1.0em/欧文0.6em）で表示・`html.dark`トグルで背景#2A241F↔#171411と枠線のみ切替（シンタックス4色固定）・diff/ファイル名タブ無傷・JPフォントはmono日本語を含むページでのみDL（完了条件の「実表示で確認済み」を充足）
+
+**コミット**
+
+- `c347588` docs: コードブロックのシンタックス配色を両テーマ共通に確定
+- `b5ce253` feat: Shikiをカスタムsingle theme化（確定4色パレット）
+- `abbfaba` feat: コード用日本語等幅フォント（UDEV Gothicサブセット）をハイブリッド配信
+- （本履歴を含むdocsコミットは後続）
 
 ### T6-4
 
