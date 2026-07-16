@@ -75,12 +75,13 @@ const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
       /*
       フォント読込（ui-design-spec「タイポグラフィ」）: Fonts API のセルフホスト
       （設定は astro.config.mjs の fonts）。preload は付けない（日本語は多数スライスの
-      ため過剰取得になる）。全角等幅の最終選定は P6（T6-3）。
+      ため過剰取得になる）。
     */
     }
     <Font cssVariable="--font-zen-kaku" />
     <Font cssVariable="--font-zen-maru" />
     <Font cssVariable="--font-jetbrains" />
+    <Font cssVariable="--font-code-jp" />
     <title>{fullTitle}</title>
     {/* meta / canonical / OGP（feeds-meta.md R-5〜R-7） */}
     <meta name="description" content={metaDescription} />

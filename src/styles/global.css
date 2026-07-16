@@ -26,7 +26,11 @@
      （var は使用時解決のため非 inline の @theme で問題ない）。 */
   --font-display: var(--font-zen-kaku);
   --font-maru: var(--font-zen-maru);
-  --font-mono: var(--font-jetbrains);
+  /* mono は「日本語グリフ差し込み（Progrust Code JP = UDEV Gothic和文サブセット・
+     unicode-range付きで欧文を含まない）→ JetBrains Mono」の変数合成（T6-3確定）。
+     JP側を先に置いても欧文は素通りしてJBMにマッチする。fonts エントリの fallbacks に
+     他エントリ名を書く方式はハッシュ付きファミリ名と一致せず機能しない点に注意。 */
+  --font-mono: var(--font-code-jp), var(--font-jetbrains);
 }
 
 /* ダークテーマ: 同名トークンの値のみ差し替える（bg-paper 等がそのまま追従する）。 */

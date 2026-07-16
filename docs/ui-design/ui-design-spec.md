@@ -71,7 +71,7 @@ tailwind.config = {
 | --- | --- | --- | --- |
 | `font-display` | Zen Kaku Gothic New | 500/700/900 | 見出し、タイトル、ボタン、バッジ |
 | `font-maru`（本文デフォルト） | Zen Maru Gothic | 400/500/700 | 本文（bodyに指定） |
-| `font-mono` | JetBrains Mono | 400/600 | 日付、タグ、eyebrow、件数、コード |
+| `font-mono` | JetBrains Mono + Progrust Code JP（★T6-3確定・下記） | 400/600（JPは400のみ） | 日付、タグ、eyebrow、件数、コード |
 
 フォント読込は **Astro Fonts API によるセルフホスト**（設定は `astro.config.mjs` の `fonts`。ビルド時にGoogleから取得して自オリジンから配信する。Firefoxのフォントスワップ時全画面再レイアウトによる点滅の緩和・表示速度・プライバシーが目的）。CSS変数のマッピング:
 
@@ -79,12 +79,20 @@ tailwind.config = {
 | --- | --- |
 | `--font-zen-kaku` | `--font-display` |
 | `--font-zen-maru` | `--font-maru` |
-| `--font-jetbrains` | `--font-mono` |
+| `--font-code-jp`, `--font-jetbrains` | `--font-mono`（この順の変数合成） |
 
-`<Font />` コンポーネントは `BaseLayout.astro` の `<head>` に置く。コード用の全角対応等幅は本実装で別途選定の可能性あり（P6 T6-3）。
+`<Font />` コンポーネントは `BaseLayout.astro` の `<head>` に置く。
 
 - サイトロゴは `Progrust Library` + アクセント色のピリオド（`<span class="text-accent dark:text-naccent">.</span>`）。大見出しの末尾ピリオドも同じ文法
-- 日本語monoのフォールバックとして `"Zen Kaku Gothic New"` をmonoスタックに含める（Fonts APIの `fallbacks` で指定）
+
+### mono の日本語（★T6-3確定・ハイブリッド方式）
+
+実表示比較（UDEV Gothic / Moralerspace / 現状、フル差し替え案・size-adjust 1:2案を含む6案）の結果、**欧文=JetBrains Mono続投 + 和文=UDEV Gothic和文グリフの差し込み（半角:全角=3:5）**で確定。
+
+- **Progrust Code JP** = UDEV Gothic v2.2.0 Regular の日本語グリフのみサブセット（約1.4MB woff2）。OFLのRFN回避のためリネーム済み（`src/assets/fonts/README.md`）
+- localプロバイダ + `unicodeRange` により、mono指定箇所に日本語を含むページでのみダウンロードされる（ハッシュ付き静的資産のため取得は初回のみ）
+- 半角:全角=3:5 は UDEV Gothic 35 と同じ公式比率（5半角=3全角で整列）。厳密1:2（size-adjust 120%拡大・フル差し替え）は和文の拡大・欧文幅の変化を嫌って不採用
+- モックの `"Zen Kaku Gothic New"` monoフォールバックは廃止（Fonts APIの `fallbacks` に他エントリ名を書いてもハッシュ付きファミリ名と一致せず機能しないことが判明。連鎖は `--font-mono: var(--font-code-jp), var(--font-jetbrains)` の変数合成で行う）
 
 ## 共通ルール
 
@@ -506,4 +514,4 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 
 ## 未確定・本実装時の課題
 
-- コード用の全角対応等幅フォント（UDEV Gothic等）の選定（モックはJetBrains Mono + Zen Kaku Gothic Newフォールバック）
+なし（P6 T6-3ですべて確定済み。コードフォントは「タイポグラフィ」、Shikiテーマは「コードブロック」参照）。

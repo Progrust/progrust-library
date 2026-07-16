@@ -72,8 +72,37 @@ export default defineConfig({
       weights: [400, 600],
       styles: ["normal"],
       subsets: ["latin", "latin-ext"],
-      // 日本語monoのフォールバック連鎖（ui-design-spec）を維持する
-      fallbacks: ["Zen Kaku Gothic New", "monospace"],
+      // 注意: fallbacks に他の fonts エントリ名を書いても解決されない（生成CSSの
+      // ファミリ名はハッシュ付きのため素の名前ではマッチしない）。日本語グリフとの
+      // 連鎖は global.css の --font-mono で変数合成する（ui-design-spec「タイポグラフィ」）。
+      fallbacks: ["monospace"],
+    },
+    // コード用日本語等幅（T6-3確定: UDEV Gothic Regular の日本語グリフのみサブセット・
+    // RFN回避のため "Progrust Code JP" にリネーム済み。半角:全角=3:5でJetBrains Monoと併用）。
+    // unicodeRange により、mono指定箇所に日本語を含むページでのみダウンロードされる。
+    {
+      provider: fontProviders.local(),
+      name: "Progrust Code JP",
+      cssVariable: "--font-code-jp",
+      // 単独では使わない差し込み用フォントのため最適化フォールバックは不要
+      fallbacks: [],
+      options: {
+        variants: [
+          {
+            weight: 400,
+            style: "normal",
+            src: ["./src/assets/fonts/progrust-code-jp-400.woff2"],
+            unicodeRange: [
+              "U+3000-303F",
+              "U+3041-309F",
+              "U+30A0-30FF",
+              "U+4E00-9FFF",
+              "U+FF01-FF60",
+              "U+FFE0-FFE6",
+            ],
+          },
+        ],
+      },
     },
   ],
   markdown: {
