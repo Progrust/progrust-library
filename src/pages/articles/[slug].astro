@@ -35,6 +35,7 @@ const { Content, headings } = await render(entry);
   tags={entry.data.tags}
   updatedAt={entry.data.updated_at}
   headings={headings}
+  isPublic={entry.isPublic}
   linkedDicts={linkedDicts}
 >
   <Content />

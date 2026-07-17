@@ -1,0 +1,20 @@
+---
+// dev サーバでの非公開識別バッジ（content-model R-10 / AC-7）。
+// 本番ビルドでは public: false のコンテンツ自体が除外されるため、
+// dev かつ非公開のときのみ描画する（本番では常に何も出力しない）。
+interface Props {
+  /** getPublic* が付与する公開フラグ（content.ts）。false のときのみバッジを出す */
+  isPublic?: boolean;
+}
+
+const { isPublic } = Astro.props;
+const show = import.meta.env.DEV && isPublic === false;
+---
+
+{
+  show && (
+    <span class="rounded border border-accent px-2 py-0.5 font-mono text-[11px] text-accent">
+      非公開
+    </span>
+  )
+}

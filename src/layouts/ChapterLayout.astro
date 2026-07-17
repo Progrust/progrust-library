@@ -13,6 +13,7 @@ import ChapterNav from "../components/ChapterNav.astro";
 import DictPane from "../components/DictPane.astro";
 import LinkedDictList from "../components/LinkedDictList.astro";
 import MobileNav from "../components/MobileNav.astro";
+import PrivateBadge from "../components/PrivateBadge.astro";
 
 /** 前後章ナビの表示データ（連番・タイトル・URL。ページ側で算出） */
 interface NavTarget {
@@ -41,6 +42,8 @@ interface Props {
   /** 前後章ナビ（先頭章の prev・最終章の next は null） */
   prev: NavTarget | null;
   next: NavTarget | null;
+  /** 公開フラグ（content-model R-10）。dev で false のときヘッダーに非公開バッジを出す */
+  isPublic?: boolean;
   /** 使用辞書一覧（本文がリンクしている辞書。wikilink-ui R-17）。ページ側で wikilink グラフから算出 */
   linkedDicts?: DictTarget[];
 }
@@ -58,6 +61,7 @@ const {
   headings,
   prev,
   next,
+  isPublic,
   linkedDicts = [],
 } = Astro.props;
 
@@ -110,6 +114,7 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
           <div
             class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-sub"
           >
+            <PrivateBadge isPublic={isPublic} />
             <time datetime={createdIso}>created: {createdIso}</time>
             <time datetime={updatedIso}>updated: {updatedIso}</time>
           </div>
