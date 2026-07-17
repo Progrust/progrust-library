@@ -213,5 +213,3 @@ graph TB
   C -->|One| D[Result one]
   C -->|Two| E[Result two]
 ```
-
-AC-2検証用: [[t6-4-nonexistent-slug]]
