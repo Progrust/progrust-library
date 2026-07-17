@@ -17,7 +17,7 @@
 - [x] **T6-3: コードフォント・Shikiテーマ確定（デザイン残課題）**
   全角対応等幅フォント（UDEV Gothic / Moralerspace等）を実表示で比較して選定・差し替える（基本3フォントはP5でAstro Fonts APIによるセルフホスト済み。ui-design-spec「タイポグラフィ」参照）。Shiki dual themeを確定配色（[ui-design-spec.md](../ui-design/ui-design-spec.md)のコードブロック配色）に合わせる（既成テーマ選定 or カスタム）。
   完了条件: 決定内容がui-design-spec.mdの「未確定・本実装時の課題」から本文へ反映され、実表示で確認済み。
-- [ ] **T6-4: Cloudflareセットアップ + GitHub Actions**
+- [x] **T6-4: Cloudflareセットアップ + GitHub Actions**
   Pagesプロジェクト作成・APIトークン発行・Secrets登録・カスタムドメイン割当（[deploy.md](../spec/deploy.md) R-1）。`.github/workflows/deploy.yml`（test → build → wrangler-action、Playwright/依存キャッシュ、OGPキャッシュのコミット運用）。
   完了条件: deploy.md AC-1〜AC-4 を満たす。
 - [x] **T6-6: Rust Playgroundリンクボタン**
@@ -96,6 +96,15 @@
 - 検証: `npm run check`（vitest 177件）green / build成功・distに新2色の実colorを確認
 
 ### T6-4
+
+デプロイパイプラインを構築し、deploy.md AC-1〜AC-4をすべて実挙動で確認した（AC-4のみ構造確認）。`https://blog.progrust.com` で公開開始。
+
+- 変更ファイル: `.github/workflows/deploy.yml`（新規。main pushトリガー → setup-node(npmキャッシュ) → `npm ci` → `npm run test` → Playwrightキャッシュ+Chromium導入 → `npm run build`（`PUBLIC_CF_BEACON_TOKEN`注入）→ `cloudflare/wrangler-action@v3` でDirect Upload）/ spec先行更新（[spec/deploy.md](../spec/deploy.md) §5にOGPキャッシュ運用・Playwrightキャッシュキー設計・トークン注入方式を確定、[spec/feeds-meta.md](../spec/feeds-meta.md) §5のbeacon登録先をGitHub Secretsへ修正）/ [markdown-pipeline/mermaid.md](../markdown-pipeline/mermaid.md)（CI上のPlaywright起動「未検証」を解消）
+- Cloudflare側セットアップ（R-1）: Pagesプロジェクト `progrust-library` は一時的な `preCommands: wrangler pages project create` ステップでCIから作成（作成後に除去。**ダッシュボードの「Upload assets」導線はWorkersプロジェクトを作るため使えない**点に注意）。APIトークン（Pages: Edit）はユーザーが発行、GitHub Secretsは `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` / `PUBLIC_CF_BEACON_TOKEN` の3つを登録。カスタムドメイン `blog.progrust.com` とWeb Analyticsサイトはユーザーがダッシュボードで割当・作成
+- AC充足（いずれもGitHub Actionsの実ランで確認）: **AC-1** main pushでtest→build→deployが自動実行され `https://blog.progrust.com` が200・canonical/beacon出力を実測。**AC-2** リンク切れwikilinkのpushでワークフロー失敗・デプロイスキップ（`b163526`→revert `bda3ce0`）。**AC-3** 失敗テストのpushでテストステップ失敗・ビルド/デプロイスキップ（`04e39e8`→revert `28c1cd4`）。**AC-4** トリガーが `push: branches: [main]` のみでPRでは起動しない（構造確認）
+- 実測知見: ①wikilinkリンク切れはビルドステップより前の**ユニットテストステップで検出される**（`vitest.config.ts` ロード時にwikilink検証が走るため）。AC-2の「ワークフロー失敗・デプロイされない」要求は満たす。②Astro Fonts APIのGoogle Fontsダウンロードがランナー上で一時的に失敗しビルドが落ちることがある（1回発生・再実行で解消）。頻発するならフォントキャッシュの `actions/cache` 追加を検討
+- 検証結果: `npm run check`（vitest 177件）green / ローカル `astro build` 成功 / CI実ラン成功（Playwrightキャッシュのmiss・hit両経路を確認）
+- コミット: `4fdd90a` docs（spec確定）/ `80b99de` feat（deploy.yml）/ `f1c682c`・`1bcfb40` chore（プロジェクト初回作成の一時ステップ追加・除去）/ `b163526`・`bda3ce0`（AC-2検証・revert）/ `04e39e8`・`28c1cd4`（AC-3検証・revert）/ 本履歴を含むdocsコミット
 
 ### T6-6
 

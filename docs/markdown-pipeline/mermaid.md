@@ -202,7 +202,7 @@ element tagName='pre' properties={}
 ## 制約・残課題
 
 - ライト/ダーク切替の実表示（`html.dark`トグルで入れ替わること）は未目視。プラグインはクラス付与までを確認しており、切替CSS/Tailwind設定を組んだ時点で1度ブラウザ確認する（[shiki.md](shiki.md)のdual theme CSSと同じ扱い）
-- CI環境（GitHub Actions）でのPlaywright/Chromium起動は未検証（ローカルWSL2のみ）
+- ~~CI環境（GitHub Actions）でのPlaywright/Chromium起動は未検証（ローカルWSL2のみ）~~ → T6-4で解消。`ubuntu-latest` ランナー上で `npx playwright install --with-deps chromium`（キャッシュヒット時は `install-deps` のみ）を実行し、実ビルドのmermaid SVG化が成功することを確認済み（ワークフローは `.github/workflows/deploy.yml`、キャッシュ設計は [deploy.md](../spec/deploy.md) §5）
 - mermaidの全図種（gantt / class / state / ER / pie等）での動作は未検証（flowchart・sequenceの2種のみ）。`themeVariables`のトークンマッピングもflowchart/sequenceが使う変数のみ明示指定しており、他図種は`theme: 'base'`の導出色になる。`iconPacks`は未使用
 - **ビルドにGoogle Fontsへのネットワークアクセスが必須**（`css`オプションでフォントCSSを取得。図ごとにlight/dark 2ページがCSS+和文woff2を取得するため、mermaid多用ページではビルド時間への影響がありうる。weightは400/700に絞って軽減）。オフラインビルドはmermaidを含むページで失敗する
 - `namespaceSvgIds`の参照書き換えは`url(#..)` / `href="#.."` / `aria-labelledby|describedby`のみ対応。`begin="foo.end"`（SMILアニメ参照）等の他形式は本アプリのmermaid出力に現れなかったため未対応（必要になれば追加）。**`aria-labelledby="a b"`のようなスペース区切り複数idも完全一致アンカーのため未追従**（flowchart/sequenceの実測出力にaria複数idは現れず実害なし。T2-4レビューR-3）
