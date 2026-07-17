@@ -33,7 +33,9 @@ Pages組み込みビルドを使わない理由: mermaidのビルド時SVG化に
 - **AC-3**: vitestが失敗するコミットをpushすると、デプロイされない。（R-6）
 - **AC-4**: PRを作成してもデプロイは実行されない。（R-2）
 
-## 5. 未確定事項
+## 5. 実装時の決定事項（T6-4で確定）
 
-- OGPキャッシュの更新運用（キャッシュ切れ時の再取得をローカルで行うかCIで行うか）は実装時に決める。
-- Playwrightキャッシュの具体的な方式（`actions/cache`のキー設計）は実装時に決める。
+- **OGPキャッシュの更新運用**: 更新（新規URLの取得・キャッシュ削除後の再取得）は**ローカルビルドで行い**、`.cache/link-card/ogp.json` の差分をコミットする。CIはコミット済みキャッシュを読むだけで書き戻さない（CI上で書かれた分は成果物に含まれず破棄される。fetch失敗時は簡易カードへフォールバック＝R-4）。
+- **Playwrightキャッシュ**: `actions/cache` で `~/.cache/ms-playwright` を キー `{runner.os}-playwright-{hashFiles('package-lock.json')}` で保存する。キャッシュはブラウザバイナリのみ有効なため、OS依存ライブラリはヒット時も `npx playwright install-deps chromium` で毎回導入する（ミス時は `npx playwright install --with-deps chromium`）。
+- **Analyticsトークンの注入**: `PUBLIC_CF_BEACON_TOKEN` はGitHub Actions Secretsに登録し、ビルドステップの環境変数として渡す（[feeds-meta.md](feeds-meta.md) §5）。
+- Pagesプロジェクト名は `progrust-library`、デプロイは `wrangler pages deploy dist --project-name=progrust-library --branch=main`（`cloudflare/wrangler-action`）。
