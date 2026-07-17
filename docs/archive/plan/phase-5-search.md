@@ -1,8 +1,12 @@
 # P5: 検索
 
+> [!warning] 凍結済みアーカイブ
+> 本計画は2026-07-17に全フェーズ完了でクローズ済み。本書は歴史的記録であり**更新しない**。
+> ワークフロー運用の現行参照先は [`../../implementation-rules.md`](../../implementation-rules.md) 8章。
+
 検索インデックス生成・クエリパーサ・ヘッダー検索UI・一覧絞込を実装する。
 
-参照spec: [search.md](../spec/search.md) / 設計: [architecture.md](../architecture.md) 7章・8章（search / search-box / list-filter）
+参照spec: [search.md](../../spec/search.md) / 設計: [architecture.md](../../architecture.md) 7章・8章（search / search-box / list-filter）
 
 依存: P3完了（P4と並行可）
 
@@ -26,7 +30,7 @@
 ### T5-1
 
 - **実装**: `src/lib/search-index.ts`（変換ロジック・vitest対象）と `src/pages/search-index.json.js`（エンドポイント）を追加。`wikilink-graph.ts` と同型の「純関数 + `getPublic*` 集約ラッパ」構成（architecture §7）。
-  - 純関数 `buildSearchEntries(sources)`: `SearchSource[]` を `SearchEntry[]`（[search.md §3](../spec/search.md) スキーマ）に変換。URL は種別ごとに導出（章 id `[本slug]/[章slug]` を `/books/[本]/[章]` に分解）。入力順を保持。
+  - 純関数 `buildSearchEntries(sources)`: `SearchSource[]` を `SearchEntry[]`（[search.md §3](../../spec/search.md) スキーマ）に変換。URL は種別ごとに導出（章 id `[本slug]/[章slug]` を `/books/[本]/[章]` に分解）。入力順を保持。
   - ラッパ `buildContentSearchIndex()`: `getPublicDict/Articles/Books/Chapters` を集約（非公開除外は上流に委譲＝R-1、章含む）。
   - エンドポイント: static 出力のため build 時に `dist/search-index.json` として prerender される。
 - **テスト**: `tests/lib/search-index.test.ts`（AC-1由来テストに `[AC-1]` 命名。4種別の type/URL・章分解・章含有・data素通し・入力順）。
@@ -38,9 +42,9 @@
 ### T5-2
 
 - **実装**: `src/scripts/search.ts` を新規追加。UI/DOM を含まないパース + フィルタの純関数のみを切り出し vitest 対象とする（architecture §8・§10）。`SearchEntry` 型は T5-1 の `src/lib/search-index.ts` から import して再利用（重複定義しない）。
-  - `parseQuery(query)`: 空白区切りでトークン化し `#`始まりをタグ・その他をキーワードに分解（[search.md](../spec/search.md) R-3）。`#`除去後に空のタグは捨てる。分割正規表現は `/\s+/`（JS の `\s` は全角空白 U+3000 も含むため全角区切りに対応。`no-irregular-whitespace` 回避のため正規表現内に生の全角空白は置かない）。
+  - `parseQuery(query)`: 空白区切りでトークン化し `#`始まりをタグ・その他をキーワードに分解（[search.md](../../spec/search.md) R-3）。`#`除去後に空のタグは捨てる。分割正規表現は `/\s+/`（JS の `\s` は全角空白 U+3000 も含むため全角区切りに対応。`no-irregular-whitespace` 回避のため正規表現内に生の全角空白は置かない）。
   - `filterEntries(entries, parsed)`: 全キーワード（title/description/tag名に部分一致・大文字小文字非区別＝R-4）**かつ** 全タグ（`Array.includes` の完全一致＝R-5）を満たす AND 検索（R-6）。空条件は真＝空クエリで全件・入力順保持。
-  - 未確定事項（全角半角・かなカナ同一視）は初期実装対象外＝仕様どおり大文字小文字の同一視のみ（[search.md §5](../spec/search.md)）。
+  - 未確定事項（全角半角・かなカナ同一視）は初期実装対象外＝仕様どおり大文字小文字の同一視のみ（[search.md §5](../../spec/search.md)）。
 - **テスト**: `tests/scripts/search.test.ts`。AC-3/4/5 由来テストに `[AC-n]` 命名。`parseQuery`（分解・空白/全角空白・`#`のみ・複数併記）と `filterEntries`（AC-3 部分一致3対象と大小非区別・AC-4 タグ完全一致で部分一致除外・AC-5 AND と片側のみ除外・空クエリ全件）を最小フィクスチャで検証（純関数のためモックなし）。
 - **検証**: `npm run check`（format/lint/typecheck/test 124件）・`npx astro build`（115ページ）ともに成功。
 - **コミット**:
@@ -55,10 +59,10 @@
     - 遅延ロード: module-level の `indexPromise` で `/search-index.json` を**初回フォーカスで1回だけ** fetch（AC-2/R-2。`dict-pane.ts` の embed キャッシュと同方式）。fetch 失敗時はドロップダウンを出さない。
     - `input` イベントで再描画、結果は `<a href={url}>`（バッジ + タイトル）で通常遷移（AC-6）。Escape・ボックス外クリックで閉じる。`initSearchBox` が `disabled` を除去して有効化（JS 無効時は disabled 表示のまま＝PE。architecture §8）。
   - `src/components/SearchBox.astro`: input に `data-search-input`/`autocomplete=off` を付与し `aria-label` の「（準備中）」を除去（markup では `disabled` のまま＝JS 無効フォールバック）。`data-search-results` のドロップダウンコンテナ（既存トークン構成）と `initSearchBox()` 呼び出しの `<script>` を追加。
-- **未確定事項の決定**（[search.md §5](../spec/search.md)。T5-2 同様 spec §5 は据え置き、決定を本履歴に記録）: ドロップダウン最大表示件数 = **8**（`MAX_RESULTS`）。矢印キー選択は**初期実装では入れない**（クリック + Escape/外クリックで閉じるのみ）。キーワード正規化は T5-2 の大文字小文字同一視を継承。
+- **未確定事項の決定**（[search.md §5](../../spec/search.md)。T5-2 同様 spec §5 は据え置き、決定を本履歴に記録）: ドロップダウン最大表示件数 = **8**（`MAX_RESULTS`）。矢印キー選択は**初期実装では入れない**（クリック + Escape/外クリックで閉じるのみ）。キーワード正規化は T5-2 の大文字小文字同一視を継承。
 - **テスト**: `tests/scripts/search-box.test.ts`。`SEARCH_TYPE_LABEL`（4種別）と `buildDropdownItems`（章の url/label・全項目の充足・limit 切り捨て）を `[AC-6]` 命名で検証（純関数・モックなし）。
 - **検証**: `npm run check`（format/lint/typecheck/test 128件）・`npx astro build`（115ページ）ともに成功。ビルド成果物で `dist/search-index.json` の生成・input の `disabled` フォールバック・`data-search-results` コンテナ・バンドル済み `initSearchBox` の inline を確認。
-- **レビュー対応**（[review/T5-3.md](../archive/review/T5-3.md) の推奨指摘）: 推奨1（0件ヒット時に空のドロップダウン枠が出る）を修正＝0件時は隠す。推奨2（`KindBadge.astro` の複製注記に `search-box.ts` の `BADGE_CLASS` を追記）を修正。軽微1・2（Tab blur で閉じない・Escape 後の再フォーカス再表示なし）はいずれも spec §5 でキーボード操作を初期実装対象外と決定済みのため現状維持（T5-4 以降の改善候補）。
+- **レビュー対応**（[review/T5-3.md](../../archive/review/T5-3.md) の推奨指摘）: 推奨1（0件ヒット時に空のドロップダウン枠が出る）を修正＝0件時は隠す。推奨2（`KindBadge.astro` の複製注記に `search-box.ts` の `BADGE_CLASS` を追記）を修正。軽微1・2（Tab blur で閉じない・Escape 後の再フォーカス再表示なし）はいずれも spec §5 でキーボード操作を初期実装対象外と決定済みのため現状維持（T5-4 以降の改善候補）。
 - **申し送り**: 推奨3（AC-2/AC-6 のブラウザ目視）。実行環境にブラウザがなく、検証はビルド成果物の静的確認（fetch を `focus` ハンドラ内のみに配線／結果は素の `<a href>` 遷移）に留まる。`npm run dev` での DevTools Network による fetch タイミング（初期ロードで出ない・初回フォーカスで1回）と章クリック遷移（`/books/[本]/[章]`）の目視は未実施＝実機での最終確認が残る。
 - **コミット**:
   - `8aa9bf5` feat: ヘッダー検索ボックスUIを追加
@@ -66,7 +70,7 @@
 
 ### T5-4
 
-- **実装**: 一覧ページ（辞書・記事・本）のタグチップ + キーワード絞込を配線し、静的シェルだった `ListFilter.astro` を機能させた（[search.md](../spec/search.md) R-9〜R-11 / AC-7）。
+- **実装**: 一覧ページ（辞書・記事・本）のタグチップ + キーワード絞込を配線し、静的シェルだった `ListFilter.astro` を機能させた（[search.md](../../spec/search.md) R-9〜R-11 / AC-7）。
   - `src/scripts/list-filter.ts` を新規追加。純ロジック（vitest 対象）と DOM 配線（architecture §10 によりビルド + 目視）を search-box.ts と同型に分離。
     - 純関数 `computeCardVisibility(cards, selectedTags, keyword)`: 各カードの可視 boolean 配列を返す。判定は `search.ts` の `parseQuery` + `entryMatches` を再利用（キーワード欄内の `#タグ` も parseQuery でタグ化し選択タグと和集合。入力順保持・空条件は全件可視）。
     - DOM 配線 `initListFilter()`: `[data-list-grid]` 直下の `[data-title]` カードから `data-title/description/tags` を読み、タグチップ（`aria-pressed` トグル）とキーワード入力で可視を再計算。件数 `[data-filter-hits]` 更新・0件で `[data-filter-empty]` 表示・`[data-filter-more]` で12件超のチップを展開。init 時に各 `disabled` を除去（JS 無効なら静的表示のまま＝PE）。
@@ -77,7 +81,7 @@
 - **テスト**: `tests/scripts/list-filter.test.ts`。`computeCardVisibility` を最小フィクスチャで検証（AC-7 由来を `[AC-7]` 命名: タグ2択で両タグ持ちのみ／片方のみで複数可視。加えてタグ+キーワード AND・R-4 部分一致大小非区別・空条件全件・`#タグ` 和集合）。純関数のためモックなし。
 - **検証**: `npm run check`（format/lint/typecheck/test 134件）・`npx astro build`（115ページ）ともに成功。`dist/dict/index.html` で `data-list-grid`・`data-description`×23（公開辞書数と一致）・`data-filter-empty`・タグチップ34件中22件 `hidden`（12件超）・バンドル済み `initListFilter` inline を静的確認。`aria-pressed:` variant が `[aria-pressed=true]{border-color/color:var(--color-accent)}` として CSS 出力されることも確認。
 - **知見の還流**: architecture §8 の `list-filter.ts` 行を参照属性 `data-description` 追加・`entryMatches` 再利用の旨に更新。
-- **レビュー対応**（[review/T5-4.md](../archive/review/T5-4.md)）:
+- **レビュー対応**（[review/T5-4.md](../../archive/review/T5-4.md)）:
   - 要修正1（spec R-2/§1 の「一覧絞込も検索インデックス JSON を利用する」が実装の `data-*` 属性参照方式と矛盾）: DOM 方式は合理的（fetch 不要・R-11 を構造的に充足・マッチ判定は `entryMatches` 共有でセマンティクス同一）と判断し、**実装は変えず spec を実態に合わせて更新**。search.md §1 概要と R-2 を「一覧絞込は fetch を伴わずカードの `data-title`/`data-description`/`data-tags` を対象にし、マッチ判定ロジックを検索ボックスと共有する」に改訂。
   - 推奨1: `ListFilter.astro` のキーワード入力 `aria-label` から「（準備中）」を除去（`SearchBox.astro`（T5-3）と整合。JS で有効化済みのため）。
   - 軽微1: `entryMatches`/`matchesKeyword` の第1引数を `Matchable = Pick<SearchEntry, "title"|"description"|"tags">` に狭め、`list-filter.ts` のダミー `type`/`url` 合成を解消（`CardModel = Matchable`）。

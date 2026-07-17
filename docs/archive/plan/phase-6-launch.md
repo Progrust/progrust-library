@@ -1,8 +1,12 @@
 # P6: 周辺機能とリリース
 
+> [!warning] 凍結済みアーカイブ
+> 本計画は2026-07-17に全フェーズ完了でクローズ済み。本書は歴史的記録であり**更新しない**。
+> ワークフロー運用の現行参照先は [`../../implementation-rules.md`](../../implementation-rules.md) 8章。
+
 フィード・メタ情報・残デザイン課題を仕上げ、CI/CDを構築して本番公開する。
 
-参照spec: [feeds-meta.md](../spec/feeds-meta.md) / [deploy.md](../spec/deploy.md)
+参照spec: [feeds-meta.md](../../spec/feeds-meta.md) / [deploy.md](../../spec/deploy.md)
 
 依存: P4・P5完了
 
@@ -15,13 +19,13 @@
   BaseLayoutのmeta/OGP出力（タイトル形式・共通OGP画像・canonical）・favicon・Cloudflare Web Analyticsタグ。OGP画像とfaviconの素材を用意する。
   完了条件: feeds-meta AC-3 / AC-4 を満たす。
 - [x] **T6-3: コードフォント・Shikiテーマ確定（デザイン残課題）**
-  全角対応等幅フォント（UDEV Gothic / Moralerspace等）を実表示で比較して選定・差し替える（基本3フォントはP5でAstro Fonts APIによるセルフホスト済み。ui-design-spec「タイポグラフィ」参照）。Shiki dual themeを確定配色（[ui-design-spec.md](../ui-design/ui-design-spec.md)のコードブロック配色）に合わせる（既成テーマ選定 or カスタム）。
+  全角対応等幅フォント（UDEV Gothic / Moralerspace等）を実表示で比較して選定・差し替える（基本3フォントはP5でAstro Fonts APIによるセルフホスト済み。ui-design-spec「タイポグラフィ」参照）。Shiki dual themeを確定配色（[ui-design-spec.md](../../ui-design/ui-design-spec.md)のコードブロック配色）に合わせる（既成テーマ選定 or カスタム）。
   完了条件: 決定内容がui-design-spec.mdの「未確定・本実装時の課題」から本文へ反映され、実表示で確認済み。
 - [x] **T6-4: Cloudflareセットアップ + GitHub Actions**
-  Pagesプロジェクト作成・APIトークン発行・Secrets登録・カスタムドメイン割当（[deploy.md](../spec/deploy.md) R-1）。`.github/workflows/deploy.yml`（test → build → wrangler-action、Playwright/依存キャッシュ、OGPキャッシュのコミット運用）。
+  Pagesプロジェクト作成・APIトークン発行・Secrets登録・カスタムドメイン割当（[deploy.md](../../spec/deploy.md) R-1）。`.github/workflows/deploy.yml`（test → build → wrangler-action、Playwright/依存キャッシュ、OGPキャッシュのコミット運用）。
   完了条件: deploy.md AC-1〜AC-4 を満たす。
 - [x] **T6-6: Rust Playgroundリンクボタン**
-  ` ```rust playground `メタ付きコードブロックに「Playgroundで開く」ボタンを付与するmdastプラグイン`playgroundLink`と右上オーバーレイのCSSを実装する（[playground.md](../markdown-pipeline/playground.md)）。
+  ` ```rust playground `メタ付きコードブロックに「Playgroundで開く」ボタンを付与するmdastプラグイン`playgroundLink`と右上オーバーレイのCSSを実装する（[playground.md](../../markdown-pipeline/playground.md)）。
   完了条件: pages.md AC-11 / AC-12 を満たし、プラグインの単体テストがgreen。
 - [x] **T6-5: リリース前総点検** 〔Fable 5〕
   全specの受入基準を通しで確認し、ダミーコンテンツを実コンテンツ運用に切り替える方針（削除 or 非公開化）を決めて適用する。Lighthouse等でパフォーマンス・アクセシビリティの大きな問題がないか確認する。
@@ -33,7 +37,7 @@
 
 `@astrojs/rss`（`/rss.xml`）と`@astrojs/sitemap`を導入し、feeds-meta AC-1 / AC-2 を満たした。既存の検索インデックス（`search-index.ts` → `search-index.json.js`）と同じ「純関数＋`getPublic*`集約ラッパ＋薄いエンドポイント」パターンを踏襲。
 
-- 変更ファイル: `src/lib/feed.ts`（新規・純関数`buildFeedItems`＋ラッパ`buildContentFeed`）/ `src/pages/rss.xml.js`（新規・`rss()`エンドポイント）/ `tests/lib/feed.test.ts`（新規）/ `astro.config.mjs`（`integrations: [sitemap()]`追加）/ `src/lib/site.ts`（`SITE.description`追加）/ `package.json`・`package-lock.json`（`@astrojs/rss` 4.0.19・`@astrojs/sitemap` 3.7.3）/ spec・設計文書（[spec/feeds-meta.md](../spec/feeds-meta.md) §5のURL確定、[architecture.md](../architecture.md) §7に生成方式を追記）。
+- 変更ファイル: `src/lib/feed.ts`（新規・純関数`buildFeedItems`＋ラッパ`buildContentFeed`）/ `src/pages/rss.xml.js`（新規・`rss()`エンドポイント）/ `tests/lib/feed.test.ts`（新規）/ `astro.config.mjs`（`integrations: [sitemap()]`追加）/ `src/lib/site.ts`（`SITE.description`追加）/ `package.json`・`package-lock.json`（`@astrojs/rss` 4.0.19・`@astrojs/sitemap` 3.7.3）/ spec・設計文書（[spec/feeds-meta.md](../../spec/feeds-meta.md) §5のURL確定、[architecture.md](../../architecture.md) §7に生成方式を追記）。
 - RSSの非公開除外は`content.ts`の`getPublic*`（本番のみ公開分・章はR-12伝播込み）に委譲。並び順は`compareNewest`を共有（SSoT）。全タイプ混在（辞書・記事・本・章）・`created_at`降順・最大20件・本文なし（feeds-meta R-2/R-3）。
 - フッターのRSSリンク（`Footer.astro`の`SITE_LINKS.rss = "/rss.xml"`）は配線済みのため変更なし。
 - head の RSS自動検出リンク（`<link rel="alternate">`）は feeds-meta R-5（head meta）の領分として T6-2 に委ねた（仕様駆動でスコープ外）。
@@ -49,9 +53,9 @@
 
 `BaseLayout.astro` の `<head>` にメタ情報群を集約実装し、feeds-meta AC-3 / AC-4（および AC-5 を確定）を満たした。全ページ共通の一元出力なので詳細ページ側の個別対応は最小。
 
-- 変更ファイル: `src/layouts/BaseLayout.astro`（OGP `og:*`・Twitter Card・canonical・`meta description` 常時出力・RSS自動検出 `<link rel="alternate">`・Cloudflare Web Analytics beacon。`ogType` Props 追加・`canonicalURL`/`metaDescription`/`ogImage`/`beaconToken` 導出）/ `src/layouts/DetailLayout.astro`・`ChapterLayout.astro`・`src/pages/books/[slug].astro`（`ogType="article"` を伝播）/ 一覧・トップ・タグ・404 各ページ（`src/pages/{index,articles/index,books/index,dict/index,tags/index,tags/[tag],404}.astro` にページ固有の固定 `description`）/ spec・plan（[spec/feeds-meta.md](../spec/feeds-meta.md) §5・R-8 の決定反映）。
-- 決定事項（[spec/feeds-meta.md](../spec/feeds-meta.md) に反映）: ①Analytics トークンは環境変数 `PUBLIC_CF_BEACON_TOKEN` の条件レンダリング（未設定ビルドは beacon 非出力・実トークンは T6-4 で Cloudflare Secrets 登録）。②favicon は SVG のみ（PNGフォールバック・`apple-touch-icon` は不要と決定）。
-- T6-1 が委譲した head の RSS 自動検出 `<link rel="alternate" type="application/rss+xml">` を本タスクで実装（[spec/feeds-meta.md](../spec/feeds-meta.md) R-1〜R-3）。
+- 変更ファイル: `src/layouts/BaseLayout.astro`（OGP `og:*`・Twitter Card・canonical・`meta description` 常時出力・RSS自動検出 `<link rel="alternate">`・Cloudflare Web Analytics beacon。`ogType` Props 追加・`canonicalURL`/`metaDescription`/`ogImage`/`beaconToken` 導出）/ `src/layouts/DetailLayout.astro`・`ChapterLayout.astro`・`src/pages/books/[slug].astro`（`ogType="article"` を伝播）/ 一覧・トップ・タグ・404 各ページ（`src/pages/{index,articles/index,books/index,dict/index,tags/index,tags/[tag],404}.astro` にページ固有の固定 `description`）/ spec・plan（[spec/feeds-meta.md](../../spec/feeds-meta.md) §5・R-8 の決定反映）。
+- 決定事項（[spec/feeds-meta.md](../../spec/feeds-meta.md) に反映）: ①Analytics トークンは環境変数 `PUBLIC_CF_BEACON_TOKEN` の条件レンダリング（未設定ビルドは beacon 非出力・実トークンは T6-4 で Cloudflare Secrets 登録）。②favicon は SVG のみ（PNGフォールバック・`apple-touch-icon` は不要と決定）。
+- T6-1 が委譲した head の RSS 自動検出 `<link rel="alternate" type="application/rss+xml">` を本タスクで実装（[spec/feeds-meta.md](../../spec/feeds-meta.md) R-1〜R-3）。
 - `og:image`/canonical は `astro.config.mjs` の `site`（`Astro.site`）で絶対URL化。素材 `public/ogp.png`（1200×630）・`public/favicon.svg` は用意済みで流用。
 - 完了条件充足: architecture §10 によりページ/レイアウトは vitest 非対象のため、実 `astro build` の dist 実測で確認。**AC-3**（記事詳細に `og:title`/`og:description`/`og:image`=`https://progrust.com/ogp.png`/canonical 出力）・**AC-4**（`PUBLIC_CF_BEACON_TOKEN=dummy` ビルドで全92ページに `beacon.min.js` タグ＋`data-cf-beacon` token・未設定ビルドで 0 件）・**AC-5**（全92ページに `<link rel="icon" type="image/svg+xml" href="/favicon.svg">`）＋ RSS alternate 全ページ出力を確認（embed断片23件は `<head>` を持たない部分HTMLのため対象外）。
 - 検証結果: `npm run check`（format:check + lint + typecheck〔hint1件は既存〕 + vitest 166件）green / `NODE_OPTIONS=--dns-result-order=ipv4first npx astro build` 成功（トークン有/無の2通り）。
@@ -61,12 +65,12 @@
 
 ### T6-3
 
-デザイン残課題2件を確定し実装した。決定内容は [ui-design-spec.md](../ui-design/ui-design-spec.md)（「タイポグラフィ > monoの日本語」「コードブロック」）へ反映済みで「未確定・本実装時の課題」は解消。
+デザイン残課題2件を確定し実装した。決定内容は [ui-design-spec.md](../../ui-design/ui-design-spec.md)（「タイポグラフィ > monoの日本語」「コードブロック」）へ反映済みで「未確定・本実装時の課題」は解消。
 
 **① Shikiカスタムテーマ（single theme化）**
 
-- 確定4色に一致する既成テーマはないため自作。配色が両テーマ共通（E案）のためdual themeを廃止しsingle themeへ（全spanの`--shiki-light/dark`重複変数によるHTML肥大を回避）。preに焼き込まれるインライン背景・前景は自作transformer`transformerCodeBg`で除去（`html.dark`切替CSSが負けるため）。実装方式・スコープ設計の実測知見（bare `keyword`不可・ライフタイムの実スコープ・alpha hex可）は [markdown-pipeline/shiki.md](../markdown-pipeline/shiki.md) 参照
-- spec先行更新: [spec/theme.md](../spec/theme.md) R-5/AC-4を「切替対象=背景・枠線とmermaidのみ、シンタックス配色は両テーマ共通」に改訂
+- 確定4色に一致する既成テーマはないため自作。配色が両テーマ共通（E案）のためdual themeを廃止しsingle themeへ（全spanの`--shiki-light/dark`重複変数によるHTML肥大を回避）。preに焼き込まれるインライン背景・前景は自作transformer`transformerCodeBg`で除去（`html.dark`切替CSSが負けるため）。実装方式・スコープ設計の実測知見（bare `keyword`不可・ライフタイムの実スコープ・alpha hex可）は [markdown-pipeline/shiki.md](../../markdown-pipeline/shiki.md) 参照
+- spec先行更新: [spec/theme.md](../../spec/theme.md) R-5/AC-4を「切替対象=背景・枠線とmermaidのみ、シンタックス配色は両テーマ共通」に改訂
 - 変更ファイル: `plugins/shiki-theme.mjs`（新規）/ `astro.config.mjs` / `src/styles/global.css` / `tests/plugins/shiki-theme.test.ts`・`tests/helpers/shiki-theme.ts`（新規、`shiki`をdevDepに明示追加）/ spec・設計文書
 
 **② コードフォント（ハイブリッド: JetBrains Mono + UDEV Gothic和文サブセット）**
@@ -91,7 +95,7 @@
 
 **追記: パレットを6色へ拡張（T6-3完了後のフィードバック対応）**
 
-- 「4色では色数が少なくコードが読みにくい」とのフィードバックにより、既存4色は不変のまま関数系 `#A9B665`・型系 `#7FB5A3` の2色を追加し、金色 `#D9B25E` の適用範囲を`self`/エスケープ/文字列補間/シェルフラグ等へ拡大（確定値と割当は [ui-design-spec「コードブロック」](../ui-design/ui-design-spec.md)、スコープ実測の知見は [markdown-pipeline/shiki.md](../markdown-pipeline/shiki.md)）。Rust/TS/bash/TOMLの実出力比較をArtifactで提示しユーザー承認済み
+- 「4色では色数が少なくコードが読みにくい」とのフィードバックにより、既存4色は不変のまま関数系 `#A9B665`・型系 `#7FB5A3` の2色を追加し、金色 `#D9B25E` の適用範囲を`self`/エスケープ/文字列補間/シェルフラグ等へ拡大（確定値と割当は [ui-design-spec「コードブロック」](../../ui-design/ui-design-spec.md)、スコープ実測の知見は [markdown-pipeline/shiki.md](../../markdown-pipeline/shiki.md)）。Rust/TS/bash/TOMLの実出力比較をArtifactで提示しユーザー承認済み
 - 変更ファイル: `plugins/shiki-theme.mjs` / `tests/plugins/shiki-theme.test.ts`（+4件で計11件）/ ui-design-spec・shiki.md・architecture.md・global.css/astro.config.mjsのコメント
 - 検証: `npm run check`（vitest 177件）green / build成功・distに新2色の実colorを確認
 
@@ -99,7 +103,7 @@
 
 デプロイパイプラインを構築し、deploy.md AC-1〜AC-4をすべて実挙動で確認した（AC-4のみ構造確認）。`https://blog.progrust.com` で公開開始。
 
-- 変更ファイル: `.github/workflows/deploy.yml`（新規。main pushトリガー → setup-node(npmキャッシュ) → `npm ci` → `npm run test` → Playwrightキャッシュ+Chromium導入 → `npm run build`（`PUBLIC_CF_BEACON_TOKEN`注入）→ `cloudflare/wrangler-action@v3` でDirect Upload）/ spec先行更新（[spec/deploy.md](../spec/deploy.md) §5にOGPキャッシュ運用・Playwrightキャッシュキー設計・トークン注入方式を確定、[spec/feeds-meta.md](../spec/feeds-meta.md) §5のbeacon登録先をGitHub Secretsへ修正）/ [markdown-pipeline/mermaid.md](../markdown-pipeline/mermaid.md)（CI上のPlaywright起動「未検証」を解消）
+- 変更ファイル: `.github/workflows/deploy.yml`（新規。main pushトリガー → setup-node(npmキャッシュ) → `npm ci` → `npm run test` → Playwrightキャッシュ+Chromium導入 → `npm run build`（`PUBLIC_CF_BEACON_TOKEN`注入）→ `cloudflare/wrangler-action@v3` でDirect Upload）/ spec先行更新（[spec/deploy.md](../../spec/deploy.md) §5にOGPキャッシュ運用・Playwrightキャッシュキー設計・トークン注入方式を確定、[spec/feeds-meta.md](../../spec/feeds-meta.md) §5のbeacon登録先をGitHub Secretsへ修正）/ [markdown-pipeline/mermaid.md](../../markdown-pipeline/mermaid.md)（CI上のPlaywright起動「未検証」を解消）
 - Cloudflare側セットアップ（R-1）: Pagesプロジェクト `progrust-library` は一時的な `preCommands: wrangler pages project create` ステップでCIから作成（作成後に除去。**ダッシュボードの「Upload assets」導線はWorkersプロジェクトを作るため使えない**点に注意）。APIトークン（Pages: Edit）はユーザーが発行、GitHub Secretsは `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` / `PUBLIC_CF_BEACON_TOKEN` の3つを登録。カスタムドメイン `blog.progrust.com` とWeb Analyticsサイトはユーザーがダッシュボードで割当・作成
 - AC充足（いずれもGitHub Actionsの実ランで確認）: **AC-1** main pushでtest→build→deployが自動実行され `https://blog.progrust.com` が200・canonical/beacon出力を実測。**AC-2** リンク切れwikilinkのpushでワークフロー失敗・デプロイスキップ（`b163526`→revert `bda3ce0`）。**AC-3** 失敗テストのpushでテストステップ失敗・ビルド/デプロイスキップ（`04e39e8`→revert `28c1cd4`）。**AC-4** トリガーが `push: branches: [main]` のみでPRでは起動しない（構造確認）
 - 実測知見: ①wikilinkリンク切れはビルドステップより前の**ユニットテストステップで検出される**（`vitest.config.ts` ロード時にwikilink検証が走るため）。AC-2の「ワークフロー失敗・デプロイされない」要求は満たす。②Astro Fonts APIのGoogle Fontsダウンロードがランナー上で一時的に失敗しビルドが落ちることがある（1回発生・再実行で解消）。頻発するならフォントキャッシュの `actions/cache` 追加を検討
@@ -108,7 +112,7 @@
 
 ### T6-6
 
-` ```rust playground ` メタ付きコードブロックに「Playgroundで開く」ボタンを付与するmdastプラグイン `plugins/playground-link.mjs`（export `playgroundLink`）を新設し、`mdastPlugins` の `codeFilename` 直後に登録した（lang補正後のmetaを読むため後置必須。[playground.md](../markdown-pipeline/playground.md)）。リンクURL（`https://play.rust-lang.org/?version=stable&edition=2024&code=<encodeURIComponent(コード全文)>`）はビルド時に静的生成し、クライアントJSなし。ボタンは `<pre>` の外側の `.code-playground`（`position: relative`）直下に置き、右上に半透明（opacity 0.55 / hover・focus-visibleで1.0）で絶対配置して横スクロールに追従させない。
+` ```rust playground ` メタ付きコードブロックに「Playgroundで開く」ボタンを付与するmdastプラグイン `plugins/playground-link.mjs`（export `playgroundLink`）を新設し、`mdastPlugins` の `codeFilename` 直後に登録した（lang補正後のmetaを読むため後置必須。[playground.md](../../markdown-pipeline/playground.md)）。リンクURL（`https://play.rust-lang.org/?version=stable&edition=2024&code=<encodeURIComponent(コード全文)>`）はビルド時に静的生成し、クライアントJSなし。ボタンは `<pre>` の外側の `.code-playground`（`position: relative`）直下に置き、右上に半透明（opacity 0.55 / hover・focus-visibleで1.0）で絶対配置して横スクロールに追従させない。
 
 - 変更ファイル: `plugins/playground-link.mjs`（新規）/ `astro.config.mjs`（登録）/ `src/styles/global.css`（`.code-playground`・`.playground-open` 追加、`.prose details` のボックス系子要素列挙6箇所へ `.code-playground` 追加、`.prose a` の下線除外に `:not(.playground-open)` 追加）/ `tests/plugins/playground-link.test.ts`・`tests/helpers/playground-link.ts`（新規）/ `content/articles/markdown-notation-test.md`（恒常テスト記事に単独・ファイル名併用の2ブロック追加）/ spec・記法・パイプライン文書（`spec/pages.md` R-23/AC-11/AC-12、`markdown-notation/rule.md`、`markdown-pipeline/playground.md` 新規 + README、`architecture.md` §4 順序）。
 - ` ```rust:main.rs playground `（ファイル名併用）は「前段が生成したノードを後段は訪問できる」仕様により成立（`.code-block > [.code-filename, .code-playground]` のネスト構造をdistで確認）。
@@ -122,9 +126,9 @@
 
 リリース前総点検を実施した。①全spec受入基準51件の通し確認（下表）、②未実装だった content-model AC-7（dev非公開バッジ）の実装、③Lighthouse実測、④ダミーコンテンツ全削除（ユーザー決定: `content/`配下は全部ダミーのため全削除）、⑤本番公開確認。
 
-**① AC-7 の実装**: 詳細ページ（辞書・記事・本トップ・章）のヘッダーメタ行先頭に「非公開」バッジをdevビルド時のみ描画する `PrivateBadge.astro` を新設し、`DetailLayout`/`ChapterLayout`/`books/[slug].astro` へ配線（`getPublic*` の `isPublic` フラグを伝播）。デザイン確定は [spec/content-model.md](../spec/content-model.md) R-10 へ反映（§5未確定事項を解消）。dev実表示で4ページ種すべて確認（本・章・記事は一時的な `public: false` 化で確認後revert）、本番distへの非出力も確認。
+**① AC-7 の実装**: 詳細ページ（辞書・記事・本トップ・章）のヘッダーメタ行先頭に「非公開」バッジをdevビルド時のみ描画する `PrivateBadge.astro` を新設し、`DetailLayout`/`ChapterLayout`/`books/[slug].astro` へ配線（`getPublic*` の `isPublic` フラグを伝播）。デザイン確定は [spec/content-model.md](../../spec/content-model.md) R-10 へ反映（§5未確定事項を解消）。dev実表示で4ページ種すべて確認（本・章・記事は一時的な `public: false` 化で確認後revert）、本番distへの非出力も確認。
 
-**② ダミーコンテンツ全削除**: 全36ファイル（辞書24・記事7・本1+章3・恒常テスト記事含む）を削除し、空ディレクトリは `.gitkeep` で維持（`validate-wikilinks` がconfig評価時に `content/dict/` をscandirするため必須）。空コレクションでのビルド（一覧0件・RSS 0件・検索インデックス空配列・sitemap一覧5URLのみ・計6ページ）と `npm run check` の健全性を確認。**落とし穴**: 削除がローカルビルドに反映されないデータストア残留を実測（[architecture.md §2](../architecture.md) に対処法を記録）。
+**② ダミーコンテンツ全削除**: 全36ファイル（辞書24・記事7・本1+章3・恒常テスト記事含む）を削除し、空ディレクトリは `.gitkeep` で維持（`validate-wikilinks` がconfig評価時に `content/dict/` をscandirするため必須）。空コレクションでのビルド（一覧0件・RSS 0件・検索インデックス空配列・sitemap一覧5URLのみ・計6ページ）と `npm run check` の健全性を確認。**落とし穴**: 削除がローカルビルドに反映されないデータストア残留を実測（[architecture.md §2](../../architecture.md) に対処法を記録）。
 
 **③ Lighthouse 実測**（削除前の本番 `blog.progrust.com`、npx lighthouse + Playwright Chromium）:
 

@@ -37,7 +37,8 @@ Astro v7（2026-06-22リリース）でMarkdownパイプラインが`unified`か
 | 機能別の詳細仕様と受入基準（コンテンツモデル・ページ・wikilink UI・検索・テーマ・フィード・デプロイ） | [`docs/spec/`](docs/spec/README.md) |
 | 全体設計（プロジェクト構成・コレクション定義・データフロー・テスト構成） | [`docs/architecture.md`](docs/architecture.md) |
 | 実装ルール（ツールチェーン・コーディング規約・テストの書き方・完了チェックリスト） | [`docs/implementation-rules.md`](docs/implementation-rules.md) |
-| 実装計画（フェーズ・タスク・進行状況） | [`docs/plan/`](docs/plan/README.md) |
+| ワークフロー運用（タスク・モデル・レビュー） | [`docs/implementation-rules.md`](docs/implementation-rules.md) 8章 |
+| 初期実装計画（全フェーズ完了・凍結済み） | [`docs/archive/plan/`](docs/archive/plan/README.md) |
 | 執筆者向けMarkdown記法一覧 | [`docs/markdown-notation/rule.md`](docs/markdown-notation/rule.md) |
 | コンテンツのfrontmatter定義 | [`docs/markdown-notation/frontmatter.md`](docs/markdown-notation/frontmatter.md) |
 | Sätteriプラグインの実装方式・雛形コード・落とし穴 | [`docs/markdown-pipeline/`](docs/markdown-pipeline/README.md) |

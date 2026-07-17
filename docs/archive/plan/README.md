@@ -1,6 +1,10 @@
 # 実装計画（plan）
 
-仕様（[`../spec/`](../spec/README.md)）と全体設計（[`../architecture.md`](../architecture.md)）に基づく、フェーズ分割した実装計画。
+> [!warning] 凍結済みアーカイブ
+> 本計画は2026-07-17に全フェーズ完了でクローズ済み。本書は歴史的記録であり**更新しない**。
+> ワークフロー運用の現行参照先は [`../../implementation-rules.md`](../../implementation-rules.md) 8章。
+
+仕様（[`../spec/`](../../spec/README.md)）と全体設計（[`../architecture.md`](../../architecture.md)）に基づく、フェーズ分割した実装計画。
 
 ## フェーズ一覧
 
@@ -21,7 +25,7 @@
 4. フェーズの完了条件は「フェーズ内全タスクの完了条件を満たす」こと。完了したら上の表の状態を更新する
 5. 実装中に仕様の変更・詳細化が必要になったら、**先に該当specを更新**してから実装する（仕様駆動）
 6. 実装中に得た知見（落とし穴・制約）は`docs/`の該当リファレンス文書（architecture / markdown-pipeline）へ反映する
-7. 全フェーズ完了後、本ディレクトリは [`../README.md`](../README.md) のルール4に従い凍結して`docs/archive/`へ移動する（生きた知識は事前にリファレンスへ抽出）
+7. 全フェーズ完了後、本ディレクトリは [`../README.md`](../../README.md) のルール4に従い凍結して`docs/archive/`へ移動する（生きた知識は事前にリファレンスへ抽出）
 
 ## 実装モデルの運用
 
@@ -36,5 +40,5 @@ Claude Codeで実装する際のモデル選択ルール。
 
 実装とレビューは専用のスラッシュコマンド（`.claude/commands/`）で定型化している。
 
-- **`/impl <タスクID>`**: タスクの実装〜検証〜チェックボックス更新〜コミットまでを本文書と [implementation-rules.md](../implementation-rules.md) のルールに従って行う。実装コミットには `Task: <タスクID>` トレーラーを必ず付与する（[implementation-rules.md 6章](../implementation-rules.md)）
-- **`/task-review <タスクID>`**: トレーラーで該当コミット群を収集し、その差分を Definition of Done（[implementation-rules.md 7章](../implementation-rules.md)）に照らしてレビューする。結果は `docs/archive/review/<タスクID>.md` に記録する（報告のみで修正は行わない）
+- **`/impl <タスクID>`**: タスクの実装〜検証〜チェックボックス更新〜コミットまでを本文書と [implementation-rules.md](../../implementation-rules.md) のルールに従って行う。実装コミットには `Task: <タスクID>` トレーラーを必ず付与する（[implementation-rules.md 6章](../../implementation-rules.md)）
+- **`/task-review <タスクID>`**: トレーラーで該当コミット群を収集し、その差分を Definition of Done（[implementation-rules.md 7章](../../implementation-rules.md)）に照らしてレビューする。結果は `docs/archive/review/<タスクID>.md` に記録する（報告のみで修正は行わない）
