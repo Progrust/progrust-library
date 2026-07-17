@@ -23,7 +23,7 @@
 - [x] **T6-6: Rust Playgroundリンクボタン**
   ` ```rust playground `メタ付きコードブロックに「Playgroundで開く」ボタンを付与するmdastプラグイン`playgroundLink`と右上オーバーレイのCSSを実装する（[playground.md](../markdown-pipeline/playground.md)）。
   完了条件: pages.md AC-11 / AC-12 を満たし、プラグインの単体テストがgreen。
-- [ ] **T6-5: リリース前総点検** 〔Fable 5〕
+- [x] **T6-5: リリース前総点検** 〔Fable 5〕
   全specの受入基準を通しで確認し、ダミーコンテンツを実コンテンツ運用に切り替える方針（削除 or 非公開化）を決めて適用する。Lighthouse等でパフォーマンス・アクセシビリティの大きな問題がないか確認する。
   完了条件: 全spec受入基準のチェックリストが埋まり、`https://blog.progrust.com` で公開されている。
 
@@ -119,6 +119,51 @@
 - コミットは `Task: T6-6` トレーラーで収集可能。
 
 ### T6-5
+
+リリース前総点検を実施した。①全spec受入基準51件の通し確認（下表）、②未実装だった content-model AC-7（dev非公開バッジ）の実装、③Lighthouse実測、④ダミーコンテンツ全削除（ユーザー決定: `content/`配下は全部ダミーのため全削除）、⑤本番公開確認。
+
+**① AC-7 の実装**: 詳細ページ（辞書・記事・本トップ・章）のヘッダーメタ行先頭に「非公開」バッジをdevビルド時のみ描画する `PrivateBadge.astro` を新設し、`DetailLayout`/`ChapterLayout`/`books/[slug].astro` へ配線（`getPublic*` の `isPublic` フラグを伝播）。デザイン確定は [spec/content-model.md](../spec/content-model.md) R-10 へ反映（§5未確定事項を解消）。dev実表示で4ページ種すべて確認（本・章・記事は一時的な `public: false` 化で確認後revert）、本番distへの非出力も確認。
+
+**② ダミーコンテンツ全削除**: 全36ファイル（辞書24・記事7・本1+章3・恒常テスト記事含む）を削除し、空ディレクトリは `.gitkeep` で維持（`validate-wikilinks` がconfig評価時に `content/dict/` をscandirするため必須）。空コレクションでのビルド（一覧0件・RSS 0件・検索インデックス空配列・sitemap一覧5URLのみ・計6ページ）と `npm run check` の健全性を確認。**落とし穴**: 削除がローカルビルドに反映されないデータストア残留を実測（[architecture.md §2](../architecture.md) に対処法を記録）。
+
+**③ Lighthouse 実測**（削除前の本番 `blog.progrust.com`、npx lighthouse + Playwright Chromium）:
+
+| ページ | perf | a11y | bp | seo |
+| --- | --- | --- | --- | --- |
+| トップ（mobile / desktop） | 96 / 100 | 95 | 100 | 100 |
+| 記事詳細（mobile / desktop） | 97 / 99 | 96 | 100 | 100 |
+| 辞書詳細（mobile） | 97 | 96 | 100 | 100 |
+| 本トップ（mobile） | 74※ | 96 | 100 | 100 |
+| 章詳細（mobile） | 97 | 96 | 100 | 100 |
+
+- ※本トップの perf 74 はダミー本の表紙画像（LCP 13.2s）が原因＝コンテンツ起因で削除により解消。実コンテンツ執筆時は content-model R-16 の画像最適化に従うこと
+- 唯一の a11y 減点は `--color-sub`（#847a6e、コントラスト比3.69 < 4.5）の `color-contrast` のみ。確定済みUIデザイントークン（ui-design-spec）のためT6-5では変更せず記録のみ（改善するならトークンの明度調整をデザイン判断で行う）
+- 「大きな問題」に該当する事項なし
+
+**④ 全spec受入基準チェックリスト**（51件。判定根拠は各タスクの実施履歴・`[AC-n]`テスト・T6-5実測）:
+
+| spec | AC | 判定 | 根拠 |
+| --- | --- | --- | --- |
+| content-model | AC-1〜6, AC-8〜10 | ✅ | T1-2 / T1-4（テスト+意図違反の実測。AC-9はT6-4のCI実ラン（deploy AC-2）でも再確認） |
+| content-model | AC-7 | ✅ | **T6-5で実装**（上記①）。dev実表示4ページ種+本番dist非出力を確認 |
+| pages | AC-1〜8 | ✅ | T3-2〜T3-6（`[AC-n]`テスト+dist実測） |
+| pages | AC-9 | ✅ | `table-wrap.test.ts` `[AC-9]`（実装コミット `e35d243`。plan記録漏れをT6-5で補完） |
+| pages | AC-10 | ✅ | **T6-5でPlaywright実測**: 幅広テーブルを一時追記し、ラッパ内横スクロール・ページ全体は横スクロールなしを確認 |
+| pages | AC-11 / AC-12 | ✅ | T6-6（テスト+dist+目視） |
+| pages | AC-13 | ✅ | `external-links.test.ts` `[AC-13]`（実装コミット `9a51751`。plan記録漏れをT6-5で補完） |
+| wikilink-ui | AC-1 | ✅ | T1-3（変換）+T3-4（デザイン）。T6-5で実HTML出力（`.wikilink` アンカー+辞書タイトル）を再確認 |
+| wikilink-ui | AC-2〜8 | ✅ | T4-1〜T4-4（`[AC-n]`テスト+dist+目視） |
+| search | AC-1, AC-3〜5 | ✅ | T5-1 / T5-2（`[AC-n]`テスト+dist実測） |
+| search | AC-2 | ✅ | T5-3のテスト+**T6-5でPlaywright実機確認**（初期ロード非fetch・初回フォーカスでfetch。T5申し送りの実機目視を解消） |
+| search | AC-6 | ✅ | T5-3のテスト+**T6-5でPlaywright実機確認**（種別バッジ表示・章クリックで章詳細へ遷移） |
+| search | AC-7 | ✅ | T5-4のテスト+**T6-5でPlaywright実機確認**（タグ2択AND絞り込み・件数23→3更新） |
+| theme | AC-1〜4 | ✅ | T3-1（Playwright目視）。AC-4はT6-3のsingle theme化仕様で再確認済み |
+| feeds-meta | AC-1〜5 | ✅ | T6-1 / T6-2（テスト+dist実測） |
+| deploy | AC-1〜4 | ✅ | T6-4（GitHub Actions実ラン。AC-4は構造確認） |
+
+- 実機確認（pages AC-10 / search AC-2, 6, 7）はコンテンツ削除前の preview + Playwright で実施
+- 検証結果: `npm run check`（vitest 177件）green / `astro build` 成功（コンテンツ有・無の両状態）/ CI実ラン成功・`https://blog.progrust.com` 200
+- コミットは `Task: T6-5` トレーラーで収集可能
 
 ## フェーズ完了条件
 

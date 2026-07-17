@@ -47,6 +47,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - zodスキーマは [`frontmatter.md`](markdown-notation/frontmatter.md) を型に落とす: `title: z.string()` / `description: z.string()` / `created_at`・`updated_at: z.coerce.date()` / `tags: z.array(z.string())` / `public: z.boolean()`、記事・本のみ `image: z.object({ url, alt })`（画像最適化を通す場合はスキーマ側で`image()`ヘルパーを検討）
 - 章エントリは元ファイル名の連番をメタとして保持する（章順ソートに使用）。本slugはentry idの前半から導出する
 - **章連番の検証**（[spec/content-model.md](spec/content-model.md) R-9）は`generateId`内または`content.config.ts`のロード後チェックで行い、違反はthrowでビルドエラー化する
+- **落とし穴（T6-5で実測）**: mdファイルを削除してもContent Layerのデータストア（`node_modules/.astro/data-store.json`）に旧エントリが残留し、ローカルの`astro build`で削除済みページが生成され続けることがある。削除が反映されないときは`node_modules/.astro/data-store.json`（と`.astro/`配下のキャッシュ）を削除して再ビルドする（CIは毎回クリーンなため影響なし）
 
 ### 公開フィルタの一元化（src/lib/content.ts）
 
