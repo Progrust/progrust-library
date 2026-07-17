@@ -60,6 +60,4 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          # 一時ステップ: Pagesプロジェクトの初回作成（成功後に除去する）
-          preCommands: wrangler pages project create progrust-library --production-branch=main
           command: pages deploy dist --project-name=progrust-library --branch=main
