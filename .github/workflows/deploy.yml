@@ -1,0 +1,63 @@
+# mainへのpushでビルドしてCloudflare PagesへDirect Uploadする（docs/spec/deploy.md）
+# PRトリガーは持たない＝プレビューデプロイなし（deploy R-2 / AC-4）
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+# 同時デプロイを直列化する（後続pushはキューされ、古い版が新しい版を上書きしないようにする）
+concurrency:
+  group: deploy
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # deploy R-3: npm依存キャッシュ
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: 依存インストール
+        run: npm ci
+
+      # deploy R-6: ユニットテスト失敗時はデプロイしない（後続ステップが実行されない）
+      - name: ユニットテスト
+        run: npm run test
+
+      # deploy R-3: Playwright（Chromium）バイナリのキャッシュ。キー設計は deploy.md §5
+      - name: Playwrightブラウザキャッシュ
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      # mermaidのビルド時SVG化に必要（markdown-pipeline/mermaid.md）。
+      # OS依存ライブラリはキャッシュできないため、キャッシュヒット時も install-deps は毎回実行する
+      - name: Playwright（Chromium）インストール
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Playwright OS依存ライブラリ導入（キャッシュヒット時）
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # deploy R-5: ビルド失敗（wikilinkリンク切れ等の検証エラー含む）時はデプロイしない
+      - name: ビルド
+        run: npm run build
+        env:
+          # Cloudflare Web Analytics beacon（feeds-meta.md §5）
+          PUBLIC_CF_BEACON_TOKEN: ${{ secrets.PUBLIC_CF_BEACON_TOKEN }}
+
+      # deploy R-3: wrangler pages deploy によるDirect Upload
+      - name: Cloudflare Pagesへデプロイ
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=progrust-library --branch=main
