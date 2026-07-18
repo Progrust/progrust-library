@@ -76,8 +76,4 @@ fn main() {
 「なければデフォルト値」はRustでは`Option`のメソッドで表現します（例: `name.unwrap_or_else(|| "ゲスト".to_string())`）。<!-- TODO: [[option]] 作成後にリンク -->
 :::
 
-## 関連項目
-
-- [[numeric-operations]]
-
 [^1]: [The Rust Reference: Arithmetic and logical binary operators](https://doc.rust-lang.org/reference/expressions/operator-expr.html#arithmetic-and-logical-binary-operators)
