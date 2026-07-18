@@ -18,7 +18,6 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 ## 2. コンテキスト読込（必読）
 
 - [`docs/markdown-notation/dict-style.md`](../../docs/markdown-notation/dict-style.md) — テンプレート・文体・分量・slug命名・wikilink方針・コード規則（**本コマンドの執筆規約はこの文書を正とする**）
-- [`docs/markdown-notation/dict-tags.md`](../../docs/markdown-notation/dict-tags.md) — タグ一覧と運用ルール
 - [`docs/markdown-notation/rule.md`](../../docs/markdown-notation/rule.md) / [`frontmatter.md`](../../docs/markdown-notation/frontmatter.md) — 記法・frontmatterの必要箇所
 
 ## 3. 事実確認（一次情報の参照）
@@ -34,7 +33,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 - 日付は必ず `date +%F` で取得した値を使う
   - 新規: `created_at` / `updated_at` の両方に当日日付、`public: false`
   - 更新: `updated_at` のみ当日日付に変更（`created_at` は変更しない）
-- タグは dict-tags.md の一覧から選ぶ。適切なタグがなければ**先に dict-tags.md へ追記**してから使い、最終報告で明示する
+- タグは `npm run dict:tags` で使用中タグを集計し、既存タグから選ぶことを優先する。意味の重なる近縁の新タグを作らない。適切な既存タグがない場合のみ新タグを付け、最終報告で明示する（規約はdict-style.md「タグの付け方」）
 - wikilinkは初出のみ・実在slugのみ。未作成の対象は `<!-- TODO: [[slug]] 作成後にリンク -->` を残す
 - **リンク漏れチェック（必須）**: 執筆後、`content/dict/` の全既存エントリのslugと `title` の一覧を取得し、本文の語と突き合わせる。既存エントリに相当する語（titleの日本語部分・一般的な同義語を含む）が本文にあれば、初出を必ず `[[slug]]` にする。表示はリンク先titleに置き換わるため、挿入後の文が自然に読めるよう調整する（規約はdict-style.md）
 - **TODOコメントを残す前に必ず** `npm run dict:todo` で既存の予約slug一覧を確認する。同じ概念の予約が既にあれば**一字一句同じslug表記**を使う（新しい表記を作らない）。既存予約がない概念のみ、命名規則に従って新しく予約slugを決める
@@ -54,7 +53,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 - モデル指定: 観点1（技術的正確性）のサブエージェントは**必ずOpusで実行**する（Agentツールの `model: "opus"` 指定。もっともらしい誤りの検出には上位モデルを使う）。観点2・3はセッションのモデルを継承してよい
 
 1. **技術的正確性（敵対的）**: 「この記述は誤りである、という前提で反証を試みよ。The Rust Reference / std公式ドキュメントを根拠に、誤り・誇張・edition依存の記述・古い情報を出典付きで指摘せよ。出典を示せない指摘はしないこと」
-2. **記法・frontmatter準拠**: 「`docs/markdown-notation/` の rule.md / frontmatter.md / dict-style.md に照らして逸脱を列挙せよ。特に: h1使用・`---`使用・`:::details[タイトル]` のlabel記法（スペース区切りはタイトルが黙って消える）・日付形式（yyyy-MM-dd）・タグが dict-tags.md の一覧内か・wikilinkが初出のみか・**既存エントリに相当する語が本文にあるのにリンクされていない箇所がないか**（`content/dict/` の全slug/titleと突き合わせる）・関連項目が本文リンクと重複していないか・リンク先slugの実在・TODOコメントの予約slugが既存コンテンツの同一概念の予約（`npm run dict:todo` で集計）と一致しているか」
+2. **記法・frontmatter準拠**: 「`docs/markdown-notation/` の rule.md / frontmatter.md / dict-style.md に照らして逸脱を列挙せよ。特に: h1使用・`---`使用・`:::details[タイトル]` のlabel記法（スペース区切りはタイトルが黙って消える）・日付形式（yyyy-MM-dd）・タグが既存タグ（`npm run dict:tags` で集計）と意味重複する新タグになっていないか・wikilinkが初出のみか・**既存エントリに相当する語が本文にあるのにリンクされていない箇所がないか**（`content/dict/` の全slug/titleと突き合わせる）・関連項目が本文リンクと重複していないか・リンク先slugの実在・TODOコメントの予約slugが既存コンテンツの同一概念の予約（`npm run dict:todo` で集計）と一致しているか」
 3. **文体・粒度**: 「dict-style.md に照らして批判的に評価せよ。ですます調の一貫性・descriptionの体言止め・分量超過（プレビューに本文全文が表示される前提）・テンプレート順序の遵守・コード例の題材が日本語話者に直感的か・識別子が英語か（ローマ字日本語は禁止）・テーブル/メッセージ/mermaid等の記法で分かりやすくできる箇所が文章のままになっていないか（逆に装飾のための乱用がないか）」
 
 共通指示: 「問題なし」だけで終わらせず、各観点で最低1つの改善候補を挙げるか「反証を試みたが崩せなかった根拠」を述べること。指摘には該当行と修正案を付けること。
@@ -68,7 +67,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 
 - `public: false` のままコミットする（公開判断は人間が行うため、このコマンドで `true` にしない）
 - コミットメッセージは `docs/implementation-rules.md` §6 に従う: Conventional Commits + 日本語サブジェクト。コンテンツのコミットは `content` typeを使う（例: `content: 辞書「所有権」を追加`）
-- dict-tags.md への新タグ追記、TODO解消で書き換えた他のコンテンツファイルも同じコミットに含める
+- TODO解消で書き換えた他のコンテンツファイルも同じコミットに含める
 - タスク運用外のため `Task:` トレーラーは付けない
 
 ## 9. 報告
@@ -76,7 +75,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 以下を含めて報告して終了する:
 
 - 作成/更新したファイルとslug（新規/更新の別）
-- 選んだタグ（dict-tags.md へ新規追加したタグは明示）
+- 選んだタグ（新規に作ったタグは明示）
 - 張ったwikilink・残したTODOコメント・解消したTODO・`<!-- 要確認 -->` コメント
 - 全コンテンツに残っている未作成slugのTODO一覧（`npm run dict:todo` の結果。次に書く候補として提示し、「リンク化漏れ」警告が出た場合は解消するか報告する）
 - 検証結果（check:dict / check / build）とサブエージェントレビューの要約（指摘と対応）
