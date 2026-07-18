@@ -48,6 +48,29 @@ function labelChild(node) {
 }
 
 /**
+ * containerDirective を、同じ children を持つ blockquote ノード（data.hName で実際の
+ * HTML要素へ相殺）に置き換える。setProperty で hName を付けるだけだとノード型が
+ * containerDirective のまま残り、Sätteriネイティブ変換器の脚注参照収集パスが
+ * containerDirective の中を走査しないため、内部の `[^n]` が脚注化されず原文のまま
+ * 出力される（directives.md「落とし穴と回避策」6）。走査対象の汎用フローコンテナである
+ * blockquote へ型を替えることで、内部の脚注が通常どおり収集・変換される。
+ * children にはハンドルをそのまま渡してよい（子への setProperty は置換後も適用される。実測済み）。
+ *
+ * @param {import('satteri').MdastNode & { children: readonly import('satteri').MdastNode[] }} node
+ * @param {MdastVisitorContext} ctx
+ * @param {Record<string, unknown>} data hName / hProperties
+ * @param {unknown[]} [children] 省略時は node.children をそのまま使う
+ */
+function replaceWithBlock(node, ctx, data, children = [...node.children]) {
+  ctx.replaceNode(
+    node,
+    /** @type {import('satteri').MdastContent} */ (
+      /** @type {unknown} */ ({ type: "blockquote", data, children })
+    ),
+  );
+}
+
+/**
  * textDirective / leafDirective ノードを、ソース原文の該当範囲へ復元する。
  * ※node.positionのoffsetはUTF-8のバイトオフセット（JSの文字indexではない）のため
  * Buffer でバイト単位にスライスする。position/source欠如時は `:name` でフォールバックする。
@@ -77,6 +100,8 @@ export const directives = defineMdastPlugin({
     if (node.name === "message") {
       const type = MESSAGE_TYPES.find((t) => t in attrs);
       const label = labelChild(node);
+      /** @type {unknown[]} */
+      let children = [...node.children];
       if (label) {
         // labelの段落をタイトル要素にする（dataは丸ごと置換されるため directiveLabel を含め直す）
         ctx.setProperty(label, "data", {
@@ -85,25 +110,24 @@ export const directives = defineMdastPlugin({
           hProperties: { class: "message-title" },
         });
       } else if (type) {
-        // タイトル省略時、種別付きは種別名をデフォルトタイトルにする（rule.md「タイトルを指定する」）。
-        // 種別なしはタイトル行を生成しない。satteriのノード別Data型は hName を
-        // 許容しないため、unknown 経由で橋渡しする（code-filename.mjs と同じ回避策）。
+        // タイトル省略時、種別付きは種別名をデフォルトタイトルにする（rule.md「タイトルを指定する」）
         const title = {
           type: "paragraph",
           data: { hName: "p", hProperties: { class: "message-title" } },
           children: [{ type: "text", value: type }],
         };
-        ctx.prependChild(
-          node,
-          /** @type {import('satteri').MdastContent} */ (
-            /** @type {unknown} */ (title)
-          ),
-        );
+        children = [title, ...children];
       }
-      ctx.setProperty(node, "data", {
-        hName: "aside",
-        hProperties: { class: type ? `message message-${type}` : "message" },
-      });
+      // 種別なし・タイトルなしはタイトル行を生成しない
+      replaceWithBlock(
+        node,
+        ctx,
+        {
+          hName: "aside",
+          hProperties: { class: type ? `message message-${type}` : "message" },
+        },
+        children,
+      );
       return;
     }
 
@@ -114,11 +138,11 @@ export const directives = defineMdastPlugin({
           `:::details にタイトルがありません（:::details[タイトル] と書く） (${posOf(node, ctx)})`,
         );
       }
-      ctx.setProperty(node, "data", { hName: "details" });
       ctx.setProperty(label, "data", {
         directiveLabel: true,
         hName: "summary",
       });
+      replaceWithBlock(node, ctx, { hName: "details" });
       return;
     }
 
@@ -126,22 +150,17 @@ export const directives = defineMdastPlugin({
       // キャプションは省略可（rule.md「画像サイズやキャプションは省略可能」）。
       // labelがあればfigcaption化し、無ければfigcaptionなしのfigureにする。
       const label = labelChild(node);
-      ctx.setProperty(node, "data", { hName: "figure" });
+      /** @type {unknown[]} */
+      let children = [...node.children];
       if (label && node.children.length > 1) {
         // キャプションは画像の下に表示するため、labelを末尾へ移動しつつfigcaption化する。
-        // removeNode+insertAfterで元ノードを直接移動するとsetPropertyによるrelabelが
-        // dropされるため、cloneにdataを直付けして挿入する（directives.md「落とし穴と回避策」）
+        // 移動した元ハンドルへのsetPropertyはdropされるため、cloneにdataを直付けする
+        // （directives.md「落とし穴と回避策」5）
         const copy = {
           ...structuredClone(label),
           data: { directiveLabel: true, hName: "figcaption" },
         };
-        ctx.removeNode(label);
-        ctx.insertAfter(
-          node.children[node.children.length - 1],
-          /** @type {import('satteri').MdastContent} */ (
-            /** @type {unknown} */ (copy)
-          ),
-        );
+        children = [...children.slice(1), copy];
       } else if (label) {
         // labelしかない縮退ケースは移動不要、relabelのみ
         ctx.setProperty(label, "data", {
@@ -162,6 +181,7 @@ export const directives = defineMdastPlugin({
           }
         }
       }
+      replaceWithBlock(node, ctx, { hName: "figure" }, children);
       return;
     }
 

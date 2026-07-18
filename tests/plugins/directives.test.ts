@@ -132,6 +132,36 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
     });
   });
 
+  describe("ディレクティブ内の脚注（rule.md: 注釈）", () => {
+    it("details内の脚注参照が脚注リンクになり脚注セクションに載る", () => {
+      const html = compileWithDirectives(
+        ":::details[詳細]\n脚注の例[^1]です。\n:::\n\n[^1]: 脚注の内容\n",
+      );
+      expect(html).toContain("data-footnote-ref");
+      expect(html).toContain("data-footnotes");
+      expect(html).toContain("脚注の内容");
+      expect(html).not.toContain("[^1]");
+    });
+
+    it("message内の脚注も外の脚注と通し番号で共存する", () => {
+      const html = compileWithDirectives(
+        "外の脚注[^1]です。\n\n:::message\n中の脚注[^2]です。\n:::\n\n[^1]: 外の内容\n[^2]: 中の内容\n",
+      );
+      expect(html).toContain('href="#user-content-fn-1"');
+      expect(html).toContain('href="#user-content-fn-2"');
+      expect(html).toContain("中の内容");
+      expect(html).not.toContain("[^2]");
+    });
+
+    it("ネストしたディレクティブ内の脚注も脚注リンクになる", () => {
+      const html = compileWithDirectives(
+        "::::message\n:::details[中]\n脚注[^1]です。\n:::\n::::\n\n[^1]: 内容\n",
+      );
+      expect(html).toContain("data-footnote-ref");
+      expect(html).not.toContain("[^1]");
+    });
+  });
+
   describe("未知のディレクティブ", () => {
     it("未知のディレクティブ名はビルドエラーになる", () => {
       const call = () => compileWithDirectives(":::unknown\n本文。\n:::");
