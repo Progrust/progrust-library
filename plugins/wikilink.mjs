@@ -73,7 +73,9 @@ export function wikilink(dictIndex) {
               ? `${node.position.start.line}:${node.position.start.column}`
               : "?:?";
             throw new Error(
-              `[[${slug}]]は${entry ? "非公開の" : "存在しない"}辞書エントリです (${file}:${pos})`,
+              entry
+                ? `[[${slug}]]は非公開（public: false）の辞書エントリのため、公開ページからリンクできません。公開するか、リンクを外してください (${file}:${pos})`
+                : `[[${slug}]]は存在しない辞書エントリです (${file}:${pos})`,
             );
           }
 
