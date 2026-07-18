@@ -1,5 +1,5 @@
 ---
-title: 文字型（Char Type）
+title: 文字型
 description: 1つのUnicodeスカラー値を表すプリミティブ型。常に4バイト固定長。
 created_at: 2026-07-18
 updated_at: 2026-07-18

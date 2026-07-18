@@ -1,5 +1,5 @@
 ---
-title: 変数（Variable）
+title: 変数
 description: 値に名前を付けて保持する仕組み。Rustでは let で宣言し、デフォルトで不変。
 created_at: 2026-07-18
 updated_at: 2026-07-18

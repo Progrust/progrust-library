@@ -1,5 +1,5 @@
 ---
-title: 論理値型（Boolean Type）
+title: 論理値型
 description: 真偽を表すプリミティブ型。`true`・`false`の2値のみを取る1バイトの型。
 created_at: 2026-07-18
 updated_at: 2026-07-18

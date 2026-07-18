@@ -1,5 +1,5 @@
 ---
-title: タプル型（Tuple Type）
+title: タプル型
 description: 異なる型の値を固定個数まとめられるプリミティブ型。要素の型の並びと個数が型の一部。
 created_at: 2026-07-18
 updated_at: 2026-07-18

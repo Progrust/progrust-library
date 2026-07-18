@@ -1,5 +1,5 @@
 ---
-title: 定数（Constant）
+title: 定数
 description: コンパイル時に値が確定する不変の名前付き値。const で宣言し、型注釈が必須。
 created_at: 2026-07-18
 updated_at: 2026-07-18

@@ -1,5 +1,5 @@
 ---
-title: 論理演算子（Logical Operators）
+title: 論理演算子
 description: 論理値を組み合わせるAND・OR・NOTの演算子。`&&`と`||`は左辺だけで結果が決まると右辺を評価しない短絡評価が特徴。
 created_at: 2026-07-18
 updated_at: 2026-07-18

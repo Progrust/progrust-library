@@ -1,5 +1,5 @@
 ---
-title: プリミティブ型（Primitive Types）
+title: プリミティブ型
 description: Rustコンパイラに組み込まれた基本型の総称。単一の値のスカラー型と複数の値をまとめる複合型に大別。
 created_at: 2026-07-18
 updated_at: 2026-07-18

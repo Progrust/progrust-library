@@ -1,5 +1,5 @@
 ---
-title: シャドーイング（Shadowing）
+title: シャドーイング
 description: 既存の変数と同じ名前で新しい変数を let 宣言し、以前の変数を覆い隠す仕組み。mut と異なり型の変更も可能。
 created_at: 2026-07-18
 updated_at: 2026-07-18

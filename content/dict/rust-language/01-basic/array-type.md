@@ -1,5 +1,5 @@
 ---
-title: 配列型（Array Type）
+title: 配列型
 description: 同じ型の要素を固定長で並べたプリミティブ型。要素数はコンパイル時に確定する型の一部。
 created_at: 2026-07-18
 updated_at: 2026-07-18

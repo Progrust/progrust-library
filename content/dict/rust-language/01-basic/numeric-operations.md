@@ -1,5 +1,5 @@
 ---
-title: 数値演算（Numeric Operations）
+title: 数値演算
 description: 加算・減算・乗算・除算・剰余の5種類の基本演算。整数の除算は0方向への切り捨て。
 created_at: 2026-07-18
 updated_at: 2026-07-18
