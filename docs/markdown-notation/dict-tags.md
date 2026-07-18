@@ -16,6 +16,7 @@
 | 所有権         | 所有権・ムーブ・Copy                            | ownership, ムーブ, move              |
 | 借用           | 参照・借用規則・ライフタイム                    | 参照, lifetime, ライフタイム         |
 | 型システム     | 型推論・ジェネリクス・型変換                    | 型, ジェネリクス, generics           |
+| プリミティブ型 | bool・数値型・char・strなど言語組み込みの基本型（The Rust Reference準拠） | primitive, primitive type, スカラー型 |
 | トレイト       | trait定義・実装・トレイトオブジェクト           | trait, インターフェース              |
 | エラー処理     | Result / Option / panic                         | Result, Option, 例外                 |
 | パターンマッチ | match式・let束縛のパターン                      | match, パターン                      |

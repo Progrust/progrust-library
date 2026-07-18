@@ -3,7 +3,7 @@ title: 論理値型（Boolean Type）
 description: 真偽を表すプリミティブ型。`true`・`false`の2値のみを取る1バイトの型。
 created_at: 2026-07-18
 updated_at: 2026-07-18
-tags: ["型システム", "基本文法"]
+tags: ["型システム", "基本文法", "プリミティブ型"]
 public: false
 ---
 

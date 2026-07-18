@@ -3,7 +3,7 @@ title: 浮動小数点型（Floating-Point Types）
 description: 小数を表す型の総称。IEEE 754に準拠し、既定は`f64`。
 created_at: 2026-07-18
 updated_at: 2026-07-18
-tags: ["型システム", "基本文法"]
+tags: ["型システム", "基本文法", "プリミティブ型"]
 public: true
 ---
 
