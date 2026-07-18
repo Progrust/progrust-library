@@ -498,15 +498,15 @@ html.dark .code-filename {
   top: 0.5rem;
   right: 0.5rem;
   padding: 0.2rem 0.6rem;
-  border: 1px solid #4a4238;
+  border: 1px solid #5a5044;
   border-radius: 4px;
   background: #332c25;
-  color: #9c9186;
+  color: #cfc4b6;
   font-family: var(--font-mono);
   font-size: 11px;
   line-height: 1.6;
   text-decoration: none;
-  opacity: 0.55;
+  opacity: 0.85;
   transition: opacity 0.15s ease;
 }
 .code-playground .playground-open:hover,
@@ -516,7 +516,7 @@ html.dark .code-filename {
 html.dark .code-playground .playground-open {
   background: var(--color-card);
   border-color: var(--color-line);
-  color: var(--color-sub);
+  color: var(--color-text);
 }
 
 /* =========================================================================
