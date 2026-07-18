@@ -16,9 +16,6 @@ fn main() {
     // 商品名・価格・セール対象かどうかをひとまとめにする
     let item: (String, u32, bool) = (String::from("りんご"), 150, true);
     println!("{}は{}円です", item.0, item.1);
-
-    let (name, price, on_sale) = item; // パターンで分解
-    println!("{} / {}円 / セール対象: {}", name, price, on_sale);
 }
 ```
 
