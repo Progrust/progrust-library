@@ -41,7 +41,7 @@
   --color-strong: #f1eae1;
   --color-ink: #e4dcd1;
   --color-sub: #9c9186;
-  --color-accent: #f0684a;
+  --color-accent: #d4715a;
   --color-head: #1e1b18;
 }
 
@@ -362,7 +362,7 @@ html.dark .prose :not(pre) > code {
   text-decoration-style: solid;
 }
 html.dark .wikilink {
-  color: #f0684a;
+  color: #d4715a;
 }
 
 /* 辞書ペイン・ホバープレビュー内の embed 本文はコンパクト表示にする
@@ -458,11 +458,11 @@ html.dark .astro-code::-webkit-scrollbar-thumb:hover {
   color: #9bb86e;
 }
 .astro-code .line.diff.remove {
-  background: rgba(240, 104, 74, 0.13);
+  background: rgba(212, 113, 90, 0.13);
 }
 .astro-code .line.diff.remove::before {
   content: "-";
-  color: #f0684a;
+  color: #d4715a;
 }
 .astro-code .line.diff.remove > span {
   opacity: 0.55;

@@ -12,12 +12,12 @@ fn take<'a>(s: &'a mut String) -> usize {
 }`;
 
 describe("shiki-theme（カスタムsingle theme・確定パレット6色）", () => {
-  it("キーワード（fn / let / mut）が #F0684A になる", async () => {
+  it("キーワード（fn / let / mut）が #D4715A になる", async () => {
     const html = await highlight(RUST, "rust");
     // 同色の隣接トークンは1スパンに結合され、先行空白を含むことがある
-    expect(html).toContain('<span style="color:#F0684A">fn</span>');
-    expect(html).toMatch(/<span style="color:#F0684A">\s*let<\/span>/);
-    expect(html).toMatch(/<span style="color:#F0684A">\s*mut<\/span>/);
+    expect(html).toContain('<span style="color:#D4715A">fn</span>');
+    expect(html).toMatch(/<span style="color:#D4715A">\s*let<\/span>/);
+    expect(html).toMatch(/<span style="color:#D4715A">\s*mut<\/span>/);
   });
 
   it("ライフタイム・数値・言語定数が #D9B25E になる", async () => {
@@ -78,7 +78,7 @@ describe("shiki-theme（カスタムsingle theme・確定パレット6色）", (
     const html = await highlight(RUST, "rust");
     // bare `keyword` スコープを使うと keyword.operator.* がマッチして -> が赤くなる（回帰防止）
     expect(html).not.toMatch(
-      /<span style="color:#F0684A">[^<]*-&gt;[^<]*<\/span>/,
+      /<span style="color:#D4715A">[^<]*-&gt;[^<]*<\/span>/,
     );
   });
 
@@ -94,7 +94,7 @@ describe("shiki-theme（カスタムsingle theme・確定パレット6色）", (
       `const x: number = 1;\n// note\nexport function f() { return "s"; }`,
       "ts",
     );
-    expect(html).toContain('<span style="color:#F0684A">const</span>');
+    expect(html).toContain('<span style="color:#D4715A">const</span>');
     expect(html).toMatch(/<span style="color:#D08A72">[^<]*s[^<]*<\/span>/);
     expect(html).toMatch(/<span style="color:#E4DCD199">\/\/ note<\/span>/);
   });

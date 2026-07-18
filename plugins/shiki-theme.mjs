@@ -1,7 +1,7 @@
 // @ts-check
 // コードハイライトのカスタムShikiテーマとpreインラインスタイル除去transformer。
 // 配色は docs/ui-design/ui-design-spec.md「コードブロック」の確定パレット（6色）
-// （キーワード #F0684A / 関数 #A9B665 / 型 #7FB5A3 / ライフタイム・数値系 #D9B25E /
+// （キーワード #D4715A / 関数 #A9B665 / 型 #7FB5A3 / ライフタイム・数値系 #D9B25E /
 // 文字列 #D08A72 / コメント = 地の文字色 #E4DCD1 の opacity 60% ≒ alpha付きhex #E4DCD199）。
 // E案（ライトでもコードだけダーク面）により配色は両テーマ共通のため、
 // dual themeではなくsingle themeで運用する（docs/markdown-pipeline/shiki.md）。
@@ -38,7 +38,7 @@ export const progrustCodeTheme = {
         "storage.modifier",
         "entity.name.tag",
       ],
-      settings: { foreground: "#F0684A" },
+      settings: { foreground: "#D4715A" },
     },
     {
       // 関数・メソッド・マクロ（println! 等）・シェルコマンド・TOMLキー
