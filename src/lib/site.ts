@@ -11,9 +11,9 @@ export const SITE = {
   since: 2026,
 } as const;
 
-/** フッター等で使う各種リンク。GitHub / X は暫定URL（実URLは P6 で確定）。 */
+/** フッター等で使う各種リンク。 */
 export const SITE_LINKS = {
   rss: "/rss.xml",
-  github: "https://github.com/",
+  github: "https://github.com/Progrust/",
   x: "https://x.com/",
 } as const;
