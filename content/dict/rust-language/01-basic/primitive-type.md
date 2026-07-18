@@ -16,7 +16,7 @@ public: true
 | 分類 | 含まれる型 |
 | --- | --- |
 | スカラー型（単一の値） | ・[[integer-type]]<br>・[[floating-point-type]]<br>・[[boolean-type]]<br>・[[char-type]] |
-| 複合型（複数の値） | ・タプル `(T, U)`<!-- TODO: [[tuple]] 作成後にリンク --><br>・[[array-type]] |
+| 複合型（複数の値） | ・タプル `(T, U)`<!-- TODO: [[tuple]] 公開後にリンク（作成済みだがpublic: falseのため公開ページからリンク不可） --><br>・[[array-type]] |
 
 ## 補足
 
@@ -27,7 +27,7 @@ public: true
 - スライス`[T]`
 - 参照`&T` / `&mut T`
 - 生ポインタ`*const T` / `*mut T`
-- 関数ポインタ`fn`、ユニット型`()`
+- 関数ポインタ`fn`、ユニット型`()`<!-- TODO: [[unit-type]] 作成後にリンク -->
 - never型`!`
 
 `String`が標準ライブラリの型であるのに対し`str`はプリミティブ型、というように「組み込みかどうか」が両者を分けます。
