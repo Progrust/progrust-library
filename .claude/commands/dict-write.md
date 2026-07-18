@@ -1,0 +1,81 @@
+---
+description: 指定トピックの辞書エントリを新規作成または更新する
+argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: rust-language/01-basic/] [指示]
+---
+
+トピック `$ARGUMENTS` の辞書エントリを、以下の手順で作成・更新してください。
+
+## 1. 対象特定（新規 or 更新）
+
+- `content/dict/` の既存ファイル一覧を確認し、`$ARGUMENTS` に対応するエントリの有無を判定する
+  - 既存slugと一致、または同一概念のエントリがある → **更新モード**
+  - 該当なし → **新規モード**。slug（英語概念名のkebab-case ASCII）を決定し、既存の全slugと衝突しないことを確認する
+- **新規モードのslug決定では、先に予約slugを照合する**: `grep -rn "TODO: \[\[" content/` で全TODOコメントを集計し、今回のトピックに該当する予約slugがあれば**必ずそれを採用**する（TODOは正式slugの予約。dict-style.md参照）。予約slugが命名規則に反している等の理由で変えたい場合は、勝手に別名で作らずユーザーに確認して停止する
+- 近縁エントリが既にあり新規/更新の判断が曖昧な場合（例: `mutability` があるのに「可変参照」を頼まれた）は、判断せずユーザーに確認して停止する
+- **配置ディレクトリ**: `$ARGUMENTS` にパスらしき指定（例: `rust-language/01-basic/`）があれば `content/dict/` 配下のそのディレクトリに作成する（なければディレクトリごと作る。`content/dict/` や `dict/` の接頭辞付きで指定されても同じ場所と解釈する）。指定がない場合は既存のディレクトリ構成を確認し、関連エントリと同じ場所に置く（判断できなければ `content/dict/` 直下）。配置はslug・URLに影響しない（content-model R-5。整理用）
+- ユーザーが記載内容を具体的に指示している場合、その内容は分量目安を理由に圧縮・省略しない（指示内容が最優先）
+
+## 2. コンテキスト読込（必読）
+
+- [`docs/markdown-notation/dict-style.md`](../../docs/markdown-notation/dict-style.md) — テンプレート・文体・分量・slug命名・wikilink方針・コード規則（**本コマンドの執筆規約はこの文書を正とする**）
+- [`docs/markdown-notation/dict-tags.md`](../../docs/markdown-notation/dict-tags.md) — タグ一覧と運用ルール
+- [`docs/markdown-notation/rule.md`](../../docs/markdown-notation/rule.md) / [`frontmatter.md`](../../docs/markdown-notation/frontmatter.md) — 記法・frontmatterの必要箇所
+
+## 3. 事実確認（一次情報の参照）
+
+- 技術的内容は一次情報で確認してから書く。優先順位: **The Rust Reference → std公式ドキュメント → The Rust Programming Language（TRPL）**
+- Astroやサイト機能に関わる内容は「astro-docs」「context7」MCPサーバーで最新情報を確認する
+- 記憶だけで技術的主張を書かない。バージョン依存の挙動は「Rust 1.x時点」と本文に明記する
+- 確認できなかった内容は書かない。どうしても残す場合は `<!-- 要確認: ... -->` コメントを付け、最終報告で明示する
+
+## 4. 執筆
+
+- dict-style.md のテンプレート（定義 → コード例 → 補足`:::details` → 関連項目）・文体・分量規約に従う
+- 日付は必ず `date +%F` で取得した値を使う
+  - 新規: `created_at` / `updated_at` の両方に当日日付、`public: false`
+  - 更新: `updated_at` のみ当日日付に変更（`created_at` は変更しない）
+- タグは dict-tags.md の一覧から選ぶ。適切なタグがなければ**先に dict-tags.md へ追記**してから使い、最終報告で明示する
+- wikilinkは初出のみ・実在slugのみ。未作成の対象は `<!-- TODO: [[slug]] 作成後にリンク -->` を残す
+- **TODOコメントを残す前に必ず** `grep -rn "TODO: \[\[" content/` で既存の予約slug一覧を確認する。同じ概念の予約が既にあれば**一字一句同じslug表記**を使う（新しい表記を作らない）。既存予約がない概念のみ、命名規則に従って新しく予約slugを決める
+- **TODOの解消（新規モードのみ）**: 作成したslugに対する `TODO: [[slug]]` を `grep -rn "TODO: \[\[slug\]\]" content/` で全コンテンツから検索し、見つかった箇所をTODOコメントの意図に応じて実リンク化する（本文中なら `[[slug]]` に置換、関連項目の予約なら `## 関連項目` の箇条書きとして追加）。書き換えた各ファイルの `updated_at` も当日日付に更新する
+- 更新モードでは全面書き換えせず差分修正に留め、既存の文体・構成を保持する
+
+## 5. コード検証（必須）
+
+- `npm run check:dict -- <対象mdファイル>` を実行し、全Rustコードブロックが通ることを確認する
+- 意図的な失敗例は `<!-- rustc: expect E**** -->` マーカーで期待エラーコードを宣言する（規約は dict-style.md）
+- 通らないコードは修正してから次へ進む。放置したまま完了しない
+
+## 6. サブエージェントレビュー
+
+以下の3観点のサブエージェントを**並行で**起動してレビューさせ、指摘を修正する。コードを修正した場合は手順5を再実行する。
+
+1. **技術的正確性（敵対的）**: 「この記述は誤りである、という前提で反証を試みよ。The Rust Reference / std公式ドキュメントを根拠に、誤り・誇張・edition依存の記述・古い情報を出典付きで指摘せよ。出典を示せない指摘はしないこと」
+2. **記法・frontmatter準拠**: 「`docs/markdown-notation/` の rule.md / frontmatter.md / dict-style.md に照らして逸脱を列挙せよ。特に: h1使用・`---`使用・`:::details[タイトル]` のlabel記法（スペース区切りはタイトルが黙って消える）・日付形式（yyyy-MM-dd）・タグが dict-tags.md の一覧内か・wikilinkが初出のみか・リンク先slugの実在・TODOコメントの予約slugが既存コンテンツの同一概念の予約（`grep -rn "TODO: \[\[" content/`）と一致しているか」
+3. **文体・粒度**: 「dict-style.md に照らして批判的に評価せよ。ですます調の一貫性・descriptionの体言止め・分量超過（プレビューに本文全文が表示される前提）・テンプレート順序の遵守・コード例の題材が日本語話者に直感的か・識別子が英語か（ローマ字日本語は禁止）」
+
+共通指示: 「問題なし」だけで終わらせず、各観点で最低1つの改善候補を挙げるか「反証を試みたが崩せなかった根拠」を述べること。指摘には該当行と修正案を付けること。
+
+## 7. ビルド検証
+
+- `npm run check` と `npx astro build` を実行し、両方通ることを確認する（wikilinkの実在検証は `astro build` で行われる）
+- 注意: `astro dev` 実行中のサーバーは新規辞書ファイルを再起動まで解決しない（buildには影響しない）
+
+## 8. コミット（必須）
+
+- `public: false` のままコミットする（公開判断は人間が行うため、このコマンドで `true` にしない）
+- コミットメッセージは `docs/implementation-rules.md` §6 に従う: Conventional Commits + 日本語サブジェクト。コンテンツのコミットは `content` typeを使う（例: `content: 辞書「所有権」を追加`）
+- dict-tags.md への新タグ追記、TODO解消で書き換えた他のコンテンツファイルも同じコミットに含める
+- タスク運用外のため `Task:` トレーラーは付けない
+
+## 9. 報告
+
+以下を含めて報告して終了する:
+
+- 作成/更新したファイルとslug（新規/更新の別）
+- 選んだタグ（dict-tags.md へ新規追加したタグは明示）
+- 張ったwikilink・残したTODOコメント・解消したTODO・`<!-- 要確認 -->` コメント
+- 全コンテンツに残っている未作成slugのTODO一覧（`grep -rn "TODO: \[\[" content/` の集計。次に書く候補として提示する）
+- 検証結果（check:dict / check / build）とサブエージェントレビューの要約（指摘と対応）
+- 作成したコミットの一覧（ハッシュ + サブジェクト）
+- 「公開する場合は `public: true` へ変更してコミットしてください」の一言

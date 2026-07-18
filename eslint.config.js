@@ -16,10 +16,11 @@ export default defineConfig([
   tseslint.configs.recommended,
   astro.configs.recommended,
   {
-    // 自作 Sätteri プラグイン（.mjs）と astro.config.mjs も lint 対象に含める
-    // （implementation-rules 1章）。Node 実行環境の global（URL / process /
-    // console / import.meta 等）を有効化し、no-undef の誤検出を防ぐ。
-    files: ["plugins/**/*.mjs", "astro.config.mjs"],
+    // 自作 Sätteri プラグイン（.mjs）・開発用スクリプト（scripts/）・
+    // astro.config.mjs も lint 対象に含める（implementation-rules 1章）。
+    // Node 実行環境の global（URL / process / console / import.meta 等）を
+    // 有効化し、no-undef の誤検出を防ぐ。
+    files: ["plugins/**/*.mjs", "scripts/**/*.mjs", "astro.config.mjs"],
     languageOptions: {
       globals: globals.node,
     },

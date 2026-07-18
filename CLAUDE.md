@@ -41,6 +41,7 @@ Astro v7（2026-06-22リリース）でMarkdownパイプラインが`unified`か
 | 初期実装計画（全フェーズ完了・凍結済み） | [`docs/archive/plan/`](docs/archive/plan/README.md) |
 | 執筆者向けMarkdown記法一覧 | [`docs/markdown-notation/rule.md`](docs/markdown-notation/rule.md) |
 | コンテンツのfrontmatter定義 | [`docs/markdown-notation/frontmatter.md`](docs/markdown-notation/frontmatter.md) |
+| 辞書コンテンツの執筆規約（テンプレート・文体・タグ一覧。執筆は `/dict-write`） | [`docs/markdown-notation/dict-style.md`](docs/markdown-notation/dict-style.md) |
 | Sätteriプラグインの実装方式・雛形コード・落とし穴 | [`docs/markdown-pipeline/`](docs/markdown-pipeline/README.md) |
 | UIデザインの確定仕様（カラートークン・コンポーネント） | [`docs/ui-design/ui-design-spec.md`](docs/ui-design/ui-design-spec.md) |
 | クローズ済み文書の凍結アーカイブ | `docs/archive/` |

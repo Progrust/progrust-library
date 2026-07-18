@@ -7,7 +7,7 @@
 | [`spec/`](spec/README.md) | 実装者 | 機能別の詳細仕様書（要求仕様 + 受入基準。仕様駆動開発の起点） |
 | [`architecture.md`](architecture.md) | 実装者 | 全体設計（プロジェクト構成・コレクション定義・モジュール分割・データフロー） |
 | [`implementation-rules.md`](implementation-rules.md) | 実装者 | 横断的な実装ルール（ツールチェーン・言語ポリシー・コーディング規約・テストの書き方・Git運用・完了チェックリスト） |
-| [`markdown-notation/`](markdown-notation/rule.md) | 執筆者 | 本サイトで利用可能なMarkdown記法の一覧（書き方のみ。実装の話は書かない） |
+| [`markdown-notation/`](markdown-notation/rule.md) | 執筆者 | 本サイトで利用可能なMarkdown記法の一覧・辞書執筆のスタイルガイド（[`dict-style.md`](markdown-notation/dict-style.md)）・辞書タグ一覧（[`dict-tags.md`](markdown-notation/dict-tags.md)）。書き方のみ。実装の話は書かない |
 | [`markdown-pipeline/`](markdown-pipeline/README.md) | 実装者 | Sätteriカスタムプラグインの機能別実装リファレンス（実装方式・雛形コード・落とし穴・残課題） |
 | `ui-design/` | 実装者 | UIデザインの仕様・計画（+ モック用ダミーコンテンツ）。モックHTML本体はリポジトリ外・claude design 上（[`ui-design/ui-design-spec.md`](ui-design/ui-design-spec.md) 冒頭にリンク） |
 | `archive/` | — | クローズ済み文書の凍結アーカイブ（歴史的記録。更新しない） |
