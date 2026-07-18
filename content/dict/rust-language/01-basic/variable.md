@@ -52,5 +52,5 @@ fn main() {
 <!-- TODO: 以下のslug作成後に「## 関連項目」として追加 -->
 <!-- TODO: [[mutability]] 作成後にリンク -->
 <!-- TODO: [[shadowing]] 作成後にリンク -->
-<!-- TODO: [[constant]] 作成後にリンク -->
+<!-- TODO: [[constant]] 作成後（公開後）にリンク -->
 <!-- TODO: [[type-inference]] 作成後にリンク -->
