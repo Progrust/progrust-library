@@ -16,7 +16,7 @@ public: true
 | 分類 | 含まれる型 |
 | --- | --- |
 | スカラー型（単一の値） | ・[[integer-type]]<br>・[[floating-point-type]]<br>・[[boolean-type]]<br>・[[char-type]] |
-| 複合型（複数の値） | ・タプル `(T, U)`<!-- TODO: [[tuple]] 公開後にリンク（作成済みだがpublic: falseのため公開ページからリンク不可） --><br>・[[array-type]] |
+| 複合型（複数の値） | ・[[tuple]]<br>・[[array-type]] |
 
 ## 補足
 
