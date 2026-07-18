@@ -17,3 +17,5 @@ pnpm-debug.log*
 .DS_Store
 # Claude Code のローカル個人設定（権限付与など。共有しない）
 .claude/settings.local.json
+# 一時利用メモフォルダ
+docs/memo/
