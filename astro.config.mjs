@@ -145,6 +145,21 @@ export default defineConfig({
     }),
   },
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [
+      tailwindcss(),
+      // devサーバーの全応答をブラウザにキャッシュさせない（VS Code Simple Browser等が
+      // 古いHTMLを表示し続ける事故の防止）。vite.server.headers はAstroがレンダリングする
+      // HTMLに付与されないため、connectミドルウェアで全応答に付ける。configureServer は
+      // devでしか呼ばれないので本番ビルド・Cloudflare Pages配信には影響しない。
+      {
+        name: "dev-no-cache",
+        configureServer(server) {
+          server.middlewares.use((_req, res, next) => {
+            res.setHeader("Cache-Control", "no-store");
+            next();
+          });
+        },
+      },
+    ],
   },
 });
