@@ -15,6 +15,7 @@
     "typecheck": "astro check",
     "test": "vitest run",
     "check:dict": "node scripts/check-dict-code.mjs",
+    "dict:todo": "node scripts/list-dict-todo.mjs",
     "check": "npm run format:check && npm run lint && npm run typecheck && npm run test"
   },
   "dependencies": {
