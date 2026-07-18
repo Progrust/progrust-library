@@ -31,7 +31,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 
 - dict-style.md のテンプレート（定義 → コード例 → 補足`:::details` → 関連項目）・文体・分量規約に従う。テンプレート遵守を第一としつつ、テーブル・メッセージ・mermaid等で分かりやすくできる箇所は積極的に使う（dict-style.md「記法の活用」）
 - 日付は必ず `date +%F` で取得した値を使う
-  - 新規: `created_at` / `updated_at` の両方に当日日付、`public: false`
+  - 新規: `created_at` / `updated_at` の両方に当日日付、`public: true`（`false`だと他記事にwikilinkが付与できないため最初から`public: true`に設定する。）
   - 更新: `updated_at` のみ当日日付に変更（`created_at` は変更しない）
 - タグは `npm run dict:tags` で使用中タグを集計し、既存タグから選ぶことを優先する。意味の重なる近縁の新タグを作らない。適切な既存タグがない場合のみ新タグを付け、最終報告で明示する（規約はdict-style.md「タグの付け方」）
 - wikilinkは初出のみ・実在slugのみ。未作成の対象は `<!-- TODO: [[slug]] 作成後にリンク -->` を残す
@@ -50,7 +50,9 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 
 以下の3観点のサブエージェントを**並行で**起動してレビューさせ、指摘を修正する。コードを修正した場合は手順5を再実行する。
 
-- モデル指定: 観点1（技術的正確性）のサブエージェントは**必ずOpusで実行**する（Agentツールの `model: "fable"` 指定。もっともらしい誤りの検出には上位モデルを使う）。観点2・3はセッションのモデルを継承してよい
+- モデル指定:
+  - 観点1（技術的正確性）のサブエージェントはFableで実行する（Agentツールの `model: "fable"` 指定）
+  - 観点2・3のサブエージェントはOpusで実行する（Agentツールの `model: "opus"` 指定）
 
 1. **技術的正確性（敵対的）**: 「この記述は誤りである、という前提で反証を試みよ。The Rust Reference / std公式ドキュメントを根拠に、誤り・誇張・edition依存の記述・古い情報を出典付きで指摘せよ。出典を示せない指摘はしないこと」
 2. **記法・frontmatter準拠**: 「`docs/markdown-notation/` の rule.md / frontmatter.md / dict-style.md に照らして逸脱を列挙せよ。特に: h1使用・`---`使用・`:::details[タイトル]` のlabel記法（スペース区切りはタイトルが黙って消える）・日付形式（yyyy-MM-dd）・タグが既存タグ（`npm run dict:tags` で集計）と意味重複する新タグになっていないか・wikilinkが初出のみか・**既存エントリに相当する語が本文にあるのにリンクされていない箇所がないか**（`content/dict/` の全slug/titleと突き合わせる）・関連項目が本文リンクと重複していないか・リンク先slugの実在・TODOコメントの予約slugが既存コンテンツの同一概念の予約（`npm run dict:todo` で集計）と一致しているか」
@@ -65,7 +67,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 
 ## 8. コミット（必須）
 
-- `public: false` のままコミットする（公開判断は人間が行うため、このコマンドで `true` にしない）
+- `public: true` のままコミットする（`false`だと他記事にwikilinkが付与できないため最初から`public: true`に設定する。本番に上げないようにプッシュは行わないこと。）
 - コミットメッセージは `docs/implementation-rules.md` §6 に従う: Conventional Commits + 日本語サブジェクト。コンテンツのコミットは `content` typeを使う（例: `content: 辞書「所有権」を追加`）
 - TODO解消で書き換えた他のコンテンツファイルも同じコミットに含める
 - タスク運用外のため `Task:` トレーラーは付けない
@@ -80,4 +82,3 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 - 全コンテンツに残っている未作成slugのTODO一覧（`npm run dict:todo` の結果。次に書く候補として提示し、「リンク化漏れ」警告が出た場合は解消するか報告する）
 - 検証結果（check:dict / check / build）とサブエージェントレビューの要約（指摘と対応）
 - 作成したコミットの一覧（ハッシュ + サブジェクト）
-- 「公開する場合は `public: true` へ変更してコミットしてください」の一言
