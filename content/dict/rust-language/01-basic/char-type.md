@@ -3,7 +3,7 @@ title: 文字型（Char Type）
 description: 1つのUnicodeスカラー値を表すプリミティブ型。常に4バイト固定長。
 created_at: 2026-07-18
 updated_at: 2026-07-18
-tags: ["型システム", "基本文法", "プリミティブ型"]
+tags: ["型システム", "基本文法", "プリミティブ型", "スカラー型"]
 public: false
 ---
 

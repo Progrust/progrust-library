@@ -3,7 +3,7 @@ title: 整数型（Integer Types）
 description: 整数を表す型の総称。符号の有無とビット幅で複数種類があり、既定は`i32`。
 created_at: 2026-07-18
 updated_at: 2026-07-18
-tags: ["型システム", "基本文法", "プリミティブ型"]
+tags: ["型システム", "基本文法", "プリミティブ型", "スカラー型"]
 public: true
 ---
 
