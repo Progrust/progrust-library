@@ -60,6 +60,22 @@ fn main() {
 また、`!`は`std::ops::Not`、`&`は`BitAnd`、`|`は`BitOr`、`^`は`BitXor`トレイトに対応しており、独自の型にも実装できます。一方、短絡評価する`&&`と`||`はトレイトに対応しておらず、`bool`型の値専用です（`&bool`のような参照はそのままでは使えず、`*`によるデリファレンスが必要です）。<!-- TODO: [[operator-overloading]] 作成後にリンク -->
 :::
 
+:::details[他言語との違い（truthy/falsyはない）]
+JavaScriptなどの`||`は「左辺がfalsyなら右辺の**値そのもの**を返す」ため、`name || "ゲスト"`のようなデフォルト値の指定に使えます。一方Rustの論理演算子は`bool`専用で結果も必ず`bool`のため、この書き方はできません。数値や文字列にtruthy/falsyの概念もなく、条件には明示的な比較式を書きます。
+
+<!-- rustc: expect E0308 -->
+```rust playground
+fn main() {
+    let count = 3;
+    if count || count > 10 { // エラー: E0308（boolではなく整数を渡している）
+        println!("在庫あり");
+    }
+}
+```
+
+「なければデフォルト値」はRustでは`Option`のメソッドで表現します（例: `name.unwrap_or_else(|| "ゲスト".to_string())`）。<!-- TODO: [[option]] 作成後にリンク -->
+:::
+
 ## 関連項目
 
 - [[numeric-operations]]
