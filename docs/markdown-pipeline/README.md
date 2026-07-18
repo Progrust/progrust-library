@@ -18,6 +18,7 @@
 | テーブルの横スクロールラッパ | [table-wrap.md](table-wrap.md) | hast層`wrapNode`で`<table>`を`.table-wrap`divに包むだけ、生HTMLテーブルは対象外 |
 | Rust Playgroundリンクボタン | [playground.md](playground.md) | ` ```rust playground `メタ判定のmdast前処理、URLはビルド時静的生成、**codeFilenameの後置必須** |
 | 外部リンクの別タブ化 | [external-links.md](external-links.md) | `link` visitorで`http(s)://`のみ`target="_blank"`+`rel`付与、wikilink/内部リンクはガードで素通り |
+| 本文中の改行の`<br>`反映 | [soft-breaks.md](soft-breaks.md) | `text` visitorで`\n`を`break`ノードに分割、コード内は購読モデルで無傷、**登録は末尾** |
 
 各文書は統一構成: **記法 → 実装方式 → 雛形コード → 落とし穴と回避策 → 制約・残課題**
 
@@ -46,6 +47,7 @@ import { linkCard } from './plugins/link-card.mjs';
 import { codeFilename } from './plugins/code-filename.mjs';
 import { playgroundLink } from './plugins/playground-link.mjs';
 import { externalLinks } from './plugins/external-links.mjs';
+import { softBreaks } from './plugins/soft-breaks.mjs';
 import { mermaid } from './plugins/mermaid.mjs';
 import { tableWrap } from './plugins/table-wrap.mjs';
 
@@ -62,7 +64,7 @@ export default defineConfig({
     },
     processor: satteri({
       features: { directive: true }, // ← 有効化したら textDirective 復元プラグイン（directives.md）が必須
-      mdastPlugins: [codeFilename, playgroundLink, wikilink(dictIndex), directives, linkCard(), externalLinks],
+      mdastPlugins: [codeFilename, playgroundLink, wikilink(dictIndex), directives, linkCard(), externalLinks, softBreaks],
       hastPlugins: [mermaid(), tableWrap],
     }),
   },

@@ -7,6 +7,7 @@ import type { DictIndexEntry } from "../../plugins/dict-index.mjs";
 import { directives } from "../../plugins/directives.mjs";
 import { linkCard } from "../../plugins/link-card.mjs";
 import { externalLinks } from "../../plugins/external-links.mjs";
+import { softBreaks } from "../../plugins/soft-breaks.mjs";
 import { mermaid } from "../../plugins/mermaid.mjs";
 import { tableWrap } from "../../plugins/table-wrap.mjs";
 
@@ -41,6 +42,7 @@ export async function compileWithAllPlugins(
       directives,
       linkCard({ cacheDir: options.cacheDir }),
       externalLinks,
+      softBreaks,
     ],
     // fake レンダラは本物の MermaidRenderer の使う部分集合のみ実装するため unknown 経由で橋渡し。
     hastPlugins: [
