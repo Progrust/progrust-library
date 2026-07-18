@@ -326,6 +326,7 @@
    アクセント文字。`:not(pre) > code` でコードブロック内の <code> を除外する。 */
 .prose :not(pre) > code {
   font-family: var(--font-mono);
+  font-variant-ligatures: none; /* JetBrains Mono の合字（>= 等）を無効化し、原文どおり表示する */
   font-size: 0.85em;
   padding: 0.1em 0.4em;
   margin-inline: 0.15em;
@@ -403,6 +404,7 @@ html.dark .wikilink {
   border: 1px solid #4a4238;
   color: #e4dcd1; /* 地の文字色（テーマ未マッチのトークンはこの色を継承する） */
   font-family: var(--font-mono);
+  font-variant-ligatures: none; /* JetBrains Mono の合字（>= 等）を無効化し、原文どおり表示する */
   font-size: 13px;
   line-height: 1.7;
 }
