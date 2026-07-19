@@ -36,7 +36,7 @@ fn main() {
 ## 補足
 
 :::details[breakで値を返せない（E0571）]
-`break 値;`が使えるループは`loop`式だけです（ループ以外ではラベル付きブロック式でも使えます）。`while`（および[[for-expression]]）で値を渡すとコンパイルエラーE0571になります[^3]。
+`break 値;`が使えるループは`loop`式だけです（ループ以外では[[loop-label]]を付けたブロック式でも使えます）。`while`（および[[for-expression]]）で値を渡すとコンパイルエラーE0571になります[^3]。
 
 <!-- rustc: expect E0571 -->
 ```rust
