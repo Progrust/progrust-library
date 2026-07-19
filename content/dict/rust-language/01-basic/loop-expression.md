@@ -29,7 +29,7 @@ fn main() {
 | 構文 | 繰り返しの条件 | 式としての値 |
 | --- | --- | --- |
 | `loop` | なし（`break`するまで無限） | `break`に渡した値（渡さなければ`()`） |
-| `while`<!-- TODO: [[while-expression]] 作成後にリンク --> | 条件が`true`の間 | 常に`()` |
+| [[while-expression]] | 条件が`true`の間 | 常に`()` |
 | `for`<!-- TODO: [[for-expression]] 作成後にリンク --> | [[range-expression]]などのイテレータに<!-- TODO: [[iterator]] 作成後にリンク -->次の要素がある間 | 常に`()` |
 
 ## 補足
