@@ -2,12 +2,12 @@
 title: 変換トレイト
 description: From/Into・TryFrom/TryIntoによる型変換。失敗しない変換とResultで失敗を返す変換を型で表現する仕組み。
 created_at: 2026-07-18
-updated_at: 2026-07-18
+updated_at: 2026-07-19
 tags: ["基本文法", "型システム"]
 public: true
 ---
 
-標準ライブラリには、型変換をトレイトとして表現した`From`/`Into`と`TryFrom`/`TryInto`が用意されています。<!-- TODO: [[trait]] 作成後にリンク -->
+[[standard-library]]には、型変換をトレイトとして表現した`From`/`Into`と`TryFrom`/`TryInto`が用意されています。<!-- TODO: [[trait]] 作成後にリンク -->
 `From`/`Into`は**失敗せず、損失もない変換**にだけ実装するのが規約で、変換しても値が変わらないことをコードの意図として表現できます。
 `TryFrom`/`TryInto`は**失敗しうる変換**用で、結果を`Result`で返すため、収まらない値をエラーとして検出できます。<!-- TODO: [[result]] 作成後にリンク -->
 収まらない値が黙って変わる[[type-cast]]と違って変換の安全性がコードから読み取れるため、これらのトレイトで書ける変換はこちらが推奨されます。
