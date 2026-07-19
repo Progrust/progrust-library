@@ -7,7 +7,7 @@ tags: ["基本文法"]
 public: true
 ---
 
-式（Expression）は、評価されると**値を生成する**コードの単位です。`1 + 2`のような演算や関数呼び出しだけでなく、Rustでは`if`・`match`・`loop`・ブロック`{}`までもが値を生成する式です。The Rust Referenceは、Rustを主に式で構成される「式言語（expression language）」だと説明しています[^1]。値を生成しない[[statement]]と対になる概念で、この区別がRustの文法の土台になります。
+式（Expression）は、評価されると**値を生成する**コードの単位です。`1 + 2`のような演算や関数呼び出しだけでなく、Rustでは`if`・`match`・[[loop-expression]]・ブロック`{}`までもが値を生成する式です。The Rust Referenceは、Rustを主に式で構成される「式言語（expression language）」だと説明しています[^1]。値を生成しない[[statement]]と対になる概念で、この区別がRustの文法の土台になります。
 
 ```rust playground
 fn main() {

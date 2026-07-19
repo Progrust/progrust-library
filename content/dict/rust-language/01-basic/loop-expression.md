@@ -30,7 +30,7 @@ fn main() {
 | --- | --- | --- |
 | `loop` | なし（`break`するまで無限） | `break`に渡した値（渡さなければ`()`） |
 | [[while-expression]] | 条件が`true`の間 | 常に`()` |
-| `for`<!-- TODO: [[for-expression]] 作成後にリンク --> | [[range-expression]]などのイテレータに<!-- TODO: [[iterator]] 作成後にリンク -->次の要素がある間 | 常に`()` |
+| [[for-expression]] | [[range-expression]]などのイテレータに<!-- TODO: [[iterator]] 作成後にリンク -->次の要素がある間 | 常に`()` |
 
 ## 補足
 

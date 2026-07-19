@@ -44,7 +44,7 @@ fn add_tax(price: i32) -> i32 {
 ## 補足
 
 :::details[ブロックで終わる式はセミコロンを省略できる]
-`if`・`match`・`loop`・`for`などブロックで終わる式を文の位置に置く場合は、セミコロンを付けずにそのまま文として扱えます（この場合、式の型は`()`である必要があります）。普段`for`ループの後ろにセミコロンを書かないのはこのルールによるものです。
+`if`・`match`・[[loop-expression]]・[[for-expression]]などブロックで終わる式を文の位置に置く場合は、セミコロンを付けずにそのまま文として扱えます（この場合、式の型は`()`である必要があります）。普段`for`ループの後ろにセミコロンを書かないのはこのルールによるものです。
 :::
 
 [^1]: [The Rust Reference: Statements](https://doc.rust-lang.org/reference/statements.html)
