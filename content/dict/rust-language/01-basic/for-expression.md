@@ -52,4 +52,17 @@ fn main() {
 `for`式はコンパイル時に、`IntoIterator::into_iter`でイテレータを作り、`loop`の中で`Iterator::next`を呼び続ける形へ展開されます[^1]。`next`が`Some(値)`を返す間だけ<!-- TODO: [[option]] 作成後にリンク -->本体を実行し、`None`になったら`break`します。`in`の左側には、この`Some`から取り出した値が束縛されるため、必ずマッチするパターン（irrefutableパターン）しか書けません。
 :::
 
+:::details[他言語のfor文との違い]
+JavaScriptやC言語にある`for (let i = 0; i < 3; i++)`のような「カウンタ変数を初期化・条件判定・更新する」形式のfor文は、Rustには存在しません（`for`の構文はイテレータを回す形式だけです[^1]）。
+
+| 言語 | 代表的な書き方 |
+| --- | --- |
+| JavaScript（C形式） | `for (let i = 0; i < 3; i++) { ... }` |
+| JavaScript（`for...of`） | `for (const item of items) { ... }` |
+| Rust | `for i in 0..3 { ... }`・`for item in &items { ... }` |
+
+Rustの`for`が相当するのはJavaScriptの`for...of`で、カウンタで回したいときは範囲式を渡します。添字と終了条件を手書きするカウンタ形式は、条件の書き間違いで配列の範囲外を指してパニックしたり要素を取りこぼしたりするバグの温床になるため、Rustではイテレータ形式の`for`が安全かつ簡潔な定番とされています[^2]。
+:::
+
 [^1]: [The Rust Reference: Loops and other breakable expressions](https://doc.rust-lang.org/reference/expressions/loop-expr.html)
+[^2]: [The Rust Programming Language: Control Flow](https://doc.rust-lang.org/book/ch03-05-control-flow.html)
