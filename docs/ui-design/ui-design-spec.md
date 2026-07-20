@@ -285,10 +285,10 @@ tailwind.config = {
 
 ### インラインコード
 
-ブロックとは異なり**ライトでは明るい面**。文字色はアクセント連動。
+ブロックとは異なり**ライトでは明るい面**。文字色はアクセント連動。空白は入力どおり保持する（`whitespace-break-spaces`。行末の連続空白も潰さず折り返し対象にする）。
 
 ```html
-<code class="font-mono text-[13px] px-1.5 py-0.5 mx-[0.15em] bg-[#EBE7DF] dark:bg-[#171411] text-accent dark:text-naccent rounded border border-line/70 dark:border-nline/70">&mut</code>
+<code class="font-mono text-[13px] px-1.5 py-0.5 mx-[0.15em] whitespace-break-spaces bg-[#EBE7DF] dark:bg-[#171411] text-accent dark:text-naccent rounded border border-line/70 dark:border-nline/70">&mut</code>
 ```
 
 > [!info] 検討の経緯

@@ -331,6 +331,7 @@
   padding: 0.1em 0.4em;
   margin-inline: 0.15em;
   border-radius: 4px;
+  white-space: break-spaces; /* 入力どおりに空白を保持しつつ、行末の連続空白も折り返し対象にする */
   background: #ebe7df;
   color: var(--color-accent);
   border: 1px solid color-mix(in srgb, var(--color-line) 70%, transparent);
