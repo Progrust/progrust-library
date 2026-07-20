@@ -2,7 +2,7 @@
 title: プリミティブ型
 description: Rustコンパイラに組み込まれた基本型の総称。単一の値のスカラー型と複数の値をまとめる複合型に大別。
 created_at: 2026-07-18
-updated_at: 2026-07-19
+updated_at: 2026-07-20
 tags: ["型システム", "基本文法", "プリミティブ型"]
 public: true
 ---
@@ -25,7 +25,7 @@ public: true
 
 - 文字列スライス`str`
 - スライス`[T]`
-- 参照`&T` / `&mut T`
+- [[reference]]`&T` / `&mut T`
 - 生ポインタ`*const T` / `*mut T`
 - 関数ポインタ`fn`、[[unit-type]]`()`
 - never型`!`

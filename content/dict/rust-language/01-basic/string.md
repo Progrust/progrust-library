@@ -2,7 +2,7 @@
 title: 文字列型
 description: 内容の追加・変更ができる、データを所有するUTF-8文字列型String。ヒープ領域にデータを確保し、実行時に自由に伸長できるのが特徴。
 created_at: 2026-07-19
-updated_at: 2026-07-19
+updated_at: 2026-07-20
 tags: ["基本文法", "文字列"]
 public: true
 ---
@@ -47,7 +47,7 @@ fn main() {
 
 ## &strとの使い分け
 
-`String`は文字列データの[[ownership]]を持つ（所有する）型、[[string-slice]]への参照`&str`は既存のデータを**借用**する型です。
+`String`は文字列データの[[ownership]]を持つ（所有する）型、[[string-slice]]への[[reference]]`&str`は既存のデータを[[borrow]]する型です。
 
 | 型 | 内容の変更 | 主な用途 |
 | --- | --- | --- |
