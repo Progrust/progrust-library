@@ -15,8 +15,8 @@ interface Props {
 const { headings, class: className = "" } = Astro.props;
 // 目次対象（h2〜h4・h1/脚注ラベル除外）の定義は content.ts に集約（pages R-13）
 const items = tocHeadings(headings);
-// 見出し深さに応じたインデント（h3・h4 を段下げ）
-const indent: Record<number, string> = { 2: "", 3: "pl-4", 4: "pl-8" };
+// 見出し深さに応じたインデント（h3・h4 を段下げ。Tailwind の padding は加算されないため絶対値で指定）
+const indent: Record<number, string> = { 2: "pl-4", 3: "pl-8", 4: "pl-12" };
 ---
 
 {
@@ -29,7 +29,7 @@ const indent: Record<number, string> = { 2: "", 3: "pl-4", 4: "pl-8" };
             <a
               href={`#${h.slug}`}
               data-toc-link={h.slug}
-              class={`-ml-px block border-l-2 border-transparent py-1 pl-4 text-sub transition-colors hover:text-accent motion-reduce:transition-none ${indent[h.depth]}`}
+              class={`-ml-px block border-l-2 border-transparent py-1 text-sub transition-colors hover:text-accent motion-reduce:transition-none ${indent[h.depth]}`}
             >
               {h.text}
             </a>
