@@ -2,7 +2,7 @@
 title: 参照
 description: 所有権を移動させずに値を指し示す&T・&mut T型の値。読み取り専用の共有参照と、排他的に書き換えもできる排他参照の2種類。
 created_at: 2026-07-20
-updated_at: 2026-07-20
+updated_at: 2026-07-21
 tags: ["所有権", "型システム"]
 public: true
 ---
@@ -68,7 +68,7 @@ fn main() {
 
 :::details[排他参照だけでは値の変更はできない]
 
-排他参照に対してそれが指し示す値を書き換えたい場合は`*`（参照外し）を通す必要があります。<!-- TODO: [[dereference]] 作成後にリンク -->
+排他参照に対してそれが指し示す値を書き換えたい場合は[[dereference]]を通す必要があります。
 
 ```rust playground
 fn deposit(balance: &mut i32, amount: i32) {
