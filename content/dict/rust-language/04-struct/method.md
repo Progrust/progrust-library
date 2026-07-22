@@ -16,12 +16,12 @@ struct User {
 }
 
 impl User {
-    // &self: フィールドを読み取るだけのメソッド
+    // &self: フィールドを読み取るだけのメソッド（共有参照を受け取る）
     fn is_adult(&self) -> bool {
         self.age >= 18
     }
 
-    // &mut self: フィールドを書き換えるメソッド
+    // &mut self: フィールドを書き換えるメソッド（排他参照を受け取る）
     fn have_birthday(&mut self) {
         self.age += 1;
     }
@@ -53,5 +53,5 @@ fn main() {
 ## 補足
 
 :::details[selfにはBox・Rc・Arcなども指定できる]
-The Rust Referenceの文法上、`self`の型には`Self`への参照だけでなく`Box<Self>`・`Rc<Self>`<!-- TODO: [[rc]] 作成後にリンク -->・`Arc<Self>`も直接指定できます。例えば`self: Box<Self>`は、ヒープ上のインスタンスの所有権を消費するメソッドを定義したい場合に使います。
+`self`の型には`Self`への参照だけでなく`Box<Self>`・`Rc<Self>`<!-- TODO: [[rc]] 作成後にリンク -->・`Arc<Self>`も直接指定できます。例えば`self: Box<Self>`は、ヒープ上のインスタンスの所有権を消費するメソッドを定義したい場合に使います。
 :::
