@@ -2,7 +2,7 @@
 title: Result型
 description: 成功と失敗を表す標準ライブラリの列挙型。成功値を持つOkと失敗理由を持つErrの2バリアントで、失敗の理由までエラー値として表現できる型。
 created_at: 2026-07-26
-updated_at: 2026-07-26
+updated_at: 2026-07-27
 tags: ["型システム", "複合型", "標準ライブラリ"]
 public: true
 ---
@@ -31,6 +31,27 @@ fn main() {
 ## `?`演算子によるエラー伝播
 
 `Result`を返す[[function]]の中では、`?`演算子を使うことで`Err`の場合にエラー値を`From`で変換したうえで即座に呼び出し元へ返せます<!-- TODO: [[question-mark-operator]] 作成後にリンク -->。`match`式を毎回書かずに済むため<!-- TODO: [[match-expression]] 作成後にリンク -->、失敗しうる処理を連続して呼び出すコードを簡潔に書けます。
+
+```rust playground
+fn split_bill(total: i32, people: i32) -> Result<i32, String> {
+    if people == 0 {
+        return Err("人数が0人です".to_string());
+    }
+    Ok(total / people)
+}
+
+fn print_share(total: i32, people: i32) -> Result<(), String> {
+    let amount = split_bill(total, people)?; // Errならここで即座にreturnする
+    println!("1人あたり{amount}円");
+    Ok(())
+}
+
+fn main() {
+    if let Err(reason) = print_share(3000, 0) {
+        println!("エラー: {reason}");
+    }
+}
+```
 
 ## `#[must_use]`による握りつぶし防止
 
