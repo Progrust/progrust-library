@@ -2,7 +2,7 @@
 title: 論理演算子
 description: 論理値を組み合わせるAND・OR・NOTの演算子。`&&`と`||`は左辺だけで結果が決まると右辺を評価しない短絡評価が特徴。
 created_at: 2026-07-18
-updated_at: 2026-07-20
+updated_at: 2026-07-26
 tags: ["基本文法", "スカラー型"]
 public: true
 ---
@@ -73,7 +73,7 @@ fn main() {
 }
 ```
 
-「なければデフォルト値」はRustでは`Option`のメソッドで表現します（例: `name.unwrap_or_else(|| "ゲスト".to_string())`）。<!-- TODO: [[option]] 作成後にリンク -->
+「なければデフォルト値」はRustでは[[option]]のメソッドで表現します（例: `name.unwrap_or_else(|| "ゲスト".to_string())`）。
 :::
 
 [^1]: [The Rust Reference: Arithmetic and logical binary operators](https://doc.rust-lang.org/reference/expressions/operator-expr.html#arithmetic-and-logical-binary-operators)

@@ -2,7 +2,7 @@
 title: for式
 description: イテレータが生み出す要素を順に取り出し、要素ごとに本体のブロックを実行するループ式。範囲・配列・ベクタなどの繰り返しに使う、3種のループで最も使用頻度が高い構文。式としての値は常にユニット型。
 created_at: 2026-07-19
-updated_at: 2026-07-20
+updated_at: 2026-07-26
 tags: ["基本文法"]
 public: true
 ---
@@ -49,7 +49,7 @@ fn main() {
 :::
 
 :::details[for式はloop式への糖衣構文]
-`for`式はコンパイル時に、`IntoIterator::into_iter`でイテレータを作り、`loop`の中で`Iterator::next`を呼び続ける形へ展開されます[^1]。`next`が`Some(値)`を返す間だけ<!-- TODO: [[option]] 作成後にリンク -->本体を実行し、`None`になったら`break`します。`in`の左側には、この`Some`から取り出した値が束縛されるため、必ずマッチするパターン（irrefutableパターン）しか書けません。
+`for`式はコンパイル時に、`IntoIterator::into_iter`でイテレータを作り、`loop`の中で`Iterator::next`を呼び続ける形へ展開されます[^1]。`next`が[[option]]の`Some(値)`を返す間だけ本体を実行し、`None`になったら`break`します。`in`の左側には、この`Some`から取り出した値が束縛されるため、必ずマッチするパターン（irrefutableパターン）しか書けません。
 :::
 
 :::details[他言語のfor文との違い]

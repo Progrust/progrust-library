@@ -49,7 +49,7 @@ C言語のenum（整数定数）やJavaのenum（全定数が共通のフィー�
 ## 補足
 
 :::details[標準ライブラリのOption・Result]
-[[standard-library]]が提供する列挙型の中でも特に重要なのが、値の有無を表す`Option<T>`と、成功・失敗を表す`Result<T, E>`です。<!-- TODO: [[option]] 作成後にリンク --><!-- TODO: [[result]] 作成後にリンク -->
+[[standard-library]]が提供する列挙型の中でも特に重要なのが、値の有無を表す[[option]]（`Option<T>`）と、成功・失敗を表す`Result<T, E>`です。<!-- TODO: [[result]] 作成後にリンク -->
 :::
 
 [^1]: [The Rust Reference: Enumerations](https://doc.rust-lang.org/reference/items/enumerations.html) — バリアントには値を持たない形・タプル型の値を持つ形・構造体型の値を持つ形の3種類があると定義しています。
