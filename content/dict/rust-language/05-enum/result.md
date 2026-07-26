@@ -30,7 +30,7 @@ fn main() {
 
 ## `?`演算子によるエラー伝播
 
-`Result`を返す[[function]]の中では、`?`演算子を使うことで`Err`の場合にエラー値を`From`で変換したうえで即座に呼び出し元へ返せます<!-- TODO: [[question-mark-operator]] 作成後にリンク -->。`match`式を毎回書かずに済むため<!-- TODO: [[match-expression]] 作成後にリンク -->、失敗しうる処理を連続して呼び出すコードを簡潔に書けます。
+`Result`を返す[[function]]の中では、`?`演算子を使うことで`Err`の場合にエラー値を`From`で変換したうえで即座に呼び出し元へ返せます<!-- TODO: [[question-mark-operator]] 作成後にリンク -->。[[match-expression]]を毎回書かずに済むため、失敗しうる処理を連続して呼び出すコードを簡潔に書けます。
 
 ```rust playground
 fn split_bill(total: i32, people: i32) -> Result<i32, String> {
