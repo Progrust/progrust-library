@@ -89,7 +89,7 @@ fn main() {
 :::
 
 :::details[フィールドを持たない構造体]
-フィールドリストごと省略した`struct Marker;`は、タプル構造体ではなくユニット様構造体と呼ばれる別の形になります。<!-- TODO: [[unit-like-struct]] 作成後にリンク -->
+フィールドリストごと省略した`struct Marker;`は、タプル構造体ではなく[[unit-like-struct]]と呼ばれる別の形になります。
 :::
 
 [^1]: [The Rust Reference: Structs](https://doc.rust-lang.org/reference/items/structs.html) — 型の定義に加えて、値の名前空間に同名のコンストラクタを定義すると述べています。
