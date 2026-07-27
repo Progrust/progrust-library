@@ -11,6 +11,7 @@
 | [`markdown-pipeline/`](markdown-pipeline/README.md) | 実装者 | Sätteriカスタムプラグインの機能別実装リファレンス（実装方式・雛形コード・落とし穴・残課題） |
 | `ui-design/` | 実装者 | UIデザインの仕様・計画（+ モック用ダミーコンテンツ）。モックHTML本体はリポジトリ外・claude design 上（[`ui-design/ui-design-spec.md`](ui-design/ui-design-spec.md) 冒頭にリンク） |
 | `archive/` | — | クローズ済み文書の凍結アーカイブ（歴史的記録。更新しない） |
+| `content-plan/` | — | コンテンツの作成プラン。規模の大きい内容について書きたい場合にここで情報の整理を行う。 |
 
 リポジトリ直下の `CLAUDE.md` はアプリ概要と本ディレクトリへの地図（詳細仕様は持たない）。
 
