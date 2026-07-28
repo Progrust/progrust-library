@@ -5,7 +5,6 @@ import {
   filterPublicChapters,
   sortByNewest,
   sortChapters,
-  chapterOrderLabel,
   chapterNav,
   chapterLedger,
   mergeRecent,
@@ -165,21 +164,6 @@ describe("sortChapters（章順・content-model R-7）", () => {
   });
 });
 
-describe("chapterOrderLabel（連番ラベル・content-model R-7）", () => {
-  it("元ファイル名先頭の連番をゼロ埋め2桁文字列で返す", () => {
-    expect(chapterOrderLabel({ filePath: "content/books/x/01-intro.md" })).toBe(
-      "01",
-    );
-    expect(chapterOrderLabel({ filePath: "content/books/x/12-final.md" })).toBe(
-      "12",
-    );
-  });
-
-  it("連番が無い（filePath 欠落）場合は 00 を返す", () => {
-    expect(chapterOrderLabel({})).toBe("00");
-  });
-});
-
 describe("chapterNav（前後章ナビ・pages R-16/AC-4）", () => {
   // 連番昇順に整列済みの章リストを前提にした最小構造
   const ch = (id: string, isPublic: boolean) => ({ id, isPublic });
@@ -240,7 +224,7 @@ describe("chapterLedger（章目次の台帳データ・pages R-17）", () => {
     data: { title },
   });
 
-  it("slug・連番ラベル・URL・公開状態を台帳項目に組み立てる", () => {
+  it("slug・URL・公開状態を台帳項目に組み立てる", () => {
     const chapters = [
       chapter("01", "intro", "イントロ"),
       chapter("02", "setup", "環境構築", false),
@@ -252,14 +236,12 @@ describe("chapterLedger（章目次の台帳データ・pages R-17）", () => {
       {
         slug: "intro",
         title: "イントロ",
-        order: "01",
         isPublic: true,
         href: "/books/rust-book/intro",
       },
       {
         slug: "setup",
         title: "環境構築",
-        order: "02",
         isPublic: false,
         href: "/books/rust-book/setup",
       },

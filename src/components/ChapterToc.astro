@@ -71,22 +71,16 @@ const indent: Record<number, string> = { 2: "", 3: "pl-6", 4: "pl-10" };
             {isCurrent ? (
               <span
                 aria-current="page"
-                class="flex items-center gap-2.5 border-t border-line px-2 py-2 text-[13px]"
+                class="block border-t border-line px-2 py-2 text-[13px] text-accent"
               >
-                <span class="font-mono text-xs text-accent">
-                  {chapter.order}
-                </span>
-                <span class="text-accent">{chapter.title}</span>
+                {chapter.title}
               </span>
             ) : (
               <a
                 href={chapter.href}
-                class="group flex items-center gap-2.5 border-t border-line px-2 py-2 text-[13px] transition-colors hover:bg-card motion-reduce:transition-none"
+                class="block border-t border-line px-2 py-2 text-[13px] text-sub transition-colors hover:bg-card hover:text-accent motion-reduce:transition-none"
               >
-                <span class="font-mono text-xs text-sub">{chapter.order}</span>
-                <span class="text-sub group-hover:text-accent">
-                  {chapter.title}
-                </span>
+                {chapter.title}
               </a>
             )}
 

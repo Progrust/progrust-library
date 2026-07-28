@@ -9,7 +9,6 @@ import {
   sortChapters,
   chapterLedger,
   chapterNav,
-  chapterOrderLabel,
 } from "../../../lib/content";
 import {
   buildContentWikilinkGraph,
@@ -37,13 +36,11 @@ export async function getStaticPaths() {
     const ledger = chapterLedger(bookChapters, bookSlug);
     const { prev, next } = chapterNav(bookChapters, chapter.id);
 
-    // 前後章エントリを台帳項目（href/order/title を保持）へ引き当てて表示データにする
+    // 前後章エントリを台帳項目（href/title を保持）へ引き当てて表示データにする
     const toTarget = (entry: (typeof bookChapters)[number] | null) => {
       if (!entry) return null;
       const item = ledger.find((l) => l.slug === entry.id.split("/")[1]);
-      return item
-        ? { href: item.href, order: item.order, title: item.title }
-        : null;
+      return item ? { href: item.href, title: item.title } : null;
     };
 
     return [
@@ -53,7 +50,6 @@ export async function getStaticPaths() {
           chapter,
           bookTitle: book.data.title,
           bookHref: `/books/${bookSlug}`,
-          order: chapterOrderLabel(chapter),
           ledger,
           currentSlug: chapterSlug,
           prev: toTarget(prev),
@@ -70,7 +66,6 @@ const {
   chapter,
   bookTitle,
   bookHref,
-  order,
   ledger,
   currentSlug,
   prev,
@@ -85,7 +80,6 @@ const { Content, headings } = await render(chapter);
   description={chapter.data.description}
   bookTitle={bookTitle}
   bookHref={bookHref}
-  order={order}
   createdAt={chapter.data.created_at}
   updatedAt={chapter.data.updated_at}
   chapters={ledger}

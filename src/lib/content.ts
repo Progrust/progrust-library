@@ -191,11 +191,6 @@ export function sortChapters<T extends FilePathed>(chapters: T[]): T[] {
   return [...chapters].sort((a, b) => chapterOrder(a) - chapterOrder(b));
 }
 
-/** 章の連番ラベル（ゼロ埋め2桁文字列。ヘッダー補助行・ナビ・台帳の表示用。content-model R-7） */
-export function chapterOrderLabel(entry: FilePathed): string {
-  return String(chapterOrder(entry)).padStart(2, "0");
-}
-
 /** 前後章ナビの最小構造（id で現在章を特定し、公開章のみを辿る） */
 interface Navigable {
   id: string;
@@ -238,15 +233,13 @@ export interface ChapterLedgerItem {
   /** 連番除去後の章 slug（URL 末尾） */
   slug: string;
   title: string;
-  /** ゼロ埋め2桁の連番ラベル（表示用） */
-  order: string;
   isPublic: boolean;
   /** 章詳細への URL（/books/[本slug]/[章slug]） */
   href: string;
 }
 
 /** 台帳表示に必要な最小構造（章エントリ） */
-interface Chapterish extends FilePathed {
+interface Chapterish {
   id: string;
   isPublic: boolean;
   data: { title: string };
@@ -254,7 +247,7 @@ interface Chapterish extends FilePathed {
 
 /**
  * 章目次の台帳データを組み立てる（pages R-17・章詳細サイドバー）。章 ID は
- * `[本slug]/[章slug]`。URL 規則（content-model R-8）と連番ラベルを一箇所に集約する。
+ * `[本slug]/[章slug]`。URL 規則（content-model R-8）を一箇所に集約する。
  * 連番昇順に整列済みのリストを渡す前提（sortChapters 済み）。
  */
 export function chapterLedger<T extends Chapterish>(
@@ -266,7 +259,6 @@ export function chapterLedger<T extends Chapterish>(
     return {
       slug,
       title: chapter.data.title,
-      order: chapterOrderLabel(chapter),
       isPublic: chapter.isPublic,
       href: `/books/${bookSlug}/${slug}`,
     };

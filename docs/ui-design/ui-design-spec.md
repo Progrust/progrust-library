@@ -387,14 +387,14 @@ html.dark .dict-link { color: #D4715A; }
 種別バッジは表示しない（eyebrow `// book` が種別を示す）。
 
 - **ヒーロー**: eyebrow `// book` → `grid gap-6 sm:gap-8 sm:grid-cols-[11rem_1fr]` で左=縦長の書影（`aspect-[600/850] object-cover rounded border border-line`、モバイルは `w-40` で縦積み）、右=タイトル（h1）・description（sub色）・タグチップ・`created / updated` 日付（mono）。下端 `border-b` で本文と区切る
-- **章目次サイドバー（lg以上）**: `sticky top-24`。eyebrow `// chapters` → 本タイトル（`font-display font-bold text-sm`、本トップへのリンク、ホバーでアクセント色）→ 台帳リスト（`border-t` 起点、各行 = mono連番 `01` + 章タイトル `text-[13px]`、行ホバーで `bg-card` + タイトルがアクセント色）。「目次」の見出し文字は置かない（eyebrowと重複するため）
+- **章目次サイドバー（lg以上）**: `sticky top-24`。eyebrow `// chapters` → 本タイトル（`font-display font-bold text-sm`、本トップへのリンク、ホバーでアクセント色）→ 台帳リスト（`border-t` 起点、各行 = 章タイトル `text-[13px]`、行ホバーで `bg-card` + タイトルがアクセント色）。「目次」の見出し文字は置かない（eyebrowと重複するため）
 - **モバイル（lg未満）**: サイドバーは非表示にし、本文の後ろに章目次セクション（`// chapters` + 見出し「目次」+ `N chapters` 件数 + 台帳リスト行）を表示
 
 ### 章詳細（★book-chapter.htmlで確定）
 
-- **左サイドバー＝複合目次**（`sticky top-24`）: 本トップのサイドバーと同じ「`// chapters` eyebrow → 本タイトルリンク → 章の台帳リスト」に、**現在章だけアクセント色（連番・タイトルとも）で強調しリンクなし（`aria-current="page"`）、その直下に章本文の見出し目次をネスト**する。ネスト部は辞書詳細の目次と同じ文法（`ml-[1.75rem] border-l` の縦罫線リスト、現在位置 `border-l-2 border-accent` + `text-strong`、h3は `pl-6` インデント）
-- **本文ヘッダー**: eyebrow `// book chapter` → mono補助行「`NN / 本タイトル`」→ 章タイトル（h1）→ `created / updated` 日付。章frontmatterに画像はないためヒーロー画像なし、タグも表示しない
-- **前後章ナビ**（本文末尾、pages R-16）: `grid sm:grid-cols-2 gap-3` のカード型リンク（`rounded border bg-card px-4 py-3`、ホバーで枠アクセント色）。mono補助行 `← prev / NN` / `next / NN →` + 章タイトル。先頭章はprev側・最終章はnext側を空にする
+- **左サイドバー＝複合目次**（`sticky top-24`）: 本トップのサイドバーと同じ「`// chapters` eyebrow → 本タイトルリンク → 章の台帳リスト」に、**現在章だけアクセント色で強調しリンクなし（`aria-current="page"`）、その直下に章本文の見出し目次をネスト**する。ネスト部は辞書詳細の目次と同じ文法（`ml-[1.75rem] border-l` の縦罫線リスト、現在位置 `border-l-2 border-accent` + `text-strong`、h3は `pl-6` インデント）
+- **本文ヘッダー**: eyebrow `// book chapter` → mono補助行「`本タイトル`」→ 章タイトル（h1）→ `created / updated` 日付。章frontmatterに画像はないためヒーロー画像なし、タグも表示しない
+- **前後章ナビ**（本文末尾、pages R-16）: `grid sm:grid-cols-2 gap-3` のカード型リンク（`rounded border bg-card px-4 py-3`、ホバーで枠アクセント色）。mono補助行 `← prev` / `next →` + 章タイトル。先頭章はprev側・最終章はnext側を空にする
 - **右カラム・モバイル**: 辞書詳細と同一（辞書ペイン+使用辞書一覧 / フローティングボタン+ボトムシート）。モバイルの目次ボトムシートには複合目次をそのまま表示する
 
 ### タグ一覧（★tags-index.htmlで確定）

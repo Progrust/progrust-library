@@ -1,7 +1,7 @@
 ---
 // 章詳細レイアウト（pages R-12/R-13/R-16 / ui-design-spec §309〜314）。
 // DetailLayout（辞書・記事）を踏襲した3カラムだが、左カラムを複合目次（章リスト+
-// 現在章の本文見出し）に、ヘッダーを章用（eyebrow // book chapter・NN/本タイトル・
+// 現在章の本文見出し）に、ヘッダーを章用（eyebrow // book chapter・本タイトル・
 // タグ/画像なし・created/updated）に差し替え、本文末尾に前後章ナビを置く。
 // 右カラム・モバイルは辞書詳細と同一（DictPane 枠 / MobileNav。動作は P4）。
 import type { MarkdownHeading } from "astro";
@@ -15,10 +15,9 @@ import LinkedDictList from "../components/LinkedDictList.astro";
 import MobileNav from "../components/MobileNav.astro";
 import PrivateBadge from "../components/PrivateBadge.astro";
 
-/** 前後章ナビの表示データ（連番・タイトル・URL。ページ側で算出） */
+/** 前後章ナビの表示データ（タイトル・URL。ページ側で算出） */
 interface NavTarget {
   href: string;
-  order: string;
   title: string;
 }
 
@@ -29,8 +28,6 @@ interface Props {
   bookTitle: string;
   /** 本トップへの URL */
   bookHref: string;
-  /** 現在章のゼロ埋め2桁連番（ヘッダー補助行） */
-  order: string;
   createdAt: Date;
   updatedAt: Date;
   /** 章の台帳（連番昇順・複合目次用） */
@@ -53,7 +50,6 @@ const {
   description,
   bookTitle,
   bookHref,
-  order,
   createdAt,
   updatedAt,
   chapters,
@@ -104,7 +100,7 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
             href={bookHref}
             class="font-mono text-xs text-sub transition-colors hover:text-accent motion-reduce:transition-none"
           >
-            {order} / {bookTitle}
+            {bookTitle}
           </a>
           <h1
             class="mt-2 font-display text-3xl font-black leading-tight tracking-tight text-strong sm:text-4xl"
