@@ -11,6 +11,15 @@ export const SITE = {
   since: 2026,
 } as const;
 
+/** 全ページ共通のOGP画像のパス（feeds-meta R-6。public/ogp.png・1200×630）。 */
+export const OGP_IMAGE_PATH = "/ogp.png";
+
+/** 記事のヘッダ画像フォールバック（pages R-9。frontmatterのimage省略時に一覧カードで使う）。 */
+export const DEFAULT_HEADER_IMAGE = {
+  url: OGP_IMAGE_PATH,
+  alt: SITE.title,
+} as const;
+
 /** フッター等で使う各種リンク。 */
 export const SITE_LINKS = {
   rss: "/rss.xml",

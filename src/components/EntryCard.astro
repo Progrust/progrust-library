@@ -3,16 +3,26 @@
 // 左にヘッダ画像、右に 日付 / タイトル / 概要（description）/ タグ。
 // data-title / data-description / data-tags は一覧絞込 JS 用（data-tags は | 区切り。search R-9）。
 // 画像はダミーの remote URL を文字列で受ける（画像最適化は後続タスク。content.config.ts 参照）。
+// image 省略時（記事のみ。pages R-9）は共通OGP画像＋サイト名altにフォールバックする。
+import { DEFAULT_HEADER_IMAGE } from "../lib/site";
+
 interface Props {
   href: string;
   title: string;
   description: string;
   createdAt: Date;
   tags: string[];
-  image: { url: string; alt: string };
+  image?: { url: string; alt: string };
 }
 
-const { href, title, description, createdAt, tags, image } = Astro.props;
+const {
+  href,
+  title,
+  description,
+  createdAt,
+  tags,
+  image = DEFAULT_HEADER_IMAGE,
+} = Astro.props;
 const isoDate = createdAt.toISOString().slice(0, 10);
 ---
 
@@ -27,7 +37,7 @@ const isoDate = createdAt.toISOString().slice(0, 10);
     src={image.url}
     alt={image.alt}
     loading="lazy"
-    class="aspect-[1200/630] w-full shrink-0 rounded border border-line/70 object-cover sm:w-40"
+    class="aspect-[1200/630] w-full shrink-0 rounded border border-line/70 object-cover sm:w-40 sm:self-center"
   />
   <div class="flex min-w-0 flex-col gap-2">
     <time datetime={isoDate} class="font-mono text-xs text-sub">{isoDate}</time>

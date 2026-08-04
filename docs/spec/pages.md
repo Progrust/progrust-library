@@ -46,7 +46,7 @@
 ### 一覧ページ
 
 - **R-8**: 辞書一覧（`/dict/`）: タイトル+タグのみのカードスタイルのグリッド表示。タグとキーワードで絞込可能（[`search.md`](search.md)）。
-- **R-9**: 記事一覧（`/articles/`）: 概要・ヘッダ画像を含むカードスタイルの縦並び。タグとキーワードで絞込可能。
+- **R-9**: 記事一覧（`/articles/`）: 概要・ヘッダ画像を含むカードスタイルの縦並び。タグとキーワードで絞込可能。frontmatterの`image`省略時（[`../markdown-notation/frontmatter.md`](../markdown-notation/frontmatter.md)）は、カードのヘッダ画像を共通OGP画像`/ogp.png`（alt=サイト名。[`feeds-meta.md`](feeds-meta.md) R-6の画像を流用）にフォールバックする。
 - **R-10**: 本一覧（`/books/`）: 概要・ヘッダ画像を含むカードスタイルの縦並び。タグとキーワードで絞込可能。
 - **R-11**: 一覧はページネーションせず全件表示する（絞込はクライアント側で行う）。
 
@@ -91,6 +91,7 @@
 - **AC-11**: ` ```rust playground ` のコードブロックが `<div class="code-playground"><pre>…</pre><a class="playground-open" href="https://play.rust-lang.org/?version=stable&edition=2024&code=<エンコード済みコード>" target="_blank" rel="noopener noreferrer">Playgroundで開く</a></div>` の構造で出力され、メタなしの ` ```rust ` や `rust` 以外の言語にはボタンが付かない。（R-23）
 - **AC-12**: ボタン押下でRust Playgroundが新規タブで開き、エディタに当該コードが入っている。ボタンは右上に半透明で表示され、hoverで濃くなり、コードの横スクロールに追従しない。（R-23）※目視確認
 - **AC-13**: 外部URLのテキストリンク（`[表示名](https://…)`）とリンクカードの `<a>` に `target="_blank" rel="noopener noreferrer"` が付与され、内部リンク（`[about](/about)` 等）とwikilinkには付与されない。（R-24）
+- **AC-14**: frontmatterの`image`を省略した記事がビルドに成功し、記事一覧のカードに `/ogp.png` がサイト名のaltで表示される。（R-9）※表示は目視確認
 
 ## 5. 未確定事項
 

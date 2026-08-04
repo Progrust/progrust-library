@@ -8,7 +8,7 @@
 import { Font } from "astro:assets";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
-import { SITE, SITE_LINKS } from "../lib/site";
+import { OGP_IMAGE_PATH, SITE, SITE_LINKS } from "../lib/site";
 import "../styles/global.css";
 
 interface Props {
@@ -32,7 +32,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 // description 未指定ページ（一覧・トップ等）はサイト固定文にフォールバックし常時出力する（feeds-meta.md R-5）。
 const metaDescription = description ?? SITE.description;
 // 全ページ共通のOGP画像（feeds-meta.md R-6。public/ogp.png・1200×630）。
-const ogImage = new URL("/ogp.png", Astro.site);
+const ogImage = new URL(OGP_IMAGE_PATH, Astro.site);
 // Cloudflare Web Analytics のトークン（feeds-meta.md R-9）。実トークンは T6-4 で Secrets 登録。
 const beaconToken = import.meta.env.PUBLIC_CF_BEACON_TOKEN;
 ---

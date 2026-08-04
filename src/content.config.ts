@@ -37,7 +37,8 @@ const articles = defineCollection({
     base: "./content/articles",
     generateId: ({ entry }) => articleId(entry),
   }),
-  schema: z.object({ ...commonFields, image: imageField }),
+  // 記事のimageは省略可（省略時は一覧カード側でフォールバック。pages R-9）。
+  schema: z.object({ ...commonFields, image: imageField.optional() }),
 });
 
 const books = defineCollection({

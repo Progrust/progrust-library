@@ -32,7 +32,7 @@ public: true
 - updated_at: 更新日（yyyy-MM-dd）
 - tags: タグ（["Rust基礎", "Axum"]）
 - public: 公開 or 非公開（true or false）
-- image: ページのヘッダ画像
+- image: ページのヘッダ画像（**省略可**。省略時は記事一覧カードに共通OGP画像`/ogp.png`＋サイト名のaltを表示する。[`../spec/pages.md`](../spec/pages.md) R-9）
   - url: URLやパス
   - alt: 説明
 
@@ -60,7 +60,7 @@ image:
 - updated_at: 更新日（yyyy-MM-dd）
 - tags: タグ（["Rust基礎", "Axum"]）
 - public: 公開 or 非公開（true or false）
-- image: ページのヘッダ画像
+- image: ページのヘッダ画像（**必須**。本トップのヒーロー表紙にも使用）
   - url: URLやパス
   - alt: 説明
 
