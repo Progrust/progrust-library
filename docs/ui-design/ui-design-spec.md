@@ -16,6 +16,7 @@ claude designでのモック検討で確定したデザイン仕様。本実装�
   - タグ一覧: `tags-index.html`（件数順チップクラウド）
   - タグ詳細: `tags-detail.html`（種別混在の台帳リスト・戻るボタン。一覧データはバッジ全種を見せるための架空混じり）
   - テーブル: `table-compare.html`（案C: カード面フレーム・ゼブラなしで確定。不採用の比較案（現状 / 案A / 案B / 案D / ゼブラ）も残置）
+  - 本カバー画像（rust-learning）: `book-cover-compare.html`（案D: ドリルます目で確定。不採用の案A（台帳）/ 案B（Playgroundエディタ）/ 案C（枠組み表紙）も残置。編集用SVG原本は [`assets/book-rust-learning.svg`](assets/book-rust-learning.svg)、配信版 `public/images/books/rust-learning.svg` は原本に使用グリフのみサブセットしたwoff2（Zen Kaku Gothic New 700/900・JetBrains Mono 400、`pyftsubset --text=... --flavor=woff2`）をdata URIで埋め込み、フォント名を固有名に置換したもの。`<img>`経由でも書体が崩れない）
   - 参考資料: `code-bg-compare.html`（コードブロック背景色の比較検討）
 - 不採用の比較案（参考として残置）: `top-a-warm.html` / `top-c-balance.html` / `top-b2-sidebar.html` / `top-b3-catalog.html` / `book-top.html`（本トップの縦積み1カラム案）
 

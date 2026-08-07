@@ -6,8 +6,8 @@ updated_at: 2026-07-28
 tags: ["基本文法", "問題集"]
 public: false
 image:
-  url: https://picsum.photos/1200/630?random=3
-  alt: ダミー
+  url: /images/books/rust-learning.svg
+  alt: ます目にRustのキーワードを散りばめた「動かして学ぶRustプログラミング問題集」の表紙
 ---
 
 Rustをこれから学ぶ人のための、**実際に問題を解きながら読み進める**入門問題集です。
