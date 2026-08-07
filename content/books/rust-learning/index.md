@@ -4,7 +4,7 @@ description: Rust Playgroundを利用して、実際に手を動かして学ぶ�
 created_at: 2026-07-28
 updated_at: 2026-07-28
 tags: ["基本文法", "問題集"]
-public: false
+public: true
 image:
   url: /images/books/rust-learning.svg
   alt: ます目にRustのキーワードを散りばめた「動かして学ぶRustプログラミング問題集」の表紙
