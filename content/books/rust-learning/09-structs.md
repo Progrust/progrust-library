@@ -252,7 +252,7 @@ fn main() {
 
 ::::details[解答例と解説]
 ```rust playground
-#[derive(Debug)] // この1行を追加した
+#[derive(Debug)] // この1行を追加した [!code ++]
 struct Product {
     name: String,
     price: u32,
@@ -345,10 +345,10 @@ fn main() {
     };
 
     // standardをもとに、priceだけ1980にしたインスタンスpremiumを作れ
-    let premium = Plan {
-        price: 1980,
-        ..standard // 残りのフィールドはstandardから引き継ぐ
-    };
+    let premium = Plan { // [!code ++]
+        price: 1980, // [!code ++]
+        ..standard // 残りのフィールドはstandardから引き継ぐ [!code ++]
+    }; // [!code ++]
 
     println!("{:?}", standard);
     println!("{:?}", premium);
@@ -428,7 +428,7 @@ fn main() {
     };
 
     let large = Drink {
-        name: regular.name.clone(), // Stringのフィールドだけ明示してクローンする
+        name: regular.name.clone(), // Stringのフィールドだけ明示してクローンする [!code ++]
         price: 580,
         size_ml: 400,
         ..regular // 残りのiced（bool）はコピーで引き継がれる
@@ -438,7 +438,7 @@ fn main() {
     println!("{} {}ml: {}円", large.name, large.size_ml, large.price);
 }
 ```
-エラーメッセージは`borrow of moved value: 'regular.name'`（E0382）です。第7章で見たムーブのエラーですが、ムーブされたものが`regular`ではなく**`regular.name`というフィールド単位**で示されているところに注目してください。
+エラーメッセージは`borrow of moved value: 'regular.name'`（E0382）です。第7章で見たムーブのエラーですが、ムーブされたものが`regular`ではなく`regular.name`という**フィールド単位**で示されているところに注目してください。
 
 `..regular`で引き継がれるフィールドは、第7章で学んだムーブの規則にそのまま従います。フィールドの型によって挙動が分かれるところがポイントです。
 
@@ -496,9 +496,9 @@ struct Product {
 }
 
 // Productを借りて「名前: 価格円」を表示する関数print_productを定義せよ
-fn print_product(product: &Product) {
-    println!("{}: {}円", product.name, product.price);
-}
+fn print_product(product: &Product) { // [!code ++]
+    println!("{}: {}円", product.name, product.price); // [!code ++]
+} // [!code ++]
 
 fn main() {
     let product = Product {
@@ -563,7 +563,7 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 // i32を2つ持つタプル構造体Positionを定義せよ
-struct Position(i32, i32);
+struct Position(i32, i32); // [!code ++]
 
 fn main() {
     let shop = Position(3, 5);
@@ -574,7 +574,7 @@ fn main() {
 ```
 フィールドに名前を付けず、型だけを並べて定義する構造体を[[tuple-struct]]と呼びます。波括弧ではなく丸括弧で書き、末尾にセミコロンが必要です。
 
-インスタンスの作り方が独特で、`Position(3, 5)`という**関数呼び出しの形**になります。タプル構造体を定義すると、型名と同じ名前のコンストラクタが自動的に作られるためです。フィールドへのアクセスは、タプルと同じく`.0`・`.1`と番号で行います。
+インスタンスの作り方が独特で、`Position(3, 5)`という**関数呼び出しの形**になります。タプル構造体を定義すると、型名と同じ名前のコンストラクタが自動的に作られるためです。フィールドへのアクセスは、[[tuple]]と同じく`.0`・`.1`と番号で行います。
 
 第5章のタプル、この問題のタプル構造体、問題01からの構造体を並べると違いがはっきりします。
 
@@ -628,7 +628,8 @@ fn to_fahrenheit(temperature: Celsius) -> Fahrenheit {
 }
 
 fn main() {
-    let temperature = Celsius(25.0); // 摂氏25度に修正した
+    let temperature = Fahrenheit(25.0); //  [!code --]
+    let temperature = Celsius(25.0); // 摂氏25度に修正した [!code ++]
 
     let result = to_fahrenheit(temperature);
 
@@ -683,8 +684,8 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 // フィールドを持たない構造体Guestを定義せよ（{:?}で出力できるようにすること）
-#[derive(Debug)]
-struct Guest;
+#[derive(Debug)] //  [!code ++]
+struct Guest; //  [!code ++]
 
 fn main() {
     let visitor = Guest;
