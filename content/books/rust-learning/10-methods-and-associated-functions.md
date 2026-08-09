@@ -417,13 +417,13 @@ fn main() {
 ## 06 - 関連関数でコンストラクタ
 
 [[associated-function]]と[[impl-block]]に関する問題です。
-商品名と価格を受け取り、在庫0の`Product`を返す関連関数`new`を定義してください。
+商品名と価格を受け取り、在庫0の`Product`を返す関連関数`new`を定義し、`main`から呼び出してください。
 
 ```txt:期待する出力
 コーヒー豆: 1200円 / 在庫0個
 ```
 
-<!-- rustc: expect E0599 -->
+<!-- rustc: expect E0425 -->
 ```rust:「Playgroundで開く」をクリックして修正・実行してください playground
 struct Product {
     name: String,
@@ -438,7 +438,7 @@ impl Product {
 }
 
 fn main() {
-    let product = Product::new(String::from("コーヒー豆"), 1200);
+    // 関連関数newを呼び出して、商品名「コーヒー豆」・価格1200の商品をproductに束縛せよ
 
     println!(
         "{}: {}円 / 在庫{}個",
@@ -468,7 +468,8 @@ impl Product {
 }
 
 fn main() {
-    let product = Product::new(String::from("コーヒー豆"), 1200);
+    // 関連関数newを呼び出して、商品名「コーヒー豆」・価格1200の商品をproductに束縛せよ
+    let product = Product::new(String::from("コーヒー豆"), 1200); // [!code ++]
 
     println!(
         "{}: {}円 / 在庫{}個",
@@ -498,7 +499,7 @@ fn main() {
 ## 07 - implブロックは分割できる
 
 [[impl-block]]に関する問題です。
-2つめの`impl`ブロックに、残高を増やすメソッド`deposit`と、残高を表示するメソッド`show`を定義してください。
+残高を増やすメソッド`deposit`と、残高を表示するメソッド`show`を定義してください。ただし、**すでに書かれている`impl`ブロックには手を加えないこと**。
 
 ```txt:期待する出力
 田中さんの残高: 5000円
@@ -511,20 +512,16 @@ struct BankAccount {
     balance: u32,
 }
 
-// 1つ目のimplブロック: 関連関数
+// このimplブロックには手を加えないこと
 impl BankAccount {
     fn new(owner: String) -> Self {
         BankAccount { owner, balance: 0 }
     }
 }
 
-// 2つ目のimplブロック: メソッド
-impl BankAccount {
-    // 残高をamount円増やすメソッドdepositを定義せよ
+// 残高をamount円増やすメソッドdepositを定義せよ
+// 「〇〇さんの残高: 〇〇円」を表示するメソッドshowを定義せよ
 
-    // 「〇〇さんの残高: 〇〇円」を表示するメソッドshowを定義せよ
-
-}
 
 fn main() {
     let mut account = BankAccount::new(String::from("田中"));
@@ -541,25 +538,24 @@ struct BankAccount {
     balance: u32,
 }
 
-// 1つ目のimplブロック: 関連関数
+// このimplブロックには手を加えないこと
 impl BankAccount {
     fn new(owner: String) -> Self {
         BankAccount { owner, balance: 0 }
     }
 }
 
-// 2つ目のimplブロック: メソッド
-impl BankAccount {
-    // 残高をamount円増やすメソッドdepositを定義せよ
+// 残高をamount円増やすメソッドdepositを定義せよ
+// 「〇〇さんの残高: 〇〇円」を表示するメソッドshowを定義せよ
+impl BankAccount { // [!code ++]
     fn deposit(&mut self, amount: u32) { // [!code ++]
         self.balance += amount; // [!code ++]
     } // [!code ++]
 
-    // 「〇〇さんの残高: 〇〇円」を表示するメソッドshowを定義せよ
     fn show(&self) { // [!code ++]
         println!("{}さんの残高: {}円", self.owner, self.balance); // [!code ++]
     } // [!code ++]
-}
+} // [!code ++]
 
 fn main() {
     let mut account = BankAccount::new(String::from("田中"));
@@ -568,6 +564,8 @@ fn main() {
     account.show();
 }
 ```
+既存の`impl BankAccount`に手を加えられないなら、`impl BankAccount`をもう1つ書けばよい——というのが答えです。
+
 1つの型に対する[[impl-block]]は、**1つにまとめる必要がありません**。今回のように「関連関数のブロック」「メソッドのブロック」と役割で分けたり、ファイルが長くなったときに関心ごとに分けたりできます。分けても呼び出し方は何も変わりません。
 
 もちろん1つのブロックにまとめても正しく動きます。数が増えたときの整理手段として使えると覚えておいてください。
@@ -605,7 +603,7 @@ impl BankAccount {
 | `deposit(amount)` | メソッド | 残高を`amount`円増やす |
 | `withdraw(amount)` | メソッド | 残高が足りれば引き出して`true`、足りなければ何もせず`false`を返す |
 | `balance()` | メソッド | 現在の残高を返す |
-| `summary()` | メソッド | `田中さんの残高は5000円です`の形式の文字列を返す（口座は消費される） |
+| `summary()` | メソッド | `田中さんの残高は5000円です`の形式の文字列を返す。呼び出した後は、その口座を二度と使えなくすること |
 
 ```rust:「Playgroundで開く」をクリックしてTESTを実行してください playground
 // 構造体BankAccountを定義せよ（フィールド: owner（String）, balance（u32））
