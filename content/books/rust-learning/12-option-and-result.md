@@ -45,10 +45,10 @@ fn show_stock(stock: Option<u32>) {
     // match式で次のように出力せよ
     // Some(count) → 在庫は〇〇個です
     // None        → 在庫が分かりません
-    match stock {
-        Some(count) => println!("在庫は{count}個です"),
-        None => println!("在庫が分かりません"),
-    }
+    match stock { // [!code ++]
+        Some(count) => println!("在庫は{count}個です"), // [!code ++]
+        None => println!("在庫が分かりません"), // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -104,10 +104,11 @@ fn main() {
 fn main() {
     let stock: Option<u32> = Some(3);
 
-    let total = match stock {
-        Some(count) => count + 2,
-        None => 2, // 在庫が分からない場合は0個として扱う
-    };
+    let total = stock + 2; // [!code --]
+    let total = match stock { // [!code ++]
+        Some(count) => count + 2, // [!code ++]
+        None => 2, // 在庫が分からない場合は0個として扱う [!code ++]
+    }; // [!code ++]
 
     println!("合計: {total}個");
 }
@@ -165,14 +166,14 @@ fn test_not_found() {
 //   引数  : 商品名（&str）
 //   戻り値: 見つかればSome(価格)、見つからなければNone
 //   メニュー: コーヒー 500円 / 紅茶 450円 / ジュース 400円
-fn find_price(name: &str) -> Option<u32> {
-    match name {
-        "コーヒー" => Some(500),
-        "紅茶" => Some(450),
-        "ジュース" => Some(400),
-        _ => None,
-    }
-}
+fn find_price(name: &str) -> Option<u32> { // [!code ++]
+    match name { // [!code ++]
+        "コーヒー" => Some(500), // [!code ++]
+        "紅茶" => Some(450), // [!code ++]
+        "ジュース" => Some(400), // [!code ++]
+        _ => None, // [!code ++]
+    } // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_found() {
@@ -228,9 +229,9 @@ fn main() {
 fn show_stock(stock: Option<u32>) {
     // if let式を使い、Someのときだけ「在庫は〇〇個です」と出力せよ
     // Noneのときは何も出力しないこと
-    if let Some(count) = stock {
-        println!("在庫は{count}個です");
-    }
+    if let Some(count) = stock { // [!code ++]
+        println!("在庫は{count}個です"); // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -305,11 +306,11 @@ fn show_coupon(coupon: Option<u32>) {
     // if let ... elseで次のように出力せよ
     // Some(amount) → 〇〇円引きのクーポンがあります
     // None         → クーポンはありません
-    if let Some(amount) = coupon {
-        println!("{amount}円引きのクーポンがあります");
-    } else {
-        println!("クーポンはありません");
-    }
+    if let Some(amount) = coupon { // [!code ++]
+        println!("{amount}円引きのクーポンがあります"); // [!code ++]
+    } else { // [!code ++]
+        println!("クーポンはありません"); // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -386,10 +387,10 @@ fn main() {
 fn print_total(stock: Option<u32>) {
     // let-else文でstockからcountを取り出せ
     // Noneの場合は「在庫が分かりません」と出力して処理を打ち切ること
-    let Some(count) = stock else {
-        println!("在庫が分かりません");
-        return;
-    };
+    let Some(count) = stock else { // [!code ++]
+        println!("在庫が分かりません"); // [!code ++]
+        return; // [!code ++]
+    }; // [!code ++]
 
     println!("在庫{count}個、合計{}円です", count * 500);
 }
@@ -474,10 +475,10 @@ fn show(result: Result<u32, String>) {
     // match式で次のように出力せよ
     // Ok(amount)  → 1人あたり〇〇円です
     // Err(reason) → エラー: 〇〇
-    match result {
-        Ok(amount) => println!("1人あたり{amount}円です"),
-        Err(reason) => println!("エラー: {reason}"),
-    }
+    match result { // [!code ++]
+        Ok(amount) => println!("1人あたり{amount}円です"), // [!code ++]
+        Err(reason) => println!("エラー: {reason}"), // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -542,13 +543,13 @@ fn test_ship_error() {
 // 在庫stockからcount個を出荷する関数shipを定義せよ
 //   在庫が足りていれば、出荷後の残り在庫数をOkで返す
 //   足りなければ「在庫が足りません（在庫〇〇個）」というErrを返す
-fn ship(stock: u32, count: u32) -> Result<u32, String> {
-    if count > stock {
-        return Err(format!("在庫が足りません（在庫{stock}個）"));
-    }
+fn ship(stock: u32, count: u32) -> Result<u32, String> { // [!code ++]
+    if count > stock { // [!code ++]
+        return Err(format!("在庫が足りません（在庫{stock}個）")); // [!code ++]
+    } // [!code ++]
 
-    Ok(stock - count)
-}
+    Ok(stock - count) // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_ship_ok() {
@@ -635,10 +636,17 @@ fn ship(stock: u32, count: u32) -> Result<u32, String> {
 
 fn ship_twice(stock: u32, first: u32, second: u32) -> Result<u32, String> {
     // 次のmatchの入れ子を?演算子で書き換えよ（動作は変えないこと）
-    let rest = ship(stock, first)?;
-    let last = ship(rest, second)?;
+    match ship(stock, first) { // [!code --]
+        Ok(rest) => match ship(rest, second) { // [!code --]
+            Ok(last) => Ok(last), // [!code --]
+            Err(reason) => Err(reason), // [!code --]
+        }, // [!code --]
+        Err(reason) => Err(reason), // [!code --]
+    } // [!code --]
+    let rest = ship(stock, first)?; // [!code ++]
+    let last = ship(rest, second)?; // [!code ++]
 
-    Ok(last)
+    Ok(last) // [!code ++]
 }
 
 fn main() {
@@ -764,66 +772,66 @@ fn test_buy_out_of_stock() {
 ::::details[解答例と解説]
 ```rust playground
 // 商品を表す構造体Itemを定義せよ（name: String / price: u32 / stock: u32）
-struct Item {
-    name: String,
-    price: u32,
-    stock: u32,
-}
+struct Item { // [!code ++]
+    name: String, // [!code ++]
+    price: u32, // [!code ++]
+    stock: u32, // [!code ++]
+} // [!code ++]
 
 // 購入の失敗理由を表す列挙型StockErrorを定義せよ
 //   NotFound                 … 商品が見つからない
 //   OutOfStock { stock: u32 } … 在庫不足（現在の在庫数を持つ）
 // テストのassert_eq!で比較するため #[derive(Debug, PartialEq)] を付けること
-#[derive(Debug, PartialEq)]
-enum StockError {
-    NotFound,
-    OutOfStock { stock: u32 },
-}
+#[derive(Debug, PartialEq)] // [!code ++]
+enum StockError { // [!code ++]
+    NotFound, // [!code ++]
+    OutOfStock { stock: u32 }, // [!code ++]
+} // [!code ++]
 
 // 在庫全体を表す構造体Inventoryを定義せよ（items: Vec<Item>）
-struct Inventory {
-    items: Vec<Item>,
-}
+struct Inventory { // [!code ++]
+    items: Vec<Item>, // [!code ++]
+} // [!code ++]
 
 // Inventoryのimplブロックにnew・add・find_price・buyを定義せよ
-impl Inventory {
-    fn new() -> Self {
-        Inventory { items: Vec::new() }
-    }
+impl Inventory { // [!code ++]
+    fn new() -> Self { // [!code ++]
+        Inventory { items: Vec::new() } // [!code ++]
+    } // [!code ++]
 
-    fn add(&mut self, name: &str, price: u32, stock: u32) {
-        self.items.push(Item {
-            name: String::from(name),
-            price,
-            stock,
-        });
-    }
+    fn add(&mut self, name: &str, price: u32, stock: u32) { // [!code ++]
+        self.items.push(Item { // [!code ++]
+            name: String::from(name), // [!code ++]
+            price, // [!code ++]
+            stock, // [!code ++]
+        }); // [!code ++]
+    } // [!code ++]
 
-    fn find_price(&self, name: &str) -> Option<u32> {
-        for item in &self.items {
-            if item.name == name {
-                return Some(item.price);
-            }
-        }
+    fn find_price(&self, name: &str) -> Option<u32> { // [!code ++]
+        for item in &self.items { // [!code ++]
+            if item.name == name { // [!code ++]
+                return Some(item.price); // [!code ++]
+            } // [!code ++]
+        } // [!code ++]
 
-        None
-    }
+        None // [!code ++]
+    } // [!code ++]
 
-    fn buy(&mut self, name: &str, count: u32) -> Result<u32, StockError> {
-        for item in &mut self.items {
-            if item.name == name {
-                if item.stock < count {
-                    return Err(StockError::OutOfStock { stock: item.stock });
-                }
+    fn buy(&mut self, name: &str, count: u32) -> Result<u32, StockError> { // [!code ++]
+        for item in &mut self.items { // [!code ++]
+            if item.name == name { // [!code ++]
+                if item.stock < count { // [!code ++]
+                    return Err(StockError::OutOfStock { stock: item.stock }); // [!code ++]
+                } // [!code ++]
 
-                item.stock -= count;
-                return Ok(item.price * count);
-            }
-        }
+                item.stock -= count; // [!code ++]
+                return Ok(item.price * count); // [!code ++]
+            } // [!code ++]
+        } // [!code ++]
 
-        Err(StockError::NotFound)
-    }
-}
+        Err(StockError::NotFound) // [!code ++]
+    } // [!code ++]
+} // [!code ++]
 
 fn sample() -> Inventory {
     let mut inventory = Inventory::new();

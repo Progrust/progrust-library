@@ -59,9 +59,9 @@ struct Product {
 
 impl Product {
     // 在庫の合計金額（price × stock）を返すメソッドtotal_priceを定義せよ
-    fn total_price(&self) -> u32 {
-        self.price * self.stock
-    }
+    fn total_price(&self) -> u32 { // [!code ++]
+        self.price * self.stock // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -137,7 +137,8 @@ struct Product {
 }
 
 impl Product {
-    fn with_tax(&self) -> u32 { // &selfを追加した
+    fn with_tax() -> u32 { // [!code --]
+    fn with_tax(&self) -> u32 { // &selfを追加した [!code ++]
         self.price * 110 / 100
     }
 }
@@ -211,9 +212,9 @@ struct Product {
 
 impl Product {
     // 在庫をcount個増やすメソッドrestockを定義せよ
-    fn restock(&mut self, count: u32) {
-        self.stock += count;
-    }
+    fn restock(&mut self, count: u32) { // [!code ++]
+        self.stock += count; // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -294,7 +295,8 @@ impl Product {
 }
 
 fn main() {
-    let mut product = Product { // mutを追加した
+    let product = Product { // [!code --]
+    let mut product = Product { // mutを追加した [!code ++]
         name: String::from("コーヒー豆"),
         stock: 3,
     };
@@ -386,8 +388,9 @@ fn main() {
         quantity: 2,
     };
 
+    println!("レシート: {}", order.into_receipt()); // [!code --]
     println!("注文内容: {} ×{}", order.item, order.quantity); // 先に読んでおく
-    println!("レシート: {}", order.into_receipt()); // ここでorderを消費する
+    println!("レシート: {}", order.into_receipt()); // ここでorderを消費する [!code ++]
 }
 ```
 エラーメッセージは`borrow of moved value: 'order'`（E0382）です。第7章で何度も見たムーブのエラーが、メソッド呼び出しで起きています。
@@ -455,13 +458,13 @@ struct Product {
 impl Product {
     // 商品名と価格を受け取り、在庫0のProductを返す関連関数newを定義せよ
     // 戻り値の型にはSelfを使うこと
-    fn new(name: String, price: u32) -> Self {
-        Product {
-            name,
-            price,
-            stock: 0,
-        }
-    }
+    fn new(name: String, price: u32) -> Self { // [!code ++]
+        Product { // [!code ++]
+            name, // [!code ++]
+            price, // [!code ++]
+            stock: 0, // [!code ++]
+        } // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -548,14 +551,14 @@ impl BankAccount {
 // 2つ目のimplブロック: メソッド
 impl BankAccount {
     // 残高をamount円増やすメソッドdepositを定義せよ
-    fn deposit(&mut self, amount: u32) {
-        self.balance += amount;
-    }
+    fn deposit(&mut self, amount: u32) { // [!code ++]
+        self.balance += amount; // [!code ++]
+    } // [!code ++]
 
     // 「〇〇さんの残高: 〇〇円」を表示するメソッドshowを定義せよ
-    fn show(&self) {
-        println!("{}さんの残高: {}円", self.owner, self.balance);
-    }
+    fn show(&self) { // [!code ++]
+        println!("{}さんの残高: {}円", self.owner, self.balance); // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -650,38 +653,38 @@ fn test_summary() {
 ::::details[解答例と解説]
 ```rust playground
 // 構造体BankAccountを定義せよ（フィールド: owner（String）, balance（u32））
-struct BankAccount {
-    owner: String,
-    balance: u32,
-}
+struct BankAccount { // [!code ++]
+    owner: String, // [!code ++]
+    balance: u32, // [!code ++]
+} // [!code ++]
 
 // implブロックにnew・deposit・withdraw・balance・summaryを定義せよ
-impl BankAccount {
-    fn new(owner: String) -> Self {
-        BankAccount { owner, balance: 0 }
-    }
+impl BankAccount { // [!code ++]
+    fn new(owner: String) -> Self { // [!code ++]
+        BankAccount { owner, balance: 0 } // [!code ++]
+    } // [!code ++]
 
-    fn deposit(&mut self, amount: u32) {
-        self.balance += amount;
-    }
+    fn deposit(&mut self, amount: u32) { // [!code ++]
+        self.balance += amount; // [!code ++]
+    } // [!code ++]
 
-    fn withdraw(&mut self, amount: u32) -> bool {
-        if amount > self.balance {
-            return false;
-        }
+    fn withdraw(&mut self, amount: u32) -> bool { // [!code ++]
+        if amount > self.balance { // [!code ++]
+            return false; // [!code ++]
+        } // [!code ++]
 
-        self.balance -= amount;
-        true
-    }
+        self.balance -= amount; // [!code ++]
+        true // [!code ++]
+    } // [!code ++]
 
-    fn balance(&self) -> u32 {
-        self.balance
-    }
+    fn balance(&self) -> u32 { // [!code ++]
+        self.balance // [!code ++]
+    } // [!code ++]
 
-    fn summary(self) -> String {
-        format!("{}さんの残高は{}円です", self.owner, self.balance)
-    }
-}
+    fn summary(self) -> String { // [!code ++]
+        format!("{}さんの残高は{}円です", self.owner, self.balance) // [!code ++]
+    } // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_new_account() {

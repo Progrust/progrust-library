@@ -41,10 +41,10 @@ fn main() {
 ```rust playground
 fn main() {
     // 参加者数を表す変数participantsを、u32の型注釈付きで42として宣言せよ
-    let participants: u32 = 42;
+    let participants: u32 = 42; // [!code ++]
 
     // 設定温度を表す変数freezer_tempを、i32の型注釈付きで-18として宣言せよ
-    let freezer_temp: i32 = -18;
+    let freezer_temp: i32 = -18; // [!code ++]
 
     println!("参加者は{}人です。", participants);
     println!("設定温度は{}度です。", freezer_temp);
@@ -77,7 +77,8 @@ fn main() {
 :::details[解答例と解説]
 ```rust playground
 fn main() {
-    let days_in_year: u16 = 365;
+    let days_in_year: u8 = 365; // この行でコンパイルエラーになる [!code --]
+    let days_in_year: u16 = 365; // [!code ++]
     println!("1年は{}日です。", days_in_year);
 }
 ```
@@ -124,12 +125,12 @@ fn main() {
 ```rust playground
 fn main() {
     // りんごの単価を表す変数priceを、f64の型注釈付きで128.5として宣言せよ
-    let price: f64 = 128.5;
+    let price: f64 = 128.5; // [!code ++]
 
     println!("りんご1個は{}円です。", price);
 
     // priceを3倍した合計金額をtotalに束縛せよ
-    let total = price * 3.0;
+    let total = price * 3.0; // [!code ++]
 
     println!("3個で{}円です。", total);
 }
@@ -175,10 +176,14 @@ fn main() {
     let b = 4;
 
     // aとbの加算・減算・乗算・除算の結果を、数値演算に置き換えよ
-    println!("{} + {} = {}", a, b, a + b);
-    println!("{} - {} = {}", a, b, a - b);
-    println!("{} × {} = {}", a, b, a * b);
-    println!("{} ÷ {} = {}", a, b, a / b);
+    println!("{} + {} = {}", a, b, 20); // [!code --]
+    println!("{} - {} = {}", a, b, 12); // [!code --]
+    println!("{} × {} = {}", a, b, 64); // [!code --]
+    println!("{} ÷ {} = {}", a, b, 4); // [!code --]
+    println!("{} + {} = {}", a, b, a + b); // [!code ++]
+    println!("{} - {} = {}", a, b, a - b); // [!code ++]
+    println!("{} × {} = {}", a, b, a * b); // [!code ++]
+    println!("{} ÷ {} = {}", a, b, a / b); // [!code ++]
 }
 ```
 四則演算の演算子は`+`（加算）・`-`（減算）・`*`（乗算）・`/`（除算）です。多くの言語と同じ書き方で、`*`は`×`ではなくアスタリスク、`/`は`÷`ではなくスラッシュを使います。
@@ -221,10 +226,10 @@ fn main() {
     let per_group = 4;
 
     // できあがる班の数をgroupsに束縛せよ
-    let groups = students / per_group;
+    let groups = students / per_group; // [!code ++]
 
     // 余る人数をremainderに束縛せよ
-    let remainder = students % per_group;
+    let remainder = students % per_group; // [!code ++]
 
     println!(
         "{}人ずつの班が{}班でき、{}人余ります。",
@@ -265,7 +270,8 @@ fn main() {
 fn main() {
     let total: f64 = 1200.0;
     let people: i32 = 5;
-    let per_person = total / people as f64; // asでf64に揃えてから割る
+    let per_person = total / people; // エラー: E0277 [!code --]
+    let per_person = total / people as f64; // asでf64に揃えてから割る [!code ++]
     println!("1人あたり{}円です。", per_person);
 }
 ```
@@ -349,10 +355,10 @@ fn main() {
     let stock = 0;
 
     // stockが0より大きいかどうかの判定結果を、bool型の型注釈付きでin_stockに束縛せよ
-    let in_stock: bool = stock > 0;
+    let in_stock: bool = stock > 0; // [!code ++]
 
     // stockが0と等しいかどうかの判定結果を、bool型の型注釈付きでneeds_restockに束縛せよ
-    let needs_restock: bool = stock == 0;
+    let needs_restock: bool = stock == 0; // [!code ++]
 
     println!("在庫あり: {}", in_stock);
     println!("再入荷が必要: {}", needs_restock);
@@ -411,7 +417,7 @@ fn main() {
     let is_rainy = false;
 
     // 上の3つの条件をすべて満たすかどうかをcan_rideに束縛せよ
-    let can_ride = !is_rainy && height >= 140 && (age >= 12 || with_adult);
+    let can_ride = !is_rainy && height >= 140 && (age >= 12 || with_adult); // [!code ++]
 
     println!("乗車できる: {}", can_ride);
 
@@ -419,7 +425,7 @@ fn main() {
     let is_rainy = true;
 
     // 同じ条件で判定し直した結果をcan_ride_in_rainに束縛せよ
-    let can_ride_in_rain = !is_rainy && height >= 140 && (age >= 12 || with_adult);
+    let can_ride_in_rain = !is_rainy && height >= 140 && (age >= 12 || with_adult); // [!code ++]
 
     println!("雨天時に乗車できる: {}", can_ride_in_rain);
 }
@@ -457,7 +463,8 @@ fn main() {
 :::details[解答例と解説]
 ```rust playground
 fn main() {
-    let grade: char = 'A'; // シングルクォートで囲む
+    let grade: char = "A"; // エラー: E0308 [!code --]
+    let grade: char = 'A'; // シングルクォートで囲む [!code ++]
     println!("成績評価は{}です。", grade);
 }
 ```

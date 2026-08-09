@@ -40,7 +40,7 @@ fn main() {
 ```rust playground
 fn main() {
     // 商品名"チョコレート"・価格150・在庫ありtrueをまとめたタプルitemを作成せよ
-    let item = ("チョコレート", 150, true);
+    let item = ("チョコレート", 150, true); // [!code ++]
 
     println!("商品名: {}", item.0);
     println!("価格: {}円", item.1);
@@ -88,7 +88,7 @@ fn main() {
     let point = (3, 5);
 
     // pointを分解し、1つ目の要素をx、2つ目の要素をyに束縛せよ
-    let (x, y) = point;
+    let (x, y) = point; // [!code ++]
 
     println!("x座標: {}", x);
     println!("y座標: {}", y);
@@ -125,9 +125,9 @@ fn test_divide() {
 ::::details[解答例と解説]
 ```rust playground
 // 割られる数dividendと割る数divisorを受け取り、(商, 余り)のタプルを返す関数divideを定義せよ
-fn divide(dividend: i32, divisor: i32) -> (i32, i32) {
-    (dividend / divisor, dividend % divisor)
-}
+fn divide(dividend: i32, divisor: i32) -> (i32, i32) { // [!code ++]
+    (dividend / divisor, dividend % divisor) // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_divide() {
@@ -180,7 +180,7 @@ fn main() {
 ```rust playground
 fn main() {
     // 80, 95, 70の3つの点数を、[i32; 3]の型注釈付きで配列scoresに束縛せよ
-    let scores: [i32; 3] = [80, 95, 70];
+    let scores: [i32; 3] = [80, 95, 70]; // [!code ++]
 
     println!("1科目目: {}点", scores[0]);
     println!("3科目目: {}点", scores[2]);
@@ -226,7 +226,7 @@ fn main() {
 ```rust playground
 fn main() {
     // 0を5個並べた配列countsを作成せよ
-    let counts = [0; 5];
+    let counts = [0; 5]; // [!code ++]
 
     println!("{:?}", counts);
     println!("要素数: {}", counts.len());
@@ -268,7 +268,8 @@ fn main() {
 fn main() {
     let scores = [80, 95, 70];
 
-    println!("最後の科目: {}点", scores[2]); // インデックスは0から始まる
+    println!("最後の科目: {}点", scores[3]); // この行でコンパイルエラーになる [!code --]
+    println!("最後の科目: {}点", scores[2]); // インデックスは0から始まる [!code ++]
 }
 ```
 エラーメッセージは「this operation will panic at runtime」、続けて「index out of bounds: the length is 3 but the index is 3（範囲外のインデックス: 長さは3だがインデックスは3）」でした。
@@ -308,9 +309,9 @@ fn main() {
     let prices = [120, 250, 80];
 
     // for式でpricesの要素を順に取り出し、「120円」の形式で出力せよ
-    for price in prices {
-        println!("{}円", price);
-    }
+    for price in prices { // [!code ++]
+        println!("{}円", price); // [!code ++]
+    } // [!code ++]
 }
 ```
 第3章では`for i in 1..=5`のように範囲式を走査しましたが、`for`式には配列もそのまま渡せます。`for price in prices`と書くと、要素が先頭から順に1つずつ`price`に束縛されます。
@@ -352,10 +353,11 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 fn main() {
-    let mut scores = [80, 95, 70]; // 書き換えるにはmutが必要
+    let scores = [80, 95, 70]; // [!code --]
+    let mut scores = [80, 95, 70]; // 書き換えるにはmutが必要 [!code ++]
 
     // 2科目目の点数を100に書き換えよ
-    scores[1] = 100;
+    scores[1] = 100; // [!code ++]
 
     println!("{:?}", scores);
 }
@@ -397,7 +399,7 @@ fn main() {
     let scores = [80, 95, 70, 60, 88];
 
     // scoresのインデックス1から3までの3要素を指すスライスmiddleを作成せよ
-    let middle = &scores[1..4]; // 1..=3 と書いてもよい
+    let middle = &scores[1..4]; // 1..=3 と書いてもよい [!code ++]
 
     println!("{:?}", middle);
     println!("要素数: {}", middle.len());
@@ -440,19 +442,19 @@ fn test_summarize() {
 ::::details[解答例と解説]
 ```rust playground
 // 点数のスライス&[i32]を受け取り、(合計, 最大値)のタプルを返す関数summarizeを定義せよ
-fn summarize(scores: &[i32]) -> (i32, i32) {
-    let mut total = 0;
-    let mut max = scores[0]; // 先頭の要素を暫定の最大値にする
+fn summarize(scores: &[i32]) -> (i32, i32) { // [!code ++]
+    let mut total = 0; // [!code ++]
+    let mut max = scores[0]; // 先頭の要素を暫定の最大値にする [!code ++]
 
-    for i in 0..scores.len() {
-        total += scores[i];
-        if scores[i] > max {
-            max = scores[i];
-        }
-    }
+    for i in 0..scores.len() { // [!code ++]
+        total += scores[i]; // [!code ++]
+        if scores[i] > max { // [!code ++]
+            max = scores[i]; // [!code ++]
+        } // [!code ++]
+    } // [!code ++]
 
-    (total, max)
-}
+    (total, max) // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_summarize() {

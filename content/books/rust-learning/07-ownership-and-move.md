@@ -42,8 +42,10 @@ fn main() {
     {
         let receipt = String::from("レシート: 弁当 500円");
 
-        println!("{}", receipt); // 波括弧の中へ移動した
+        println!("{}", receipt); // 波括弧の中へ移動した [!code ++]
     }
+
+    println!("{}", receipt); // [!code --]
 }
 ```
 波括弧`{}`で囲まれた範囲を**スコープ**と呼びます。変数が使えるのは、宣言されたスコープの中だけです。`receipt`は内側の波括弧の中で宣言されているので、その外側には存在しません。エラーメッセージの`cannot find value 'receipt' in this scope`（E0425）は、まさに「このスコープに`receipt`という値は見つからない」と言っています。
@@ -99,7 +101,8 @@ fn main() {
     let order = String::from("コーヒー ×2");
     let confirmed = order; // 所有権がorderからconfirmedへ移動した
 
-    println!("注文内容: {}", confirmed);
+    println!("注文内容: {}", order); // [!code --]
+    println!("注文内容: {}", confirmed); // [!code ++]
 }
 ```
 `let confirmed = order;`は、一見すると値をコピーしているように見えます。しかし所有者は常にただ1つでなければならないため、`order`と`confirmed`が同じ文字列を同時に所有することはできません。そこでRustは**所有権を`order`から`confirmed`へ移動させ、移動元の`order`を使えない状態にします**。この移動を[[move]]（move）と呼びます。
@@ -149,7 +152,7 @@ fn main() {
     let price = 150;
 
     // priceの値をcopiedに代入せよ
-    let copied = price;
+    let copied = price; // [!code ++]
 
     println!("元の値: {}", price); // ムーブしていないのでpriceも使える
     println!("コピー先: {}", copied);
@@ -207,9 +210,10 @@ fn print_order(order: String) {
 fn main() {
     let order = String::from("コーヒー ×2");
 
+    print_order(order); // [!code --]
     println!("控え: {}", order); // ムーブする前に使う
 
-    print_order(order); // ここで所有権が関数へ移動する
+    print_order(order); // ここで所有権が関数へ移動する [!code ++]
 }
 ```
 関数に値を渡すときにも、変数への代入とまったく同じようにムーブが起きます。`print_order(order)`と書いた瞬間に所有権は関数の引数`order`へ移り、呼び出し元の`order`は使えなくなります。そして関数を抜けるときに引数がスコープを抜けるので、文字列はそこで破棄されます。
@@ -269,7 +273,7 @@ fn main() {
     let order = String::from("コーヒー ×2");
 
     // print_orderにorderを渡し、返ってきた値をorderに束縛し直せ
-    let order = print_order(order);
+    let order = print_order(order); // [!code ++]
 
     println!("控え: {}", order);
 }
@@ -327,7 +331,8 @@ fn print_order(order: String) {
 fn main() {
     let order = String::from("コーヒー ×2");
 
-    print_order(order.clone()); // 複製を作って渡す
+    print_order(order); // [!code --]
+    print_order(order.clone()); // 複製を作って渡す [!code ++]
 
     println!("控え: {}", order); // 原本の所有権は残っている
 }
@@ -381,7 +386,7 @@ fn main() {
     let original = String::from("買い物メモ");
 
     // originalをクローンしてcopyに束縛せよ
-    let mut copy = original.clone();
+    let mut copy = original.clone(); // [!code ++]
 
     copy.push_str(" / 牛乳");
 
@@ -451,12 +456,12 @@ fn main() {
     let mut order = String::from("コーヒー");
 
     // 現在のorderの内容を控えとしてbackupに残せ
-    let backup = order.clone();
+    let backup = order.clone(); // [!code ++]
 
     order.push_str(" ×2");
 
     // shoutにorderを渡し、呼び出した後もorderを使い続けられるようにせよ
-    let order = shout(order);
+    let order = shout(order); // [!code ++]
 
     println!("原本: {}", order);
     println!("控え: {}", backup);

@@ -47,12 +47,12 @@ fn main() {
 ```rust playground
 // Coffee・Tea・Juiceの3つのバリアントを持つ列挙型Drinkを定義せよ
 // {:?}で出力できるようにすること
-#[derive(Debug)]
-enum Drink {
-    Coffee,
-    Tea,
-    Juice,
-}
+#[derive(Debug)] // [!code ++]
+enum Drink { // [!code ++]
+    Coffee, // [!code ++]
+    Tea, // [!code ++]
+    Juice, // [!code ++]
+} // [!code ++]
 
 fn main() {
     let first = Drink::Coffee;
@@ -129,11 +129,11 @@ fn announce(drink: Drink) {
     // Coffee → コーヒーをどうぞ
     // Tea    → 紅茶をどうぞ
     // Juice  → ジュースをどうぞ
-    match drink {
-        Drink::Coffee => println!("コーヒーをどうぞ"),
-        Drink::Tea => println!("紅茶をどうぞ"),
-        Drink::Juice => println!("ジュースをどうぞ"),
-    }
+    match drink { // [!code ++]
+        Drink::Coffee => println!("コーヒーをどうぞ"), // [!code ++]
+        Drink::Tea => println!("紅茶をどうぞ"), // [!code ++]
+        Drink::Juice => println!("ジュースをどうぞ"), // [!code ++]
+    } // [!code ++]
 }
 
 fn main() {
@@ -209,11 +209,12 @@ enum Drink {
 fn checkout(drink: Drink) {
     // match式で価格を求めてpriceに束縛せよ
     // Coffee: 500円 / Tea: 450円 / Juice: 400円
-    let price = match drink {
-        Drink::Coffee => 500,
-        Drink::Tea => 450,
-        Drink::Juice => 400,
-    };
+    let price = 0; // [!code --]
+    let price = match drink { // [!code ++]
+        Drink::Coffee => 500, // [!code ++]
+        Drink::Tea => 450, // [!code ++]
+        Drink::Juice => 400, // [!code ++]
+    }; // [!code ++]
 
     println!("お会計: {price}円");
 }
@@ -310,7 +311,7 @@ fn checkout(drink: Drink) {
     let price = match drink {
         Drink::Coffee => 500,
         Drink::Tea => 450,
-        Drink::Juice => 400, // このアームを追加した
+        Drink::Juice => 400, // このアームを追加した [!code ++]
     };
 
     println!("お会計: {price}円");
@@ -387,7 +388,7 @@ fn total(order: Order) -> u32 {
         Order::Regular => 500,
         // Discountedのアームを追加せよ
         // 割引額を取り出し、500から引いた金額を返すこと
-        Order::Discounted(amount) => 500 - amount,
+        Order::Discounted(amount) => 500 - amount, // [!code ++]
     }
 }
 
@@ -473,9 +474,9 @@ fn announce(delivery: Delivery) {
         Delivery::Pickup => println!("店頭受け取りです"),
         // Shippingのアームを追加せよ
         // 「〇〇へ配送します（送料〇〇円）」と出力すること
-        Delivery::Shipping { address, fee } => {
-            println!("{address}へ配送します（送料{fee}円）");
-        }
+        Delivery::Shipping { address, fee } => { // [!code ++]
+            println!("{address}へ配送します（送料{fee}円）"); // [!code ++]
+        } // [!code ++]
     }
 }
 
@@ -571,7 +572,7 @@ fn describe(points: u32) {
         1..=99 => println!("あと少しで特典です"),
         // 100以上をまとめて処理するアームを追加せよ
         // 「〇〇ポイント貯まっています」と出力すること
-        other => println!("{other}ポイント貯まっています"),
+        other => println!("{other}ポイント貯まっています"), // [!code ++]
     }
 }
 
@@ -580,7 +581,7 @@ fn is_free_drink(points: u32) {
         100 => println!("無料ドリンク券が使えます"),
         // それ以外をまとめて処理するアームを追加せよ
         // 「無料ドリンク券は使えません」と出力すること（ポイント数は使わない）
-        _ => println!("無料ドリンク券は使えません"),
+        _ => println!("無料ドリンク券は使えません"), // [!code ++]
     }
 }
 
@@ -666,8 +667,12 @@ enum Drink {
 
 fn serve_hot(drink: Drink) {
     match drink {
-        Drink::Coffee | Drink::Tea => println!("ホットもご用意できます"),
-        Drink::Juice | Drink::Water => println!("冷たいドリンクのみです"),
+        Drink::Coffee => println!("ホットもご用意できます"), // [!code --]
+        Drink::Tea => println!("ホットもご用意できます"), // [!code --]
+        Drink::Juice => println!("冷たいドリンクのみです"), // [!code --]
+        Drink::Water => println!("冷たいドリンクのみです"), // [!code --]
+        Drink::Coffee | Drink::Tea => println!("ホットもご用意できます"), // [!code ++]
+        Drink::Juice | Drink::Water => println!("冷たいドリンクのみです"), // [!code ++]
     }
 }
 
@@ -797,30 +802,30 @@ use std::f64::consts::PI; // 円周率
 //   Circle    … 半径をf64で1つ持つ（タプル的バリアント）
 //   Rectangle … width・heightをf64で持つ（構造体的バリアント）
 //   Triangle  … base・heightをf64で持つ（構造体的バリアント）
-enum Shape {
-    Circle(f64),
-    Rectangle { width: f64, height: f64 },
-    Triangle { base: f64, height: f64 },
-}
+enum Shape { // [!code ++]
+    Circle(f64), // [!code ++]
+    Rectangle { width: f64, height: f64 }, // [!code ++]
+    Triangle { base: f64, height: f64 }, // [!code ++]
+} // [!code ++]
 
 // implブロックにareaとnameの2つのメソッドを定義せよ
-impl Shape {
-    fn area(&self) -> f64 {
-        match self {
-            Shape::Circle(radius) => PI * radius * radius,
-            Shape::Rectangle { width, height } => width * height,
-            Shape::Triangle { base, height } => base * height / 2.0,
-        }
-    }
+impl Shape { // [!code ++]
+    fn area(&self) -> f64 { // [!code ++]
+        match self { // [!code ++]
+            Shape::Circle(radius) => PI * radius * radius, // [!code ++]
+            Shape::Rectangle { width, height } => width * height, // [!code ++]
+            Shape::Triangle { base, height } => base * height / 2.0, // [!code ++]
+        } // [!code ++]
+    } // [!code ++]
 
-    fn name(&self) -> String {
-        match self {
-            Shape::Circle(_) => String::from("円"),
-            Shape::Rectangle { .. } => String::from("長方形"),
-            Shape::Triangle { .. } => String::from("三角形"),
-        }
-    }
-}
+    fn name(&self) -> String { // [!code ++]
+        match self { // [!code ++]
+            Shape::Circle(_) => String::from("円"), // [!code ++]
+            Shape::Rectangle { .. } => String::from("長方形"), // [!code ++]
+            Shape::Triangle { .. } => String::from("三角形"), // [!code ++]
+        } // [!code ++]
+    } // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_circle() {

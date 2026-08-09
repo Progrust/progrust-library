@@ -43,14 +43,16 @@ fn main() {
 
 ::::details[解答例と解説]
 ```rust playground
-fn print_order(order: &String) {
+fn print_order(order: String) { // [!code --]
+fn print_order(order: &String) { // [!code ++]
     println!("注文内容: {}", order);
 }
 
 fn main() {
     let order = String::from("コーヒー ×2");
 
-    print_order(&order); // 所有権は渡さず、参照だけを渡す
+    print_order(order); // [!code --]
+    print_order(&order); // 所有権は渡さず、参照だけを渡す [!code ++]
 
     println!("控え: {}", order); // 所有権は手元に残っている
 }
@@ -103,8 +105,8 @@ fn main() {
     let message = String::from("こんにちは");
 
     // messageへの参照を2つ作り、first・secondに束縛せよ
-    let first = &message;
-    let second = &message;
+    let first = &message; // [!code ++]
+    let second = &message; // [!code ++]
 
     println!("1つ目: {}", first);
     println!("2つ目: {}", second);
@@ -150,7 +152,7 @@ fn main() {
 ```rust playground
 fn add_item(order: &mut String, item: &str) {
     // 参照order経由でitemを追記せよ
-    order.push_str(item);
+    order.push_str(item); // [!code ++]
 }
 
 fn main() {
@@ -217,13 +219,13 @@ fn main() {
 
     let account = &mut balance;
     // account経由で参照先の残高に500を足せ
-    *account += 500;
+    *account += 500; // [!code ++]
 
     println!("残高: {}", balance);
 
     let viewer = &balance;
     // viewerの参照先の値そのものをsnapshotに束縛せよ
-    let snapshot = *viewer;
+    let snapshot = *viewer; // [!code ++]
 
     println!("記録した残高: {}", snapshot);
 }
@@ -277,7 +279,8 @@ fn deposit(balance: &mut i32, amount: i32) {
 }
 
 fn main() {
-    let mut balance = 1000; // mutを追加した
+    let balance = 1000; // [!code --]
+    let mut balance = 1000; // mutを追加した [!code ++]
 
     deposit(&mut balance, 500);
 
@@ -323,11 +326,13 @@ fn main() {
 fn main() {
     let mut order = String::from("コーヒー");
 
+    let viewer = &order; // [!code --]
     let editor = &mut order; // 排他参照だけを残す
 
     editor.push_str(" ×2");
 
-    println!("注文内容: {}", editor); // 排他参照からは読み取りもできる
+    println!("注文内容: {}", viewer); // [!code --]
+    println!("注文内容: {}", editor); // 排他参照からは読み取りもできる [!code ++]
 }
 ```
 エラーメッセージは`cannot borrow 'order' as mutable because it is also borrowed as immutable`（E0502）——「`order`は共有的にも借用されているので、排他的には借用できない」です。今回は`viewer`と`editor`という2つの参照が変数として並んでいるので、どちらとどちらがぶつかっているのかがエラー出力にもはっきり示されます。
@@ -389,11 +394,12 @@ fn main() {
 
     let first = &scores[0];
 
-    println!("最初の点数: {}", first); // firstの最後の使用をここへ移動した
+    println!("最初の点数: {}", first); // firstの最後の使用をここへ移動した [!code ++]
     // ここでfirstによる共有借用が終わる
 
     scores.push(70); // 借用が終わっているので排他借用できる
 
+    println!("最初の点数: {}", first); // [!code --]
     println!("全科目: {:?}", scores);
 }
 ```
@@ -455,10 +461,12 @@ fn main() {
 
 ::::details[解答例と解説]
 ```rust playground
-fn make_receipt(item: &str) -> String {
+fn make_receipt(item: &str) -> &String { // [!code --]
+fn make_receipt(item: &str) -> String { // [!code ++]
     let receipt = format!("レシート: {}", item);
 
-    receipt // 参照ではなく所有権ごと返す
+    &receipt // [!code --]
+    receipt // 参照ではなく所有権ごと返す [!code ++]
 }
 
 fn main() {
@@ -525,20 +533,20 @@ fn test_total_score_empty() {
 ::::details[解答例と解説]
 ```rust playground
 // 点数のスライス&[i32]を借りて合計を返す関数total_scoreを定義せよ
-fn total_score(scores: &[i32]) -> i32 {
-    let mut total = 0;
+fn total_score(scores: &[i32]) -> i32 { // [!code ++]
+    let mut total = 0; // [!code ++]
 
-    for score in scores {
-        total += score;
-    }
+    for score in scores { // [!code ++]
+        total += score; // [!code ++]
+    } // [!code ++]
 
-    total
-}
+    total // [!code ++]
+} // [!code ++]
 
 // 点数のベクタを排他的に借りて、点数を1つ追加する関数add_scoreを定義せよ
-fn add_score(scores: &mut Vec<i32>, score: i32) {
-    scores.push(score);
-}
+fn add_score(scores: &mut Vec<i32>, score: i32) { // [!code ++]
+    scores.push(score); // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_total_score() {

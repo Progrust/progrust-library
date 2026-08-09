@@ -37,7 +37,7 @@ fn main() {
 ```rust playground
 fn main() {
     // Hello, world! をコンソールに出力せよ
-    println!("Hello, world!");
+    println!("Hello, world!"); // [!code ++]
 }
 ```
 `println!`は渡した文字列をコンソールに出力し、末尾に改行を加えます。名前の最後に`!`が付いているのは、関数ではなくマクロだからです。
@@ -64,7 +64,8 @@ fn main() {
 ```rust playground
 fn main() {
     // プレースホルダ{}を2つ追加し、3と360を埋め込んで出力せよ
-    println!("りんごを{}個買うと{}円です。", 3, 360);
+    println!("りんごを個買うと円です。"); // [!code --]
+    println!("りんごを{}個買うと{}円です。", 3, 360); // [!code ++]
 }
 ```
 `{}`は書いた順番どおりに、後ろの値と対応します。1つ目の`{}`に`3`が、2つ目の`{}`に`360`が入ります。
@@ -92,10 +93,11 @@ fn main() {
 ```rust playground
 fn main() {
     // nameという変数名に「次郎」という文字列を束縛した変数を記載せよ
-    let name = "次郎";
+    let name = "次郎"; // [!code ++]
 
     // 上記の変数を利用して「私の名前は次郎です。」が出力されるように以下コードを修正せよ
-    println!("私の名前は{}です。", name);
+    println!("私の名前は太郎です。"); // [!code --]
+    println!("私の名前は{}です。", name); // [!code ++]
 }
 ```
 変数は`let 変数名 = 値;`で宣言します。
@@ -123,7 +125,8 @@ fn main() {
 :::details[解答例と解説]
 ```rust playground
 fn main() {
-    let mut money = 1000;
+    let money = 1000; // [!code --]
+    let mut money = 1000; // [!code ++]
     money = money + 500;
     println!("所持金は{}円です。", money);
 }
@@ -159,12 +162,12 @@ fn main() {
 ```rust playground
 fn main() {
     // 残高を表す可変の変数balanceを1000で初期化して宣言せよ
-    let mut balance = 1000;
+    let mut balance = 1000; // [!code ++]
 
     println!("残高は{}円です。", balance);
 
     // balanceに500を足して更新せよ
-    balance = balance + 500;
+    balance = balance + 500; // [!code ++]
 
     println!("入金後の残高は{}円です。", balance);
 }
@@ -195,7 +198,8 @@ fn main() {
 
 :::details[解答例と解説]
 ```rust playground
-const TICKET_PRICE: u32 = 1200;
+const TICKET_PRICE = 1200; // この行でコンパイルエラーになる [!code --]
+const TICKET_PRICE: u32 = 1200; // [!code ++]
 
 fn main() {
     println!("チケットは1枚{}円です。", TICKET_PRICE);
@@ -234,7 +238,7 @@ fn main() {
     println!("通常価格は{}円です。", price);
 
     // シャドーイングで、priceを100円引きの値に作り直せ
-    let price = price - 100;
+    let price = price - 100; // [!code ++]
 
     println!("セール価格は{}円です。", price);
 }
@@ -265,8 +269,10 @@ fn main() {
 :::details[解答例と解説]
 ```rust playground
 fn main() {
-    let input = "12345"; // 文字列
-    let input = input.len(); // シャドーイングなら型の違う値で作り直せる
+    let mut input = "12345"; // 文字列 [!code --]
+    input = input.len(); // エラー: E0308 [!code --]
+    let input = "12345"; // 文字列 [!code ++]
+    let input = input.len(); // シャドーイングなら型の違う値で作り直せる [!code ++]
     println!("入力は{}文字です。", input);
 }
 ```
@@ -304,7 +310,7 @@ fn main() {
         let apple = 150;
         let orange = 100;
         // 合計金額がtotalに束縛されるように、ここにコードを追記せよ
-        apple + orange // セミコロンを付けない: この式の値がブロックの値になる
+        apple + orange // セミコロンを付けない: この式の値がブロックの値になる [!code ++]
     };
     println!("合計は{}円です。", total);
 }

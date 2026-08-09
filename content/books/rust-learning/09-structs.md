@@ -49,19 +49,19 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 // 上の表のフィールド名と型で構造体Productを定義せよ
-struct Product {
-    name: String,
-    price: u32,
-    in_stock: bool,
-}
+struct Product { // [!code ++]
+    name: String, // [!code ++]
+    price: u32, // [!code ++]
+    in_stock: bool, // [!code ++]
+} // [!code ++]
 
 fn main() {
     // 上の表の値でProductのインスタンスを作り、変数productに束縛せよ
-    let product = Product {
-        name: String::from("コーヒー豆"),
-        price: 1200,
-        in_stock: true,
-    };
+    let product = Product { // [!code ++]
+        name: String::from("コーヒー豆"), // [!code ++]
+        price: 1200, // [!code ++]
+        in_stock: true, // [!code ++]
+    }; // [!code ++]
 
     println!("商品名: {}", product.name);
     println!("価格: {}円", product.price);
@@ -131,7 +131,8 @@ struct Product {
 }
 
 fn main() {
-    let mut product = Product { // mutを追加した
+    let product = Product { // [!code --]
+    let mut product = Product { // mutを追加した [!code ++]
         name: String::from("コーヒー豆"),
         price: 1200,
     };
@@ -199,7 +200,7 @@ struct Product {
 
 fn build_product(name: String, price: u32) -> Product {
     // 引数nameとpriceからProductを作って返せ
-    Product { name, price } // name: name, price: price の省略形
+    Product { name, price } // name: name, price: price の省略形 [!code ++]
 }
 
 fn main() {
@@ -628,7 +629,7 @@ fn to_fahrenheit(temperature: Celsius) -> Fahrenheit {
 }
 
 fn main() {
-    let temperature = Fahrenheit(25.0); //  [!code --]
+    let temperature = Fahrenheit(25.0); // [!code --]
     let temperature = Celsius(25.0); // 摂氏25度に修正した [!code ++]
 
     let result = to_fahrenheit(temperature);

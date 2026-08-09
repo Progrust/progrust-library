@@ -38,7 +38,7 @@ fn main() {
 ```rust playground
 fn main() {
     // 文字列リテラル"Rust"を、&strの型注釈付きで変数languageに束縛せよ
-    let language: &str = "Rust";
+    let language: &str = "Rust"; // [!code ++]
 
     println!("言語: {}", language);
     println!("バイト数: {}", language.len());
@@ -88,10 +88,10 @@ fn main() {
 ```rust playground
 fn main() {
     // String::fromを使って"こんにちは"からStringを作り、greetingに束縛せよ
-    let greeting = String::from("こんにちは");
+    let greeting = String::from("こんにちは"); // [!code ++]
 
     // to_stringを使って"さようなら"からStringを作り、farewellに束縛せよ
-    let farewell = "さようなら".to_string();
+    let farewell = "さようなら".to_string(); // [!code ++]
 
     println!("{}", greeting);
     println!("{}", farewell);
@@ -140,10 +140,10 @@ fn main() {
     let mut message = String::from("Hello");
 
     // push_strでmessageに", world"を追記せよ
-    message.push_str(", world");
+    message.push_str(", world"); // [!code ++]
 
     // pushでmessageに'!'を追記せよ
-    message.push('!');
+    message.push('!'); // [!code ++]
 
     println!("{}", message);
 }
@@ -191,7 +191,7 @@ fn main() {
     let count = 3;
 
     // format!を使って「りんご 150円 × 3個」というStringを作り、labelに束縛せよ
-    let label = format!("{} {}円 × {}個", item, price, count);
+    let label = format!("{} {}円 × {}個", item, price, count); // [!code ++]
 
     println!("{}", label);
     println!("合計: {}円", price * count);
@@ -257,10 +257,10 @@ fn main() {
     let email = "hanako@example.com";
 
     // emailの先頭6文字（インデックス0から5）を切り出してuserに束縛せよ
-    let user = &email[0..6];
+    let user = &email[0..6]; // [!code ++]
 
     // emailのインデックス7から末尾までを切り出してdomainに束縛せよ
-    let domain = &email[7..];
+    let domain = &email[7..]; // [!code ++]
 
     println!("ユーザー名: {}", user);
     println!("ドメイン: {}", domain);
@@ -309,9 +309,9 @@ fn main() {
     let word = "Rust";
 
     // chars()とfor式でwordを1文字ずつ取り出して出力せよ
-    for c in word.chars() {
-        println!("{}", c);
-    }
+    for c in word.chars() { // [!code ++]
+        println!("{}", c); // [!code ++]
+    } // [!code ++]
 }
 ```
 `chars()`は文字列を`char`（1文字）の並びに分解するメソッドです。`for`式と組み合わせると、先頭から1文字ずつ取り出して処理できます。取り出される`c`の型は`&str`ではなく[[char-type]]の`char`です。
@@ -359,12 +359,12 @@ fn main() {
 ```rust playground
 fn main() {
     // vec!マクロで120, 250, 80を要素に持つベクタpricesを作れ
-    let prices = vec![120, 250, 80];
+    let prices = vec![120, 250, 80]; // [!code ++]
 
     // Vec::newで空のベクタを作りnumbersに束縛し、pushで10と20を順に追加せよ
-    let mut numbers = Vec::new();
-    numbers.push(10);
-    numbers.push(20);
+    let mut numbers = Vec::new(); // [!code ++]
+    numbers.push(10); // [!code ++]
+    numbers.push(20); // [!code ++]
 
     println!("{:?}", prices);
     println!("{:?}", numbers);
@@ -418,13 +418,13 @@ fn main() {
     prices.push(300);
 
     // 最初の要素を「最初の商品: 120円」の形式で出力せよ
-    println!("最初の商品: {}円", prices[0]);
+    println!("最初の商品: {}円", prices[0]); // [!code ++]
 
     // 要素数を「商品数: 4個」の形式で出力せよ
-    println!("商品数: {}個", prices.len());
+    println!("商品数: {}個", prices.len()); // [!code ++]
 
     // 最後の要素を「最後の商品: 300円」の形式で出力せよ
-    println!("最後の商品: {}円", prices[prices.len() - 1]);
+    println!("最後の商品: {}円", prices[prices.len() - 1]); // [!code ++]
 }
 ```
 要素へのアクセス`prices[0]`も、要素数を返す`len()`も、書き方は配列とまったく同じです。第5章で学んだことがそのまま使えます。
@@ -466,10 +466,10 @@ fn main() {
     let mut total = 0;
 
     // for式でscoresを走査し、各要素を「80点」の形式で出力しつつtotalに足し込め
-    for score in &scores {
-        println!("{}点", score);
-        total += score;
-    }
+    for score in &scores { // [!code ++]
+        println!("{}点", score); // [!code ++]
+        total += score; // [!code ++]
+    } // [!code ++]
 
     println!("合計: {}点", total);
 }
@@ -530,17 +530,17 @@ fn test_summarize_single() {
 ```rust playground
 // 点数のスライス&[i32]を受け取り、「合計: 245点 / 平均: 81.7点」の形式のStringを返す
 // 関数summarizeを定義せよ
-fn summarize(scores: &[i32]) -> String {
-    let mut total = 0;
+fn summarize(scores: &[i32]) -> String { // [!code ++]
+    let mut total = 0; // [!code ++]
 
-    for score in scores {
-        total += score;
-    }
+    for score in scores { // [!code ++]
+        total += score; // [!code ++]
+    } // [!code ++]
 
-    let average = total as f64 / scores.len() as f64;
+    let average = total as f64 / scores.len() as f64; // [!code ++]
 
-    format!("合計: {}点 / 平均: {:.1}点", total, average)
-}
+    format!("合計: {}点 / 平均: {:.1}点", total, average) // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_summarize() {

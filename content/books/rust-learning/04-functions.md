@@ -38,14 +38,14 @@ fn main() {
 ```rust playground
 fn main() {
     // greetを2回呼び出せ
-    greet();
-    greet();
+    greet(); // [!code ++]
+    greet(); // [!code ++]
 }
 
 // 「いらっしゃいませ。」と出力する関数greetを定義せよ
-fn greet() {
-    println!("いらっしゃいませ。");
-}
+fn greet() { // [!code ++]
+    println!("いらっしゃいませ。"); // [!code ++]
+} // [!code ++]
 ```
 関数は`fn 関数名() { ... }`の形で定義し、`関数名()`の形で呼び出します。呼び出すたびに本体のブロックが実行されるので、同じ処理を何度でも使い回せます。
 
@@ -80,7 +80,8 @@ fn main() {
 
 ::::details[解答例と解説]
 ```rust playground
-fn print_total(price: u32, count: u32) { // 引数それぞれに型注釈を付ける
+fn print_total(price, count) { // [!code --]
+fn print_total(price: u32, count: u32) { // 引数それぞれに型注釈を付ける [!code ++]
     println!("合計は{}円です。", price * count);
 }
 
@@ -129,9 +130,9 @@ fn main() {
 }
 
 // 幅widthと高さheightを受け取り、面積を返す関数rectangle_areaを定義せよ
-fn rectangle_area(width: u32, height: u32) -> u32 {
-    width * height
-}
+fn rectangle_area(width: u32, height: u32) -> u32 { // [!code ++]
+    width * height // [!code ++]
+} // [!code ++]
 ```
 値を返す関数は、引数の後ろに`-> 型`と書いて戻り値の型を宣言します。そして**本体ブロックの末尾に置いたセミコロンなしの式**が、そのまま戻り値になります。
 
@@ -167,7 +168,8 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 fn double(value: i32) -> i32 {
-    value * 2 // セミコロンを外すと式のまま残り、戻り値になる
+    value * 2; // [!code --]
+    value * 2 // セミコロンを外すと式のまま残り、戻り値になる [!code ++]
 }
 
 fn main() {
@@ -212,9 +214,9 @@ fn main() {
 ```rust playground
 fn admission_fee(age: u32) -> u32 {
     // ageが12以下なら0を返して関数を抜けよ
-    if age <= 12 {
-        return 0; // ここで関数を抜けるので、以降は実行されない
-    }
+    if age <= 12 { // [!code ++]
+        return 0; // ここで関数を抜けるので、以降は実行されない [!code ++]
+    } // [!code ++]
 
     1800
 }
@@ -278,8 +280,9 @@ fn show_price(price: u32) {
 }
 
 fn main() {
-    let price = 500; // 値そのものを束縛する
-    show_price(price); // 出力だけを関数に任せる
+    let price = show_price(500); // [!code --]
+    let price = 500; // 値そのものを束縛する [!code ++]
+    show_price(price); // 出力だけを関数に任せる [!code ++]
     let with_tax = price + price / 10;
     println!("税込は{}円です。", with_tax);
 }
@@ -332,9 +335,9 @@ fn test_is_even() {
 ::::details[解答例と解説]
 ```rust playground
 // 受け取った整数が偶数ならtrue、奇数ならfalseを返す関数is_evenを定義せよ
-fn is_even(number: i32) -> bool {
-    number % 2 == 0
-}
+fn is_even(number: i32) -> bool { // [!code ++]
+    number % 2 == 0 // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_is_even() {
@@ -379,9 +382,9 @@ fn test_celsius_to_fahrenheit() {
 ::::details[解答例と解説]
 ```rust playground
 // 摂氏celsius(i32)を華氏(f64)に変換して返す関数celsius_to_fahrenheitを定義せよ
-fn celsius_to_fahrenheit(celsius: i32) -> f64 {
-    celsius as f64 * 9.0 / 5.0 + 32.0
-}
+fn celsius_to_fahrenheit(celsius: i32) -> f64 { // [!code ++]
+    celsius as f64 * 9.0 / 5.0 + 32.0 // [!code ++]
+} // [!code ++]
 
 #[test]
 fn test_celsius_to_fahrenheit() {

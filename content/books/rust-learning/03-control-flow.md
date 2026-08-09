@@ -38,11 +38,11 @@ fn main() {
     let temperature = 28;
 
     // temperatureが25以上なら「暑いですね。」、そうでなければ「過ごしやすいですね。」を出力せよ
-    if temperature >= 25 {
-        println!("暑いですね。");
-    } else {
-        println!("過ごしやすいですね。");
-    }
+    if temperature >= 25 { // [!code ++]
+        println!("暑いですね。"); // [!code ++]
+    } else { // [!code ++]
+        println!("過ごしやすいですね。"); // [!code ++]
+    } // [!code ++]
 }
 ```
 `if 条件 { ... } else { ... }`と書くと、条件が`true`のときは前のブロック、`false`のときは`else`のブロックが実行されます。条件には第2章で学んだ[[boolean-type]]の値を生む式（`temperature >= 25`など）を書きます。
@@ -83,13 +83,13 @@ fn main() {
     let score = 72;
 
     // scoreが80以上なら「評価: 優」、60以上なら「評価: 良」、それ未満なら「評価: 可」を出力せよ
-    if score >= 80 {
-        println!("評価: 優");
-    } else if score >= 60 {
-        println!("評価: 良");
-    } else {
-        println!("評価: 可");
-    }
+    if score >= 80 { // [!code ++]
+        println!("評価: 優"); // [!code ++]
+    } else if score >= 60 { // [!code ++]
+        println!("評価: 良"); // [!code ++]
+    } else { // [!code ++]
+        println!("評価: 可"); // [!code ++]
+    } // [!code ++]
 }
 ```
 分岐が3つ以上になるときは`else if`で条件をつなげます。条件は上から順に判定され、最初に`true`になったブロックだけが実行されて、残りの分岐は評価されません。
@@ -137,7 +137,8 @@ fn main() {
     } else if stock < 5 {
         "残りわずかです。"
     } else {
-        "在庫は十分にあります。" // 他の分岐と同じ&str型に揃える
+        stock // [!code --]
+        "在庫は十分にあります。" // 他の分岐と同じ&str型に揃える [!code ++]
     };
 
     println!("お知らせ: {}", message);
@@ -194,9 +195,9 @@ fn main() {
         println!("{}回目のループです。", count);
 
         // countが3になったらループを抜けよ
-        if count == 3 {
-            break;
-        }
+        if count == 3 { // [!code ++]
+            break; // [!code ++]
+        } // [!code ++]
     }
 
     println!("ループを抜けました。");
@@ -248,9 +249,9 @@ fn main() {
         days += 1;
 
         // amountが1000を超えたら、そのときのdaysをloop式の値として返しつつループを抜けよ
-        if amount > 1000 {
-            break days;
-        }
+        if amount > 1000 { // [!code ++]
+            break days; // [!code ++]
+        } // [!code ++]
     };
 
     println!("{}日目に1000円を超えました。", result);
@@ -291,10 +292,10 @@ fn main() {
     let mut count = 3;
 
     // countが0より大きい間、countを出力してから1減らす処理を繰り返せ
-    while count > 0 {
-        println!("{}", count);
-        count -= 1;
-    }
+    while count > 0 { // [!code ++]
+        println!("{}", count); // [!code ++]
+        count -= 1; // [!code ++]
+    } // [!code ++]
 
     println!("発射!");
 }
@@ -334,10 +335,10 @@ fn main() {
 ```rust playground
 fn main() {
     // 1以上5未満を表す範囲式をexclusiveに束縛せよ
-    let exclusive = 1..5; // 1, 2, 3, 4
+    let exclusive = 1..5; // 1, 2, 3, 4 [!code ++]
 
     // 1以上5以下を表す範囲式をinclusiveに束縛せよ
-    let inclusive = 1..=5; // 1, 2, 3, 4, 5
+    let inclusive = 1..=5; // 1, 2, 3, 4, 5 [!code ++]
 
     println!("終端を含まない範囲の要素は{}個です。", exclusive.count());
     println!("終端を含む範囲の要素は{}個です。", inclusive.count());
@@ -379,9 +380,9 @@ fn main() {
 ```rust playground
 fn main() {
     // for式で1から5までを順に走査し、3の段を出力せよ
-    for i in 1..=5 {
-        println!("3 × {} = {}", i, i * 3);
-    }
+    for i in 1..=5 { // [!code ++]
+        println!("3 × {} = {}", i, i * 3); // [!code ++]
+    } // [!code ++]
 }
 ```
 `for 変数名 in 範囲 { ... }`と書くと、範囲から値が1つずつ取り出されて変数に束縛され、その値ごとに本体が実行されます。`1..=5`なら`i`が1, 2, 3, 4, 5と変化しながら5回繰り返されます。
@@ -427,10 +428,12 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 fn main() {
-    'outer: for i in 1..=3 {
+    for i in 1..=3 { // [!code --]
+    'outer: for i in 1..=3 { // [!code ++]
         for j in 1..=3 {
             if i * j > 4 {
-                break 'outer; // 内側だけでなく外側のforごと抜ける
+                break; // [!code --]
+                break 'outer; // 内側だけでなく外側のforごと抜ける [!code ++]
             }
             println!("{} × {} = {}", i, j, i * j);
         }
@@ -489,15 +492,15 @@ fn main() {
     for number in 1..=15 {
         // numberが3と5の両方の倍数なら「FizzBuzz」、3の倍数なら「Fizz」、
         // 5の倍数なら「Buzz」、それ以外なら数値そのものを出力せよ
-        if number % 3 == 0 && number % 5 == 0 {
-            println!("FizzBuzz");
-        } else if number % 3 == 0 {
-            println!("Fizz");
-        } else if number % 5 == 0 {
-            println!("Buzz");
-        } else {
-            println!("{}", number);
-        }
+        if number % 3 == 0 && number % 5 == 0 { // [!code ++]
+            println!("FizzBuzz"); // [!code ++]
+        } else if number % 3 == 0 { // [!code ++]
+            println!("Fizz"); // [!code ++]
+        } else if number % 5 == 0 { // [!code ++]
+            println!("Buzz"); // [!code ++]
+        } else { // [!code ++]
+            println!("{}", number); // [!code ++]
+        } // [!code ++]
     }
 }
 ```
