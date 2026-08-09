@@ -1,6 +1,6 @@
 # playground（Rust Playgroundリンクボタン）
 
-フェンスメタに `playground` を持つRustコードブロックへ「Playgroundで開く」ボタンを付与するmdastプラグイン（要求仕様: `../spec/pages.md` R-23 / スタイル実体: `src/styles/global.css`）。リンクURLはビルド時に静的生成し、クライアントJSは使わない。
+フェンスメタに `playground` を持つRustコードブロックへ「Playgroundで開く」ボタンを付与するmdastプラグイン（要求仕様: `../spec/pages.md` R-23・R-25 / スタイル実体: `src/styles/global.css`）。リンクURLはビルド時に静的生成し、クライアントJSは使わない。
 
 ## 記法
 
@@ -10,14 +10,25 @@
 
 mdast層の `code` visitorで `lang === "rust"` かつ metaの空白区切りトークンに `playground` を含むノードを捕捉し、`ctx.replaceNode` で以下に置換する:
 
-- 新codeノード（metaから `playground` トークンのみ除去。他トークンは温存）
-- `<a class="playground-open" target="_blank" rel="noopener noreferrer">` （hrefは `https://play.rust-lang.org/?version=stable&edition=2024&code=` + `encodeURIComponent(コード全文)`）
+- 新codeノード（metaから `playground` トークンのみ除去。他トークンは温存）。**値は原文のまま**（Shikiのdiff等の記法にマーカーが必要なため）
+- `<a class="playground-open" target="_blank" rel="noopener noreferrer">` （hrefは `https://play.rust-lang.org/?version=stable&edition=2024&code=` + `encodeURIComponent(stripCodeNotation(コード全文))`）
 - 両者を `data.hName` 方式で `<div class="code-playground">` に包む（`codeFilename` と同パターン）
+
+`stripCodeNotation`（`plugins/code-notation.mjs`。R-25）はコード記法コメントを行単位で処理する。`scripts/check-dict-code.mjs`（rustc検証）も同じ関数を使い、「表示用のコード」と「そのまま動くコード」の変換規則を一本化している:
+
+| 入力行 | 出力 |
+| --- | --- |
+| `let x = 1; // [!code --]` | （行ごと削除） |
+| `let x = 2; // [!code ++]` | `let x = 2;` |
+| `..base // 引き継ぐ [!code ++]` | `..base // 引き継ぐ` |
+| `// [!code highlight]` | （行ごと削除） |
 
 設計判断:
 
 - **mdast層を採用**: hast層ではShiki実行後でコードブロックが `raw` ノードになり操作できない（[shiki.md](shiki.md)と同じ理由）。またmdast層なら `node.value` からコード全文を直接取れる
 - **ボタンを `<pre>` の外側（ラッパ直下）に置く**: `<pre>` は `overflow-x: auto` で横スクロールするため、内側に置くとボタンがコードと一緒に流れる。`position: relative` のラッパ + `position: absolute` で右上固定にする
+- **マーカー除去はhref側だけ**: 表示用codeノードから消すとShikiの `transformerNotationDiff` が効かない。「表示は原文 / リンクは実行可能コード」の非対称は意図的
+- **行末 `//` の除去は `$` 固定の正規表現**で行う。行内に文字列リテラル `"a // b"` があっても、最後の `//` （＝コメント開始）だけが対象になる
 - 無状態のため定義オブジェクト直export（ファクトリ不要）
 
 ## 雛形コード（動作確認済み）
@@ -38,6 +49,8 @@ mdastPlugins: [codeFilename, playgroundLink, wikilink(dictIndex), directives, li
 ```js
 import { defineMdastPlugin } from "satteri";
 
+import { stripCodeNotation } from "./code-notation.mjs";
+
 const PLAYGROUND_URL = "https://play.rust-lang.org/?version=stable&edition=2024&code=";
 
 export const playgroundLink = defineMdastPlugin({
@@ -55,7 +68,7 @@ export const playgroundLink = defineMdastPlugin({
         hName: "a",
         hProperties: {
           class: "playground-open",
-          href: PLAYGROUND_URL + encodeURIComponent(node.value),
+          href: PLAYGROUND_URL + encodeURIComponent(stripCodeNotation(node.value)),
           target: "_blank",
           rel: "noopener noreferrer",
         },
@@ -82,4 +95,6 @@ export const playgroundLink = defineMdastPlugin({
 ## 制約・残課題
 
 - edition は 2024 固定（`version=stable`）。ブロック別のedition/channel指定（例: ` ```rust playground:nightly `）は必要になったら拡張する
+- `stripCodeNotation` は**範囲指定記法（`[!code --:3]` のように後続N行に効く形）に未対応**。マーカーの付いた1行しか落とさないため、削除行は1行ずつ `[!code --]` を書く。範囲記法を使いたくなったら拡張する
+- コード中の文字列リテラルに `[!code ...]` という文字列そのものを書いた場合は誤除去される（記法の解説を書くときはPlaygroundボタンを付けない運用でカバー）
 - 実行ボタン（ページ内で `evaluate.json` APIを叩き結果をインライン表示）は本プラグインの範囲外。必要になったらクライアントJSとして別途設計する

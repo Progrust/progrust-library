@@ -66,6 +66,50 @@ describe("playground-link（```rust playground のボタン付与・pages R-23 /
   });
 });
 
+describe("playground-link コード記法の除去（pages R-25 / AC-15）", () => {
+  it("[AC-15] 表示側にはマーカーを残し、hrefからは [!code ++] を除去する", () => {
+    const html = compileWithPlaygroundLink(
+      "```rust playground\nlet x = 2; // [!code ++]\n```",
+    );
+    // 表示コードはShikiのハイライトに必要なのでマーカーごと残す
+    expect(html).toContain("let x = 2; // [!code ++]");
+    // hrefはマーカーを外した実行可能コード
+    expect(html).toContain(encodeURIComponent("let x = 2;"));
+    expect(html).not.toContain(encodeURIComponent("[!code"));
+  });
+
+  it("[AC-15] [!code --] が付いた行はhrefから行ごと除去する", () => {
+    const html = compileWithPlaygroundLink(
+      "```rust playground\nlet x = 1; // [!code --]\nlet x = 2; // [!code ++]\n```",
+    );
+    expect(html).toContain(encodeURIComponent("let x = 2;"));
+    expect(html).not.toContain(encodeURIComponent("let x = 1;"));
+  });
+
+  it("[AC-15] 既存コメント末尾のマーカーはマーカー部分だけ除去する", () => {
+    const html = compileWithPlaygroundLink(
+      "```rust playground\nlet x = 2; // 値を変えた [!code ++]\n```",
+    );
+    expect(html).toContain(encodeURIComponent("let x = 2; // 値を変えた"));
+  });
+
+  it("[AC-15] マーカーだけのコメント行はhrefから行ごと除去する", () => {
+    const html = compileWithPlaygroundLink(
+      "```rust playground\nfn main() {}\n// [!code highlight]\n```",
+    );
+    expect(html).toContain(encodeURIComponent("fn main() {}"));
+    expect(html).not.toContain(encodeURIComponent("//"));
+  });
+
+  it("マーカーを含まないコードはそのまま（改行・インデントを保つ）", () => {
+    const code = "fn main() {\n    let x = 1;\n}";
+    const html = compileWithPlaygroundLink(
+      "```rust playground\n" + code + "\n```",
+    );
+    expect(html).toContain(encodeURIComponent(code));
+  });
+});
+
 describe("playground-link URL生成", () => {
   it("コードがそのままURLエンコードされてhrefに乗る", () => {
     const html = compileWithPlaygroundLink(

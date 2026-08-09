@@ -1,13 +1,17 @@
 // @ts-check
 // ```rust playground メタ付きコードブロックに「Playgroundで開く」ボタンを付与するmdast前処理プラグイン
-// （docs/markdown-pipeline/playground.md、spec: docs/spec/pages.md R-23）。
+// （docs/markdown-pipeline/playground.md、spec: docs/spec/pages.md R-23 / R-25）。
 // 記法は docs/markdown-notation/rule.md「Rust Playgroundで開くボタンを表示する」に従う。
 // リンクURLはビルド時に静的生成する（クライアントJSなし）。
 // ボタンは <pre> の横スクロールに追従させないため、pre の外側（.code-playground直下）に置き、
 // CSS（src/styles/global.css）で右上に絶対配置する。
 // ※登録は codeFilename の後に置くこと（```rust:main.rs playground はcodeFilenameのlang補正後で
 //   ないと lang === "rust" 判定に落ちる。前段が生成したノードを後段は訪問できる仕様に依存）。
+// hrefに載せるコードからは [!code ...] を除去する（R-25）。表示用のcodeノードは
+// Shikiのdiffハイライトにマーカーが必要なため原文のまま渡す。
 import { defineMdastPlugin } from "satteri";
+
+import { stripCodeNotation } from "./code-notation.mjs";
 
 const PLAYGROUND_URL =
   "https://play.rust-lang.org/?version=stable&edition=2024&code=";
@@ -34,7 +38,8 @@ export const playgroundLink = defineMdastPlugin({
         hName: "a",
         hProperties: {
           class: "playground-open",
-          href: PLAYGROUND_URL + encodeURIComponent(node.value),
+          href:
+            PLAYGROUND_URL + encodeURIComponent(stripCodeNotation(node.value)),
           target: "_blank",
           rel: "noopener noreferrer",
         },

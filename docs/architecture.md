@@ -19,6 +19,7 @@
 ├ plugins/                … Sätteri用自作プラグイン（.mjs、astro.config.mjsから参照）
 │   ├ dict-index.mjs      … 辞書一覧のconfig時直読み + ファイル名一意性検証
 │   ├ wikilink.mjs / directives.mjs / link-card.mjs / code-filename.mjs / mermaid.mjs / table-wrap.mjs
+│   ├ code-notation.mjs   … Shikiのコード記法（[!code ++]等）除去の共有関数（プラグインではない。playground-link.mjs と scripts/check-dict-code.mjs が使う）
 ├ src/
 │   ├ content.config.ts   … 4コレクション定義（下記2章）
 │   ├ pages/              … ルーティング（下記5章）

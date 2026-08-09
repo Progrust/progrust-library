@@ -5,6 +5,9 @@
 //   - マーカーなし                  → コンパイル成功を要求（fn main がなければ自動ラップ）
 //   - <!-- rustc: expect E0502 --> → コンパイル失敗かつ指定エラーコードの出力を要求
 //   - <!-- rustc: skip -->         → 検証対象外
+// Shikiのコード記法コメント（[!code ++] / [!code --]）はコードの一部ではないため、
+// rustcへ渡す前に stripCodeNotation で取り除く（docs/spec/pages.md R-25 と同じ規則。
+// [!code --] の行は「修正前のコード」なので行ごと落とす）。
 import { execFileSync } from "node:child_process";
 import {
   mkdtempSync,
@@ -16,6 +19,8 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import process from "node:process";
+
+import { stripCodeNotation } from "../plugins/code-notation.mjs";
 
 const DICT_DIR = "content/dict";
 const MARKER_PATTERN = /^<!--\s*rustc:\s*(?:(skip)|expect\s+(E\d{4}))\s*-->$/;
@@ -83,7 +88,7 @@ const extractRustBlocks = (markdown) => {
 
 /** 1ブロックをrustcでコンパイルし、結果を { ok, detail } で返す */
 const compileBlock = (block, workDir, index) => {
-  let source = block.code;
+  let source = stripCodeNotation(block.code);
   if (!/fn\s+main\s*\(/.test(source)) {
     source = `fn main() {\n${source}\n}\n`;
   }

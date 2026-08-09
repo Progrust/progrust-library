@@ -60,6 +60,12 @@
 - **R-22**: 本文のGFMテーブルは、横スクロールコンテナとなるラッパ要素（`.table-wrap`）で包んで出力する。テーブル幅が本文幅を超える場合はラッパ内で横スクロールし、ページ全体には横スクロールを発生させない。見た目（カード面フレーム・水平罫線のみ）は [`ui-design-spec.md`](../ui-design/ui-design-spec.md)「テーブル」に従う。
 - **R-23**: フェンスメタに `playground` を指定したRustコードブロック（` ```rust playground `。記法は [`rule.md`](../markdown-notation/rule.md)）には、コードブロック右上に半透明の「Playgroundで開く」リンクボタンを重ねて表示する。押下で `https://play.rust-lang.org/?version=stable&edition=2024&code=<URLエンコードしたコード全文>` を新規タブ（`target="_blank" rel="noopener noreferrer"`）で開く。URLはビルド時に静的生成する（クライアントJSなし）。対象は `rust` 言語のブロックのみで、`lang:ファイル名` 記法と併用できる。ボタンは `<pre>` の横スクロールに追従せず右上に固定される。実装方式は [`playground.md`](../markdown-pipeline/playground.md) に従う。
 - **R-24**: 本文の外部リンク（hrefが `http(s)://` で始まるもの）は、テキストリンク・リンクカードとも新規タブ（`target="_blank" rel="noopener noreferrer"`）で開く。内部リンク（サイト内相対パス）とwikilink（`/dict/…`。[`wikilink-ui.md`](wikilink-ui.md)）は対象外で同一タブのまま。実装方式は [`external-links.md`](../markdown-pipeline/external-links.md)（テキストリンク）/ [`link-card.md`](../markdown-pipeline/link-card.md)（リンクカード）に従う。
+- **R-25**: R-23のPlaygroundリンクのhrefに載せるコードからは、Shikiのコード記法コメント（`[!code ...]`。diff記法は [`rule.md`](../markdown-notation/rule.md)「diff のシンタックスハイライト」）を除去する。除去規則は次のとおり。**表示されるコードブロック側はマーカーを残す**（Shikiのハイライトに必要なため）。
+  - `[!code --]`（削除行）が付いた行は、行ごと除去する
+  - それ以外のマーカー（`[!code ++]` / `[!code highlight]` 等）はマーカー部分のみ除去する。除去の結果コメントが空になる場合は行末の `//` ごと除去する
+  - マーカーだけのコメント行は、行ごと除去する
+
+  除去処理は `plugins/code-notation.mjs` の `stripCodeNotation` に一元化し、コードブロックを「そのまま動くコード」として扱う経路（本要件のPlaygroundリンク / `npm run check:dict` のrustc検証。[`dict-style.md`](../markdown-notation/dict-style.md)「コード例の規則」）で共有する。
 
 ### 本トップページ（`/books/[slug]`）
 
@@ -92,6 +98,7 @@
 - **AC-12**: ボタン押下でRust Playgroundが新規タブで開き、エディタに当該コードが入っている。ボタンは右上に半透明で表示され、hoverで濃くなり、コードの横スクロールに追従しない。（R-23）※目視確認
 - **AC-13**: 外部URLのテキストリンク（`[表示名](https://…)`）とリンクカードの `<a>` に `target="_blank" rel="noopener noreferrer"` が付与され、内部リンク（`[about](/about)` 等）とwikilinkには付与されない。（R-24）
 - **AC-14**: frontmatterの`image`を省略した記事がビルドに成功し、記事一覧のカードに `/ogp.png` がサイト名のaltで表示される。（R-9）※表示は目視確認
+- **AC-15**: `[!code ++]` / `[!code --]` を含む ` ```rust playground ` のコードブロックで、`<pre>` 内にはマーカー付きのコードが渡って diff ハイライトされ、`playground-open` のhrefには `[!code --]` 行を除去しマーカーを取り去ったコードが載る。（R-25）
 
 ## 5. 未確定事項
 
