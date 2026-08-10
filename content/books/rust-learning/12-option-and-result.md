@@ -1,13 +1,13 @@
 ---
 title: 第12章 OptionとResult
-description: Some・NoneによるOption型、Ok・ErrによるResult型、if let式とlet-else文による簡潔な取り出し、?演算子によるエラー伝播まで、nullも例外も使わずに「値がない」「失敗した」を扱う方法を手を動かして学ぶ10問。
+description: Some・NoneによるOption型、Ok・ErrによるResult型、if let式とlet-else文による簡潔な取り出し、?演算子によるエラー伝播、unwrap系メソッドによる値の取り出しまで、nullも例外も使わずに「値がない」「失敗した」を扱う方法を手を動かして学ぶ13問。
 created_at: 2026-08-08
 updated_at: 2026-08-10
 tags: ["複合型", "パターンマッチング", "問題集"]
 public: true
 ---
 
-第11章で、列挙型と`match`式を身につけました。この最終章では、その2つが実際にどう使われているのか——標準ライブラリの`Option`型と`Result`型——を10問で扱います。
+第11章で、列挙型と`match`式を身につけました。この最終章では、その2つが実際にどう使われているのか——標準ライブラリの`Option`型と`Result`型——を13問で扱います。
 
 プログラムを書いていると、必ず2つの場面に出会います。「探したものが見つからなかった」と「処理に失敗した」です。多くの言語ではnullを返したり例外を投げたりして表しますが、どちらもチェックを忘れたコードがそのまま動いてしまい、実行時に初めて問題が表面化します。
 
@@ -132,7 +132,7 @@ let total = match stock {
 「在庫が分からない場合は0個として扱う」といった**判断は必ず書き手がすることになる**、という点も大事です。0とみなすのか、エラーにするのか、処理を打ち切るのか。言語が勝手に決めるのではなく、コードとして残ります。
 
 :::message{tip}
-`match`を毎回書くのは面倒に思えるかもしれません。実際には`unwrap_or`のような「`None`ならこの値を使う」を1行で書ける便利なメソッド（[[unwrap]]系）が`Option`には数多く用意されていて、上の例は`stock.unwrap_or(0) + 2`とも書けます。ただし、それらはすべて`match`の short-hand です。まずは`match`で何が起きているのかを押さえておくと、後から出会うメソッドもすんなり読めるようになります。
+`match`を毎回書くのは面倒に思えるかもしれません。実際には`unwrap_or`のような「`None`ならこの値を使う」を1行で書ける便利なメソッド（[[unwrap]]系）が`Option`には数多く用意されていて、上の例は`stock.unwrap_or(0) + 2`とも書けます。ただし、それらはすべて`match`の short-hand です。まずは`match`で何が起きているのかを押さえておくと、後から出会うメソッドもすんなり読めるようになります。unwrap系は問題10から扱います。
 :::
 ::::
 
@@ -690,7 +690,250 @@ let rest = match ship(stock, first) {
 :::
 ::::
 
-## 10 - 応用: 在庫管理システム
+## 10 - unwrap_orで既定値を使う
+
+[[unwrap]]と[[option]]に関する問題です。
+`main`の中の2つの`match`を、`unwrap_or`を使って1行ずつに書き換えてください。出力は変わりません。
+
+```txt:期待する出力
+コーヒーの在庫は3個です
+紅茶の在庫は0個です
+```
+
+```rust:「Playgroundで開く」をクリックして修正・実行してください playground
+fn main() {
+    let coffee: Option<u32> = Some(3);
+    let tea: Option<u32> = None;
+
+    // 次の2つのmatchをunwrap_orで書き換えよ（動作は変えないこと）
+    let coffee_stock = match coffee {
+        Some(count) => count,
+        None => 0,
+    };
+
+    let tea_stock = match tea {
+        Some(count) => count,
+        None => 0,
+    };
+
+    println!("コーヒーの在庫は{coffee_stock}個です");
+    println!("紅茶の在庫は{tea_stock}個です");
+}
+```
+
+::::details[解答例と解説]
+```rust playground
+fn main() {
+    let coffee: Option<u32> = Some(3);
+    let tea: Option<u32> = None;
+
+    // 次の2つのmatchをunwrap_orで書き換えよ（動作は変えないこと）
+    let coffee_stock = match coffee { // [!code --]
+        Some(count) => count, // [!code --]
+        None => 0, // [!code --]
+    }; // [!code --]
+    let coffee_stock = coffee.unwrap_or(0); // [!code ++]
+    let tea_stock = match tea { // [!code --]
+        Some(count) => count, // [!code --]
+        None => 0, // [!code --]
+    }; // [!code --]
+    let tea_stock = tea.unwrap_or(0); // [!code ++]
+
+    println!("コーヒーの在庫は{coffee_stock}個です");
+    println!("紅茶の在庫は{tea_stock}個です");
+}
+```
+8行が2行になりました。問題02のtipで触れた[[unwrap]]系のメソッドです。
+
+`unwrap_or(既定値)`は、`Some`なら中身を返し、`None`なら引数の既定値を返します。書き換え前の`match`とやっていることは同じで、`None`のアームに書いていた値が引数に移っただけです。
+
+<!-- rustc: skip -->
+```rust:2つは同じ意味
+// match
+let coffee_stock = match coffee {
+    Some(count) => count,
+    None => 0,
+};
+
+// unwrap_or
+let coffee_stock = coffee.unwrap_or(0);
+```
+
+同じメソッドが`Result`にもあります。`Err`のときに既定値を返す、という点だけが違います。値を取り出すメソッドは他にもいくつかあり、[[unwrap]]に一覧があります。
+
+便利ですが、使ってよいのは既定値が事実として正しい場面だけです。今回は在庫が分からないものを0個として扱うので筋が通っています。一方、価格が分からない商品を`unwrap_or(0)`で0円として扱えば、存在しない価格を勝手に作り出すことになります。この線引きは問題12で扱います。
+
+:::message{tip}
+`unwrap_or`の引数は、`Some`だったときでも必ず評価されます。既定値の生成に時間がかかる処理を書くと、使われないのに毎回実行されてしまいます。それを避けるための`unwrap_or_else`というメソッドもありますが、引数にクロージャという未習の書き方が必要なので、ここでは名前だけ覚えておいてください。
+:::
+::::
+
+## 11 - unwrapとexpect
+
+[[unwrap]]と[[result]]に関する問題です。
+次のコードは実行するとパニックして止まります。止まった理由が伝わるように、2つの`unwrap`を`expect`へ書き換えてください。
+
+```txt:期待する出力
+1回目の出荷後: 残り7個
+thread 'main' panicked at src/main.rs:14:30:
+在庫は足りているはず: "在庫が足りません（在庫7個）"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+```
+
+パニックのメッセージは、`thread 'main'`の後ろにスレッドの番号が入ることがあり、`src/main.rs:14:30`の行と桁も書いたコードによって変わります。`在庫は足りているはず:`から始まる行が出ていれば正解です。
+
+```rust:「Playgroundで開く」をクリックして修正・実行してください playground
+fn ship(stock: u32, count: u32) -> Result<u32, String> {
+    if count > stock {
+        return Err(format!("在庫が足りません（在庫{stock}個）"));
+    }
+
+    Ok(stock - count)
+}
+
+fn main() {
+    // 2つのunwrapを、失敗した理由が伝わるexpectへ書き換えよ
+    let rest = ship(10, 3).unwrap();
+    println!("1回目の出荷後: 残り{rest}個");
+
+    let rest = ship(rest, 9).unwrap();
+    println!("2回目の出荷後: 残り{rest}個");
+}
+```
+
+::::details[解答例と解説]
+```rust playground
+fn ship(stock: u32, count: u32) -> Result<u32, String> {
+    if count > stock {
+        return Err(format!("在庫が足りません（在庫{stock}個）"));
+    }
+
+    Ok(stock - count)
+}
+
+fn main() {
+    // 2つのunwrapを、失敗した理由が伝わるexpectへ書き換えよ
+    let rest = ship(10, 3).unwrap(); // [!code --]
+    let rest = ship(10, 3).expect("在庫は足りているはず"); // [!code ++]
+    println!("1回目の出荷後: 残り{rest}個");
+
+    let rest = ship(rest, 9).unwrap(); // [!code --]
+    let rest = ship(rest, 9).expect("在庫は足りているはず"); // [!code ++]
+    println!("2回目の出荷後: 残り{rest}個");
+}
+```
+`unwrap`は、`Ok`なら中身を返し、`Err`ならパニックしてプログラムを止めるメソッドです<!-- TODO: [[panic]] 作成後にリンク -->。`Option`に対しても同じで、`Some`なら中身、`None`ならパニックします。
+
+在庫10個から3個、さらに9個を出荷しようとしているので、2回目の`ship`は`Err`を返します。`match`なら`Err`のアームを書かされるところですが、`unwrap`は「`Err`なら止まる」と決め打ちするメソッドなので、コンパイルは通り、実行して初めて止まります。
+
+書き換え前の`unwrap`が出すメッセージはこうです。
+
+```txt:unwrapのメッセージ
+called `Result::unwrap()` on an `Err` value: "在庫が足りません（在庫7個）"
+```
+
+止まった場所と`Err`の中身は分かりますが、書き手がそこで何を期待していたのかは残りません。`expect`は同じ動作でメッセージを追加できるメソッドで、そこを補えます。
+
+```txt:expectのメッセージ
+在庫は足りているはず: "在庫が足りません（在庫7個）"
+```
+
+The Rust Programming Languageは、成功すると期待した理由を「〜のはず」という形で書くことを勧めています。「在庫は足りているはず」なのに足りなかった、と読めるので、前提のほうが間違っていたことがすぐ分かります。詳しくは[[unwrap]]を参照してください。
+
+どちらのメッセージにも`Err`の中身が続いて表示されます。`{:?}`と同じ表示（第9章のDebug出力）なので、`String`はダブルクォートで囲まれます。問題08で`format!`にわざわざ在庫数を入れておいたことが、ここで効いています。
+
+:::message{warning}
+メッセージを付けてもパニックはパニックで、プログラムはその場で終わります。`expect`が適切なのは、失敗しないと言い切れる根拠があるときだけです。失敗が現実に起こりうる場面では、`match`・`if let`・`let-else`・`?`で分岐しなければなりません。その見分け方を次の問題12で扱います。
+:::
+::::
+
+## 12 - unwrapを使ってよい場面
+
+[[unwrap]]・[[option]]・[[if-let-expression]]に関する問題です。
+次のコードは実行するとパニックして止まります。2つの`unwrap`を、それぞれの場面にふさわしい形へ書き換えてください。
+
+```txt:期待する出力
+コーヒー: 500円
+ビールは取り扱いがありません
+```
+
+```rust:「Playgroundで開く」をクリックして修正・実行してください playground
+fn find_price(name: &str) -> Option<u32> {
+    match name {
+        "コーヒー" => Some(500),
+        "紅茶" => Some(450),
+        "ジュース" => Some(400),
+        _ => None,
+    }
+}
+
+fn main() {
+    // メニューにある商品なので、必ず見つかる
+    let coffee = find_price("コーヒー").unwrap();
+    println!("コーヒー: {coffee}円");
+
+    // 客が注文した商品名。メニューにないこともある
+    // 見つからない場合は「〇〇は取り扱いがありません」と出力すること
+    let ordered = "ビール";
+    let price = find_price(ordered).unwrap();
+    println!("{ordered}: {price}円");
+}
+```
+
+::::details[解答例と解説]
+```rust playground
+fn find_price(name: &str) -> Option<u32> {
+    match name {
+        "コーヒー" => Some(500),
+        "紅茶" => Some(450),
+        "ジュース" => Some(400),
+        _ => None,
+    }
+}
+
+fn main() {
+    // メニューにある商品なので、必ず見つかる
+    let coffee = find_price("コーヒー").unwrap(); // [!code --]
+    let coffee = find_price("コーヒー").expect("メニューにある商品なので必ず見つかるはず"); // [!code ++]
+    println!("コーヒー: {coffee}円");
+
+    // 客が注文した商品名。メニューにないこともある
+    // 見つからない場合は「〇〇は取り扱いがありません」と出力すること
+    let ordered = "ビール";
+    let price = find_price(ordered).unwrap(); // [!code --]
+    println!("{ordered}: {price}円"); // [!code --]
+    if let Some(price) = find_price(ordered) { // [!code ++]
+        println!("{ordered}: {price}円"); // [!code ++]
+    } else { // [!code ++]
+        println!("{ordered}は取り扱いがありません"); // [!code ++]
+    } // [!code ++]
+}
+```
+2つの`unwrap`は見た目が同じでも、意味はまったく違います。判断の基準は、取り出せなかったときの振る舞いを決め打ってよい根拠があるかどうかです。
+
+1つ目は、探す名前がコードに直接書かれていて、`find_price`の定義を読めば必ず`Some`が返ると分かります。ところがコンパイラは`find_price`の戻り値が`Option<u32>`であることしか見ないので、`None`の可能性を消してくれません。書き手のほうが多くを知っている場面なので、取り出してしまってかまいません。ただし`unwrap`ではなく`expect`にして、なぜ見つかるはずなのかを残しておきます。
+
+2つ目は、注文された商品名次第で`None`になります。ここで`unwrap`を使うと、メニューにない商品を注文されただけでプログラムが止まってしまいます。「取り扱いがありません」と伝えて続ければ済む話なので、[[if-let-expression]]で分岐します（`match`や`let-else`でも書けます）。
+
+`unwrap_or(0)`ではいけないのか、とも考えられます。しかし、それでは`ビール: 0円`と出力され、存在しない価格を勝手に作り出してしまいます。既定値で埋めてよいのは、問題10の在庫数のように既定値が事実として正しい場面だけです。
+
+取り出し方を、この章で扱った順にまとめておきます。
+
+| 場面 | 取り出し方 |
+| --- | --- |
+| 失敗しないと言い切れる根拠がある | `expect`（根拠をメッセージに書く） |
+| 失敗しうるが、既定値で埋めてよい | `unwrap_or` |
+| 失敗しうるので、場合ごとに処理を分けたい | `match`・`if let`・`let-else` |
+| 失敗の判断を呼び出し元に任せたい | `?`演算子 |
+
+書き分けの感覚は、この章の問題を書き直しながら確かめるのが近道です。
+
+:::message{tip}
+サンプルコードや`#[test]`の中では、`unwrap`のままでも問題ありません。エラー処理の方針を決める前の段階では、後から手を入れる目印として役立ちますし、テストは失敗したらパニックで落ちるのが望ましい挙動です。使ってよい場面の整理は[[unwrap]]にまとめてあります。
+:::
+::::
+
+## 13 - 応用: 在庫管理システム
 
 第7章以降の総復習として、[[struct]]・[[enum]]・[[option]]・[[result]]・[[method]]をすべて組み合わせた問題です。
 商品の在庫を管理する`Inventory`を実装して、テストに合格させてください。
