@@ -7,7 +7,7 @@ tags: ["標準ライブラリ", "型システム"]
 public: true
 ---
 
-`unwrap`は、[[option]]や[[result]]に包まれた値を取り出す[[standard-library]]の[[method]]です[^1][^2]。`Some(値)`・`Ok(値)`ならその中身を返し、`None`・`Err`ならパニックして<!-- TODO: [[panic]] 作成後にリンク -->処理を中断します。パニックの代わりに既定値を返す`unwrap_or`などを含め、これらをまとめてunwrap系のメソッドと呼びます。
+`unwrap`は、[[option]]や[[result]]に包まれた値を取り出す[[standard-library]]の[[method]]です[^1][^2]。`Some(値)`・`Ok(値)`ならその中身を返し、`None`・`Err`ならパニックして<!-- TODO: [[panic]] 作成後にリンク -->処理を中断します。パニックの代わりに既定値を返す`unwrap_or`など、`unwrap`以外にもunwrap系のメソッドが複数存在します。
 
 ```rust playground
 fn find_price(item: &str) -> Option<i32> {
