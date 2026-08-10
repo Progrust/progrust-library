@@ -16,6 +16,7 @@
 | [content-model.md](content-model.md) | コンテンツモデル（コレクション・ID/URL規則・公開制御・ビルド時検証・画像・タグ） |
 | [pages.md](pages.md) | 全画面のページ仕様（トップ・一覧・詳細・タグ・404） |
 | [wikilink-ui.md](wikilink-ui.md) | 辞書リンクのUI（ホバープレビュー・サイドペイン・embedパーシャル・逆リンク） |
+| [playground-project.md](playground-project.md) | Playgroundプロジェクト連携（`:::project` 記法・Gist同期スクリプト・マッピングファイル・ファイルツリー） |
 | [search.md](search.md) | 検索（インデックス・クエリ構文・検索ボックス・一覧絞込） |
 | [theme.md](theme.md) | ライト/ダークテーマ切替 |
 | [feeds-meta.md](feeds-meta.md) | RSS・sitemap・OGP/meta・アクセス解析 |

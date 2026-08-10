@@ -10,6 +10,7 @@
 | [`markdown-notation/`](markdown-notation/rule.md) | 執筆者 | 本サイトで利用可能なMarkdown記法の一覧・辞書執筆のスタイルガイド（[`dict-style.md`](markdown-notation/dict-style.md)。タグ運用を含む。使用中タグの集計は `npm run dict:tags`）。書き方のみ。実装の話は書かない |
 | [`markdown-pipeline/`](markdown-pipeline/README.md) | 実装者 | Sätteriカスタムプラグインの機能別実装リファレンス（実装方式・雛形コード・落とし穴・残課題） |
 | `ui-design/` | 実装者 | UIデザインの仕様・計画（+ モック用ダミーコンテンツ）。モックHTML本体はリポジトリ外・claude design 上（[`ui-design/ui-design-spec.md`](ui-design/ui-design-spec.md) 冒頭にリンク） |
+| [`plan/`](plan/README.md) | 実装者 | 進行中の機能追加の実装計画（タスク分割・完了条件・進行状態。クローズしたら `archive/` へ凍結） |
 | `archive/` | — | クローズ済み文書の凍結アーカイブ（歴史的記録。更新しない） |
 | `content-plan/` | — | コンテンツの作成プラン。規模の大きい内容について書きたい場合にここで情報の整理を行う。 |
 
