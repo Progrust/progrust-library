@@ -16,6 +16,7 @@ claude designでのモック検討で確定したデザイン仕様。本実装�
   - タグ一覧: `tags-index.html`（件数順チップクラウド）
   - タグ詳細: `tags-detail.html`（種別混在の台帳リスト・戻るボタン。一覧データはバッジ全種を見せるための架空混じり）
   - テーブル: `table-compare.html`（案C: カード面フレーム・ゼブラなしで確定。不採用の比較案（現状 / 案A / 案B / 案D / ゼブラ）も残置）
+  - `:::project`: `project-compare.html`（案A: カード面フレーム + box-drawingツリー + アクセントアウトラインボタンで確定。不採用の案B/C-0〜C-2・ツリー案2（縦罫線ガイド）・ボタン比較（現行チップ/塗り）も残置。details内・辞書ペイン内の文脈確認を含む）
   - 本カバー画像（rust-learning）: `book-cover-compare.html`（案D: ドリルます目で確定。不採用の案A（台帳）/ 案B（Playgroundエディタ）/ 案C（枠組み表紙）も残置。編集用SVG原本は [`assets/book-rust-learning.svg`](assets/book-rust-learning.svg)、配信版 `public/images/books/rust-learning.svg` は原本に使用グリフのみサブセットしたwoff2（Zen Kaku Gothic New 700/900・JetBrains Mono 400、`pyftsubset --text=... --flavor=woff2`）をdata URIで埋め込み、フォント名を固有名に置換したもの。`<img>`経由でも書体が崩れない）
   - 参考資料: `code-bg-compare.html`（コードブロック背景色の比較検討）
 - 不採用の比較案（参考として残置）: `top-a-warm.html` / `top-c-balance.html` / `top-b2-sidebar.html` / `top-b3-catalog.html` / `book-top.html`（本トップの縦積み1カラム案）
@@ -284,6 +285,48 @@ tailwind.config = {
 > [!info] 補足
 > コメントのopacity 60%と重なる削除行内コメントは約33%まで薄くなるが、削除行として許容する。モック（`code-diff-compare.html`）では素のテキストノードがあるため`.lc`ラッパーで代用しているが、実装ではShikiのトークンspanをそのまま使う。ファイル名タブとの併用表示もモックで確認済み。
 
+### `:::project`（Playgroundプロジェクト・★案A/project-compare.htmlで確定）
+
+機能仕様は [`../spec/playground-project.md`](../spec/playground-project.md)。ここでは見た目の確定仕様のみ。
+
+- **全体**: `.code-project` をカード面フレーム（rounded 4px + `line` 枠 + `card` 面 + `overflow: hidden`）で囲い、「ヘッダー行 / ファイルツリー / 本文」の3段を薄罫線 `line/70` で区切る
+- **ヘッダー行**（`px-5 py-2.5`・`flex flex-wrap items-center gap-x-3`）: eyebrow `// project`（mono 12px・accent）→ タイトル（`font-display font-bold text-sm text-strong`。`[タイトル]` 省略時は要素ごと出力しない）→ ファイル数 `N files`（mono 11px・sub）→ ボタン（`ml-auto` で右端）
+- **「Playgroundで開く」ボタン**: アクセント色アウトライン型。class は単一ブロック版と同じ `playground-open` を使い、`.code-project` 配下でスタイルを上書きする（単一ブロック版のダーク面チップ（pages R-23）は従来のまま）
+  - `font-display` 700 / 12px / padding `0.3rem 0.7rem` / rounded 4px / `inline-flex items-center gap-[0.3rem]` / `white-space: nowrap`
+  - light: 枠・文字 `accent`・背景透過。hover / focus-visible で塗り反転（背景 `accent`・文字 #FBF9F6）
+  - dark: 枠・文字 `naccent`。hover で背景 `naccent`・文字 #1E1B18
+  - 末尾に新規タブを示す矢印アイコン（lucide arrow-up-right `<path d="M7 17 17 7"/><path d="M7 7h10v10"/>`、11px・stroke 2.5・currentColor）
+- **ファイルツリー**（`px-5 py-4`）: box-drawing（`tree` コマンド風）。mono 12.5px / line-height 2 / `white-space: pre`、はみ出しは横スクロール（`overflow-x: auto`）
+  - 枝記号（`├──` `│` `└──`）: 装飾。light `#BFB7AA` / dark `#57504A`・`user-select: none`
+  - ディレクトリ: `/` 接尾・非リンク・`sub` 色
+  - ファイル: 対応コードブロックへのページ内アンカー `<a>`。文字 `ink`、ホバーで `accent` + 点線下線（`text-underline-offset: 3px`）
+  - 並び順: 各階層でディレクトリ優先 + 名前昇順
+- **アンカージャンプ**: 各コードブロックのラッパ（`.code-block`）にページ内一意の id を付与。`scroll-margin-top` で sticky header 分を確保し、`:target` のラッパ内ファイル名タブの文字色を `#D4715A` にして着地位置を示す
+- **本文**（`px-5 py-5`）: 子ブロック（ファイル名タブ付きコードブロック・解説文等）が通常の prose と同じタイポグラフィで並ぶ。ブロック間 1.25rem（`space-y-5`）
+- **ネスト時**（`::::details` 内・辞書サイドペイン/ホバープレビュー内）: フレーム背景を `paper` に落とす（ネスト時の message・details と同じ規則）。枠線・内部罫線は保持
+- **コンパクト表示**（ペイン/プレビュー内）: ヘッダー `px-3 py-1.5`・eyebrow 11px・ファイル数 10px、ボタン 11px（padding `0.25rem 0.55rem`）、ツリー 11.5px（`px-3 py-2.5`）、本文 `px-3 py-3`、`:::project` 内のコード 12px（padding 0.75rem）・ファイル名タブ 10px
+
+HTML構造（実装の目安。`playground-open` が1つだけ出力されることは playground-project AC-1。`code-project-body` ラッパの生成がパイプライン制約で難しい場合は、details と同様に直下子への padding/margin で余白を代替する）:
+
+```html
+<div class="code-project">
+  <div class="code-project-header">
+    <p class="code-project-eyebrow">// project</p>
+    <p class="code-project-title">モジュール分割の検証</p><!-- label省略時は出力しない -->
+    <p class="code-project-count">3 files</p>
+    <a class="playground-open" href="https://play.rust-lang.org/?version=stable&edition=2024&gist=…" target="_blank" rel="noopener noreferrer">Playgroundで開く<svg>…</svg></a>
+  </div>
+  <div class="code-project-tree">（box-drawingツリー。ファイルは <a href="#対応ブロックのid">）</div>
+  <div class="code-project-body">
+    <div class="code-block" id="…"><span class="code-filename">src/utils.rs</span><pre>…</pre></div>
+    <p>解説文…</p>
+  </div>
+</div>
+```
+
+> [!info] 検討の経緯
+> 囲いは案A（カード面フレーム）/ 案B（ダーク面ツリーパネル）/ 案C系（左レール。C-0単独パネル・C-1ヘッダー一体パネル・C-2タブ型）の5案を比較。C系はツリーとタイトルの一体感とプロジェクト全体の一体感が両立せず、面で全体を囲う案Aを採用。ツリーはbox-drawingと縦罫線ガイド（目次文法）の2案からbox-drawingを採用。ボタンは現行チップ/アウトライン/塗りの3種比較でアウトラインを採用し、単一ブロック版チップとはスタイルを分けた（2026-08）。
+
 ### インラインコード
 
 ブロックとは異なり**ライトでは明るい面**。文字色はアクセント連動。空白は入力どおり保持し、コード内では折り返さない（`whitespace-pre`。行に収まらない場合はインラインコード全体が次行へ送られる。1行幅を超える長さのコードははみ出しを許容する）。
@@ -520,6 +563,7 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 11. タグ一覧は**件数順チップクラウド**、タグ詳細は**種別混在・`created_at` 降順の台帳リスト**を採用（名前順台帳案・種別ごとのセクション分け案は不採用）。章は「本タイトル › 章タイトル」の併記で表示。タグ詳細の戻る導線はテキストリンク → ボタン型に変更して確定
 12. テーブルは旧実装（全セル罫線グリッド）が淡白との判断から4案 + ゼブラオプションを比較（`table-compare.html`）→ **案C（カード面フレーム）・ゼブラなし**を採用。縦罫線を消して水平罫線のみとし、ヘッダー背景はインラインコードbg（light）/ npaper（dark）の一段濃い面に
 13. 本トップの書影は縦長（`600/850`・実際の本の比率）→ **OGP標準比率 `1200/630` に変更**（2026-08確定）。実カバー画像をOGP兼用の1200×630で作成する運用にしたため、縦長クロップでは絵柄が見切れる。ヒーローも横並び2カラム（書影左・テキスト右）→ 書影全幅+テキスト縦積みに変更
+14. `:::project` は囲い5案（A / B / C-0〜C-2）・ツリー2案・ボタン3種を比較（`project-compare.html`）→ **案A（カード面フレーム・3段罫線区切り）+ box-drawingツリー + アクセントアウトラインボタン**で確定（2026-08）。ボタンのアクセント化に伴い、プロジェクト版は単一ブロック版チップ（R-23）と別スタイルになった
 
 ## 未確定・本実装時の課題
 

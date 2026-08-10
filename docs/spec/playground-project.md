@@ -11,7 +11,7 @@ Gistは**執筆時にローカルの同期スクリプトが1回だけ作成**�
 - 執筆者向け記法: [`../markdown-notation/rule.md`](../markdown-notation/rule.md)「プロジェクト（複数ファイルをPlaygroundで開く）」
 - 単一コードブロック版のPlaygroundボタン: [`pages.md`](pages.md) R-23 / R-25（本仕様はその複数ファイル版。併存する）
 - コード記法コメントの除去規則: [`pages.md`](pages.md) R-25（`stripCodeNotation`。本仕様でも同じ規則・同じ実装を共有する）
-- 見た目（ファイルツリー等のデザイン）: [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)（§5未確定事項参照）
+- 見た目（フレーム・ファイルツリー・ボタンのデザイン）: [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」（確定済み）
 - Sätteriプラグインの実装方式: `../markdown-pipeline/`（実装時に作成）
 
 ## 2. 要求仕様
@@ -23,8 +23,8 @@ Gistは**執筆時にローカルの同期スクリプトが1回だけ作成**�
   - `rust` 以外の言語のファイル（` ```txt:src/data.txt ` 等）も置ける
   - コードブロックの間に解説文・`:::figure` 等の通常のブロック要素を挟んでよい（通常どおり表示される）
   - `:::project[タイトル]` のlabel記法で任意のプロジェクト名を指定できる。指定時はプロジェクト表示内にタイトルを表示する（省略時はタイトルなし）
-- **R-2**: `:::project` 全体に「Playgroundで開く」リンクボタンを**1つ**表示する。押下で `https://play.rust-lang.org/?version=stable&edition=2024&gist=<Gist ID>` を新規タブ（`target="_blank" rel="noopener noreferrer"`）で開く。Gist IDはマッピングファイル（§3）から解決し、URLはビルド時に静的生成する（クライアントJSなし）。ボタンの見た目は既存の `.playground-open`（[`pages.md`](pages.md) R-23）を流用する。
-- **R-3**: `:::project` 内の全ファイル名から**ファイルツリー**（ディレクトリ階層のツリー表示）を生成して表示する。ツリー内の各ファイル名はページ内アンカーリンクとし、クリックで対応するコードブロックへジャンプする（各コードブロックのラッパに一意なidを付与する。クライアントJSなし）。ツリーの視覚デザインは未確定（§5）。
+- **R-2**: `:::project` 全体に「Playgroundで開く」リンクボタンを**1つ**表示する。押下で `https://play.rust-lang.org/?version=stable&edition=2024&gist=<Gist ID>` を新規タブ（`target="_blank" rel="noopener noreferrer"`）で開く。Gist IDはマッピングファイル（§3）から解決し、URLはビルド時に静的生成する（クライアントJSなし）。ボタンのclass名は既存と同じ `playground-open` とし、見た目は `.code-project` 配下でアクセント色アウトライン型に上書きする（[`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定。単一ブロック版 R-23 のチップは従来のまま）。
+- **R-3**: `:::project` 内の全ファイル名から**ファイルツリー**（ディレクトリ階層のツリー表示）を生成して表示する。ツリー内の各ファイル名はページ内アンカーリンクとし、クリックで対応するコードブロックへジャンプする（各コードブロックのラッパに一意なidを付与する。クライアントJSなし）。ツリーの視覚デザイン（box-drawing・並び順等）は [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定済み。
 - **R-4**: Gistの内容は「各コードブロックのファイル名 → `stripCodeNotation` 適用後のコード」とする。除去規則と実装は [`pages.md`](pages.md) R-25 に従い、全ファイル（非Rustファイル含む）へ一律に適用する。**表示されるコードブロック側はマーカーを残す**（同R-25と同じ非対称）。
 - **R-5**: version / edition は `stable` / `2024` 固定とする（[`pages.md`](pages.md) R-23と同様。プロジェクト別の指定は制約・残課題）。
 - **R-6**: 既存の単一ブロック版 ` ```rust playground `（[`pages.md`](pages.md) R-23）は本機能導入後も従来どおり動作する。`:::project` の外のコードブロックの挙動は一切変えない。
@@ -88,4 +88,4 @@ Gistは**執筆時にローカルの同期スクリプトが1回だけ作成**�
 
 ## 5. 未確定事項
 
-- **ファイルツリーUIの視覚デザイン**: ツリーの見た目（配置・アイコン・開閉の有無等）とタイトルの表示スタイルは未確定。UIデザイン検討後に [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md) へ追記し、確定後にAC-2の構造詳細（クラス名等）を必要に応じて具体化する。機能要件（ツリー表示・アンカージャンプ）自体はR-3で確定
+なし（PG-1で解消済み。ファイルツリーUI・タイトル・ボタンの視覚デザインは [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定。構造の目安となるクラス名・HTML骨子も同所に記載）

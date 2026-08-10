@@ -6,7 +6,7 @@
 
 ## タスク
 
-- [ ] **PG-1: ファイルツリーUIデザインの検討・確定** 〔Fable 5〕
+- [x] **PG-1: ファイルツリーUIデザインの検討・確定** 〔Fable 5〕
   `:::project` の表示（ファイルツリー・タイトル・「Playgroundで開く」ボタン配置・コードブロック群の囲い方）のデザインを検討し確定する。既存のコードブロック系デザイン（[`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「コードブロック」「ファイル名タブ」）との整合をとる。確定内容を ui-design-spec の「コンポーネント仕様」へ追記し、[`../spec/playground-project.md`](../spec/playground-project.md) §5 の未確定事項を解消する（必要ならAC-2の構造詳細を具体化）。
   完了条件: ui-design-spec に `:::project` のコンポーネント仕様が追記され、playground-project.md §5 が空になっている。
 - [ ] **PG-2: ハッシュ共有モジュール + 同期スクリプト**
