@@ -27,9 +27,9 @@ Rustにはnullも例外もありません。代わりに、値がないかもし
 
 ```rust:「Playgroundで開く」をクリックして修正・実行してください playground
 fn show_stock(stock: Option<u32>) {
-    // match式で次のように出力せよ
-    // Some(count) → 在庫は〇〇個です
-    // None        → 在庫が分かりません
+    // 次のように出力せよ
+    // 在庫数が設定されている  → 在庫は〇〇個です
+    // 在庫数が設定されていない → 在庫が分かりません
 
 }
 
@@ -42,9 +42,9 @@ fn main() {
 ::::details[解答例と解説]
 ```rust playground
 fn show_stock(stock: Option<u32>) {
-    // match式で次のように出力せよ
-    // Some(count) → 在庫は〇〇個です
-    // None        → 在庫が分かりません
+    // 次のように出力せよ
+    // 在庫数が設定されている  → 在庫は〇〇個です
+    // 在庫数が設定されていない → 在庫が分かりません
     match stock { // [!code ++]
         Some(count) => println!("在庫は{count}個です"), // [!code ++]
         None => println!("在庫が分かりません"), // [!code ++]
@@ -107,7 +107,7 @@ fn main() {
     let total = stock + 2; // [!code --]
     let total = match stock { // [!code ++]
         Some(count) => count + 2, // [!code ++]
-        None => 2, // 在庫が分からない場合は0個として扱う [!code ++]
+        None => 0 + 2, // 在庫が分からない場合は0個として扱う [!code ++]
     }; // [!code ++]
 
     println!("合計: {total}個");
@@ -458,8 +458,8 @@ let Some(count) = stock else {
 ```rust:「Playgroundで開く」をクリックして修正・実行してください playground
 fn show(result: Result<u32, String>) {
     // match式で次のように出力せよ
-    // Ok(amount)  → 1人あたり〇〇円です
-    // Err(reason) → エラー: 〇〇
+    // 成功時 → 1人あたり〇〇円です
+    // 失敗時 → エラー: 〇〇
 
 }
 
@@ -473,8 +473,8 @@ fn main() {
 ```rust playground
 fn show(result: Result<u32, String>) {
     // match式で次のように出力せよ
-    // Ok(amount)  → 1人あたり〇〇円です
-    // Err(reason) → エラー: 〇〇
+    // 成功時 → 1人あたり〇〇円です
+    // 失敗時 → エラー: 〇〇
     match result { // [!code ++]
         Ok(amount) => println!("1人あたり{amount}円です"), // [!code ++]
         Err(reason) => println!("エラー: {reason}"), // [!code ++]
