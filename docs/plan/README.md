@@ -4,6 +4,8 @@
 
 ## 計画一覧
 
-| 計画 | 内容 | 状態 |
-| --- | --- | --- |
-| [playground-project.md](playground-project.md) | Playgroundプロジェクト連携（`:::project`）のUIデザイン検討〜実装 | 進行中 |
+各計画には**プロジェクトID**（英大文字+数字）を割り当てる。計画内のタスクIDは `<プロジェクトID>-<連番>` 形式（例: `PG1-1`）とし、コミットトレーラー `Task: <タスクID>` や `/impl` / `/task-review` の引数にはこのIDを使う。
+
+| プロジェクトID | 計画 | 内容 | 状態 |
+| --- | --- | --- | --- |
+| PG1 | [playground-project.md](playground-project.md) | Playgroundプロジェクト連携（`:::project`）のUIデザイン検討〜実装 | 進行中 |

@@ -88,4 +88,4 @@ Gistは**執筆時にローカルの同期スクリプトが1回だけ作成**�
 
 ## 5. 未確定事項
 
-なし（PG-1で解消済み。ファイルツリーUI・タイトル・ボタンの視覚デザインは [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定。構造の目安となるクラス名・HTML骨子も同所に記載）
+なし（PG1-1で解消済み。ファイルツリーUI・タイトル・ボタンの視覚デザインは [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定。構造の目安となるクラス名・HTML骨子も同所に記載）
