@@ -8,4 +8,4 @@
 
 | プロジェクトID | 計画 | 内容 | 状態 |
 | --- | --- | --- | --- |
-| PG1 | [playground-project.md](playground-project.md) | Playgroundプロジェクト連携（`:::project`）のUIデザイン検討〜実装 | 進行中 |
+| PG1 | [playground-project.md](../archive/plan/playground-project.md) | Playgroundプロジェクト連携（`:::project`）のUIデザイン検討〜実装 | 完了（アーカイブ済み） |

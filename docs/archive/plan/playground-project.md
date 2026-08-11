@@ -1,16 +1,20 @@
 # Playgroundプロジェクト連携（`:::project`） 実装計画
 
-仕様 [`../spec/playground-project.md`](../spec/playground-project.md)（作成済み）に基づく、UIデザイン検討から実装完了までのタスク分割。運用ルールは [`../implementation-rules.md`](../implementation-rules.md) 8章（1タスク=1セッション・`/impl <タスクID>`・レビューは `/task-review <タスクID>`）。
+> [!warning] 凍結済みアーカイブ
+> 本計画は2026-08-11に全タスク完了でクローズ済み。本書は歴史的記録であり**更新しない**。
+> 現行の参照先は、機能の仕様が [`../../spec/playground-project.md`](../../spec/playground-project.md)、実装リファレンスが [`../../markdown-pipeline/project.md`](../../markdown-pipeline/project.md)、見た目が [`../../ui-design/ui-design-spec.md`](../../ui-design/ui-design-spec.md)「`:::project`」、ワークフロー運用が [`../../implementation-rules.md`](../../implementation-rules.md) 8章。
+
+仕様 [`../spec/playground-project.md`](../../spec/playground-project.md)（作成済み）に基づく、UIデザイン検討から実装完了までのタスク分割。運用ルールは [`../implementation-rules.md`](../../implementation-rules.md) 8章（1タスク=1セッション・`/impl <タスクID>`・レビューは `/task-review <タスクID>`）。
 
 依存の流れ: PG1-1（デザイン確定）→ PG1-2 / PG1-3（並行可）→ PG1-4（統合・スタイル）→ PG1-5（追従文書と実地確認）
 
 ## タスク
 
 - [x] **PG1-1: ファイルツリーUIデザインの検討・確定** 〔Fable 5〕
-  `:::project` の表示（ファイルツリー・タイトル・「Playgroundで開く」ボタン配置・コードブロック群の囲い方）のデザインを検討し確定する。既存のコードブロック系デザイン（[`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「コードブロック」「ファイル名タブ」）との整合をとる。確定内容を ui-design-spec の「コンポーネント仕様」へ追記し、[`../spec/playground-project.md`](../spec/playground-project.md) §5 の未確定事項を解消する（必要ならAC-2の構造詳細を具体化）。
+  `:::project` の表示（ファイルツリー・タイトル・「Playgroundで開く」ボタン配置・コードブロック群の囲い方）のデザインを検討し確定する。既存のコードブロック系デザイン（[`../ui-design/ui-design-spec.md`](../../ui-design/ui-design-spec.md)「コードブロック」「ファイル名タブ」）との整合をとる。確定内容を ui-design-spec の「コンポーネント仕様」へ追記し、[`../spec/playground-project.md`](../../spec/playground-project.md) §5 の未確定事項を解消する（必要ならAC-2の構造詳細を具体化）。
   完了条件: ui-design-spec に `:::project` のコンポーネント仕様が追記され、playground-project.md §5 が空になっている。
 - [x] **PG1-2: ハッシュ共有モジュール + 同期スクリプト**
-  プロジェクトハッシュ計算（playground-project §3）をビルド側と共有できる形（`plugins/` 配下の共有関数。`code-notation.mjs` と同パターン）で実装し、`scripts/sync-playground-gists.mjs`（走査→未登録のみ `POST /meta/gist` → `playground-gists.json` 追記・`--verify`）を作る。npm script `sync:playground` の追加は [`../implementation-rules.md`](../implementation-rules.md) 1章の表を**先に更新**してから行う。fetchは `vi.stubGlobal` でスタブしてテストする。
+  プロジェクトハッシュ計算（playground-project §3）をビルド側と共有できる形（`plugins/` 配下の共有関数。`code-notation.mjs` と同パターン）で実装し、`scripts/sync-playground-gists.mjs`（走査→未登録のみ `POST /meta/gist` → `playground-gists.json` 追記・`--verify`）を作る。npm script `sync:playground` の追加は [`../implementation-rules.md`](../../implementation-rules.md) 1章の表を**先に更新**してから行う。fetchは `vi.stubGlobal` でスタブしてテストする。
   完了条件: playground-project AC-5・AC-8・AC-9 のテストが通る。`npm run check` green。
 - [x] **PG1-3: `:::project` mdastプラグイン + markdown-pipeline文書** 〔Fable 5〕
   `:::project` の変換プラグインを実装する（containerDirective の捕捉方式・`codeFilename` 変換後の子ノード走査・`directives.mjs` の未知名throwとの順序関係、という一次検証を含むため技術検証込み）。ビルドエラー5系統（playground-project R-7）、ボタン（R-2）、ファイルツリー生成とアンカーid付与（R-3）、マッピング参照（R-7e）を実装。`tests/helpers/pipeline.ts` への登録と `tests/plugins/directives.test.ts` の「未知のディレクティブ」テスト更新を含む。検証済みの実装方式・雛形・落とし穴を `../markdown-pipeline/project.md` として新規作成し、README対応表・全体像スニペットも更新する。
@@ -18,24 +22,47 @@
 - [x] **PG1-4: スタイル適用と表示統合**
   PG1-1で確定したデザインを `src/styles/global.css` に実装する（`.code-project` 等の新セレクタ + 既存のフルブリード/幅制御系セレクタ列への追加）。実記事（`content/articles/rust-playground-multifile-release.md` の検証コード等）に `:::project` を適用し、`npm run sync:playground` を実運用して初回マッピングをコミットする。
   完了条件: 実記事のプロジェクトがビルドされ、ボタン押下でPlaygroundが複数ファイルモードで開く（playground-project AC-11 目視）。ライト/ダーク両テーマで表示崩れがない（目視）。
-- [ ] **PG1-5: 追従文書の更新とクローズ**
-  実装を反映して [`../architecture.md`](../architecture.md)（1章プロジェクト構成ツリー・3章ビルド時検証テーブル・4章プラグイン順序）を更新する。実装中に得た知見を `../markdown-pipeline/project.md` へ還流し、残課題を整理する。全タスクのレビュー完了を確認し、本計画をクローズして [`../archive/`](../archive/plan/README.md) へ凍結・移動する（README一覧の更新含む）。
-  完了条件: architecture.md が実装と一致し、[`../implementation-rules.md`](../implementation-rules.md) 7章のDefinition of Doneを全タスクが満たし、本計画がアーカイブされている。
+- [x] **PG1-5: 追従文書の更新とクローズ**
+  実装を反映して [`../architecture.md`](../../architecture.md)（1章プロジェクト構成ツリー・3章ビルド時検証テーブル・4章プラグイン順序）を更新する。実装中に得た知見を `../markdown-pipeline/project.md` へ還流し、残課題を整理する。全タスクのレビュー完了を確認し、本計画をクローズして [`../archive/`](README.md) へ凍結・移動する（README一覧の更新含む）。
+  完了条件: architecture.md が実装と一致し、[`../implementation-rules.md`](../../implementation-rules.md) 7章のDefinition of Doneを全タスクが満たし、本計画がアーカイブされている。
 
 ## 申し送り事項
 
-- ~~**PG1-3へ**: `:::project` のファイルとして扱うのは**直下のコードブロックのみ**（入れ子ディレクティブ内は対象外）と [`../spec/playground-project.md`](../spec/playground-project.md) R-1 に明記した。R-7 (a)〜(d) の判定は同期スクリプト側にも別実装があり（走査対象のmdastが `codeFilename` 変換前後で異なるため）、条件を変えるときは `scripts/sync-playground-gists.mjs` の `readProject` と同時に直す（spec R-8 の但し書き）。ハッシュ計算とマッピング読み込みは `plugins/project-gist.mjs`（`projectHash` / `readGistMap` / `GIST_MAP_PATH`）をそのまま使うこと（R-12）~~（PG1-3で対応済み。二重実装の同期義務は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md) に恒久記載）
+- ~~**PG1-3へ**: `:::project` のファイルとして扱うのは**直下のコードブロックのみ**（入れ子ディレクティブ内は対象外）と [`../spec/playground-project.md`](../../spec/playground-project.md) R-1 に明記した。R-7 (a)〜(d) の判定は同期スクリプト側にも別実装があり（走査対象のmdastが `codeFilename` 変換前後で異なるため）、条件を変えるときは `scripts/sync-playground-gists.mjs` の `readProject` と同時に直す（spec R-8 の但し書き）。ハッシュ計算とマッピング読み込みは `plugins/project-gist.mjs`（`projectHash` / `readGistMap` / `GIST_MAP_PATH`）をそのまま使うこと（R-12）~~（PG1-3で対応済み。二重実装の同期義務は [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md) に恒久記載）
 - ~~**PG1-3へ**: AC-5 の「表示側の `<pre>` にはマーカー付きコードが渡る」半分は未検証（PG1-2ではGistへ送る側のみ検証した）。PG1-3のプラグインテストで担保する~~（PG1-3のプラグインテストで担保済み）
 - ~~**PG1-4へ**: `playground-gists.json` はルート直下のJSONで `prettier --check .` の対象。`writeGistMap` はPrettier既定（2スペース + 末尾改行）で書くため、生成物をそのままコミットしてよい~~（PG1-4で生成物をそのままコミットし `format:check` green を確認）
-- ~~**PG1-4へ**: CSS実装の前提（id契約 `project-{n}-{slug}`・ツリーのHTML構造 `.tree-row`/`.tree-branch`/`.tree-dir` と `white-space: pre` の必要性・eyebrow `// project` はmarkupリテラルのため `::before` で二重付与しない・ファイル数の単数形 `1 file`・ルート行なし）は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」を参照。ツリー見た目の最終確認はPG1-4の目視で行う~~（PG1-4でCSS実装・目視確認とも完了）
-- ~~**PG1-4へ**: gistMapはconfig評価時に1回読むため、devサーバー起動中に `npm run sync:playground` を実行したら再起動が必要~~（恒久的な制約として [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」に記載済み）
-- **PG1-5へ**: `playground-gists.json`（ルート直下・コミット対象）は [`../architecture.md`](../architecture.md) 1章のプロジェクト構成ツリーに未記載。3章のビルド時検証テーブル・4章のプラグイン順序（`codeFilename → project → playgroundLink → …`）とあわせて追記する
+- ~~**PG1-4へ**: CSS実装の前提（id契約 `project-{n}-{slug}`・ツリーのHTML構造 `.tree-row`/`.tree-branch`/`.tree-dir` と `white-space: pre` の必要性・eyebrow `// project` はmarkupリテラルのため `::before` で二重付与しない・ファイル数の単数形 `1 file`・ルート行なし）は [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md)「制約・残課題」を参照。ツリー見た目の最終確認はPG1-4の目視で行う~~（PG1-4でCSS実装・目視確認とも完了）
+- ~~**PG1-4へ**: gistMapはconfig評価時に1回読むため、devサーバー起動中に `npm run sync:playground` を実行したら再起動が必要~~（恒久的な制約として [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md)「制約・残課題」に記載済み）
+- ~~**PG1-5へ**: `playground-gists.json`（ルート直下・コミット対象）は [`../architecture.md`](../../architecture.md) 1章のプロジェクト構成ツリーに未記載。3章のビルド時検証テーブル・4章のプラグイン順序（`codeFilename → project → playgroundLink → …`）とあわせて追記する~~（PG1-5で1章・3章・4章とも対応済み）
 
 ## 実施履歴
 
+### PG1-5
+
+`:::project` 実装を追従文書へ反映し、本計画をクローズした。
+
+**実装**:
+
+- [`../architecture.md`](../../architecture.md): 1章のツリーに `playground-gists.json`（ルート直下・コミット対象）とルート `scripts/` を追加し、`plugins/` を役割別3グループ（変換プラグイン / config評価時検証 / 共有関数）+ `shiki-theme.mjs` に整理して現存17ファイルを漏れなく列挙した（従来は6ファイルのみの記載で `project.mjs` 等が欠けていた）。3章のビルド時検証テーブルに `validate-projects.mjs` の行を追加。4章のプラグイン順序に `project` を挿入し、3制約の詳細は [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md) へ委譲
+- [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md): 「制約・残課題」にネスト文脈（`::::details` 内・辞書ペイン/ホバープレビュー内）の見た目が実コンテンツ未確認である旨を追記（PG1-4レビュー軽微2の恒久記録）。あわせてタスクID前方参照を除去し、計画アーカイブ後も自立して読める表現に調整
+- `src/styles/global.css`: 枝記号の `user-select: none` に `-webkit-user-select` を併記（PG1-4レビュー軽微1の解消）
+- クローズ: 本書に凍結注記を付けて `docs/archive/plan/` へ移動し、相対リンクを移動後の階層（`../../` / `../review/`）へ付け替え。[`README.md`](README.md) の計画一覧とリポジトリ直下 `CLAUDE.md` のドキュメント地図を更新
+
+**満たした完了条件**: architecture.md が実装と一致（上記3箇所）、[`../implementation-rules.md`](../../implementation-rules.md) 7章のDefinition of Doneを全タスクが充足、本計画のアーカイブ。
+
+**レビュー状況**: PG1-2〜PG1-4 は `docs/archive/review/` に承認済み（要修正0件）の記録あり。**PG1-1 はレビュー対象外**とした（ui-design-spec と spec §5 への追記のみでコード変更がなく、その確定仕様と実装の一致は [`../archive/review/PG1-4.md`](../review/PG1-4.md) のDoDチェック1で項目単位に検証済みのため）。
+
+**検証結果**: `npm run check` green（format:check / lint / typecheck 0 errors・1 hint（既存）/ vitest 255 passed）、`npx astro build` 成功（143ページ）。移動後の相対リンクは全リンク先の実在をgrepで突き合わせ、旧パス `plan/playground-project.md` への残存参照がないことも確認した。
+
+**コミット**:
+
+- `4e14b8e` fix: :::projectツリーの枝記号に-webkit-user-selectを併記
+- `c642c3b` docs: architecture.mdへ:::projectの実装を反映しproject.mdの残課題を整理
+- （本書の更新・移動と索引更新は、この履歴を含むクローズコミット自体で行った）
+
 ### PG1-4
 
-`:::project` のCSSを実装し、実記事へ適用して初回のGistマッピングを作成した。見た目の仕様は [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」を正とし、本節では実装・検証結果のみ記載する。
+`:::project` のCSSを実装し、実記事へ適用して初回のGistマッピングを作成した。見た目の仕様は [`../ui-design/ui-design-spec.md`](../../ui-design/ui-design-spec.md)「`:::project`」を正とし、本節では実装・検証結果のみ記載する。
 
 **実装**:
 
@@ -54,7 +81,7 @@
 - `::::details` 内・辞書ペイン内は実コンテンツが無いため、DOMを組み替えた擬似再現で背景 paper とコンパクト表示を確認
 - 「Playgroundで開く」のURL（プロジェクト1・2・5）を開き、Files欄に全ファイルが階層どおり復元され複数ファイルモードに切り替わることを確認（AC-11）。プロジェクト4のGistはマーカー除去済みで、表示側はdiffのtint付き（AC-5）
 
-**実装中に得た知見**（[`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」へ反映済み）:
+**実装中に得た知見**（[`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md)「制約・残課題」へ反映済み）:
 
 - ツリーのファイルリンクは素の `<a>` のため、汎用リンク規則 `.prose a:not(.wikilink):not(.link-card):not(.playground-open)`（詳細度 (0,4,1)）に負ける。同じ `:not()` 連鎖を付けて詳細度で上回る必要がある
 - 単一ファイル + `[!code ++]` だけの行（マーカーのみで中身が空白の行）は、Shikiの記法除去後に表示・Gistとも行ごと消える（両者は一致するため実害なし）
@@ -67,11 +94,11 @@
 
 ### PG1-3
 
-`:::project` のビルド側変換プラグインとconfig評価時検証、リファレンス文書を実装した。実装方式・設計判断・落とし穴の詳細は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)（新設）を正とする。
+`:::project` のビルド側変換プラグインとconfig評価時検証、リファレンス文書を実装した。実装方式・設計判断・落とし穴の詳細は [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md)（新設）を正とする。
 
 **先行したドキュメント更新**（仕様駆動）:
 
-- [`../spec/playground-project.md`](../spec/playground-project.md): R-1 に「他のディレクティブ内の `:::project` も通常どおりプロジェクトとして扱う」を追記（PG1-2レビュー軽微4の解消。両実装の挙動が一致していることをテストで確認）
+- [`../spec/playground-project.md`](../../spec/playground-project.md): R-1 に「他のディレクティブ内の `:::project` も通常どおりプロジェクトとして扱う」を追記（PG1-2レビュー軽微4の解消。両実装の挙動が一致していることをテストで確認）
 
 **実装**:
 
@@ -84,7 +111,7 @@
 
 **満たした完了条件 / AC**: AC-1〜AC-4・AC-6・AC-7・AC-10 + AC-5の表示側（`<pre>` にマーカー付きコードが渡る）。AC-11（実Playgroundの目視）とCSS適用はPG1-4の担当。
 
-**実装中に得た知見**（詳細は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「落とし穴と回避策」と [`../markdown-pipeline/satteri-plugin-api.md`](../markdown-pipeline/satteri-plugin-api.md) へ反映済み）:
+**実装中に得た知見**（詳細は [`../markdown-pipeline/project.md`](../../markdown-pipeline/project.md)「落とし穴と回避策」と [`../markdown-pipeline/satteri-plugin-api.md`](../../markdown-pipeline/satteri-plugin-api.md) へ反映済み）:
 
 - 新規リテラルのトップレベル `position` はarenaへ引き継がれないが、`data` の任意キーは後段パスから読める
 - 前段パス生成ノードへの `setProperty` は成立する（arena未登録エラーは同一パス内限定）
@@ -99,7 +126,7 @@
 - `961bdd1` test: :::projectのAC-1〜AC-7・AC-10テストとヘルパを追加
 - `b08bc25` docs: markdown-pipelineに:::projectの実装リファレンスを追加しREADME・APIを更新
 
-**レビュー指摘対応**（`推奨` 範囲。詳細は [`../archive/review/PG1-3.md`](../archive/review/PG1-3.md) の対応記録）: 要修正0件・推奨1件（入れ子 `:::project` のsync側回帰テスト）に対応した（`5e4ad6e`）。軽微1・2はレビュー判定どおり対応不要として残置。
+**レビュー指摘対応**（`推奨` 範囲。詳細は [`../archive/review/PG1-3.md`](../review/PG1-3.md) の対応記録）: 要修正0件・推奨1件（入れ子 `:::project` のsync側回帰テスト）に対応した（`5e4ad6e`）。軽微1・2はレビュー判定どおり対応不要として残置。
 
 ### PG1-2
 
@@ -107,9 +134,9 @@
 
 **先行したドキュメント更新**（仕様駆動）:
 
-- [`../spec/playground-project.md`](../spec/playground-project.md): R-1 に「ファイルは直下のコードブロックのみ」を追記、R-8 に「R-7 (a)〜(d) 違反はNG報告してGist作成をスキップ・exit 1」「判定はビルド側と別実装になる」を追記
-- [`../implementation-rules.md`](../implementation-rules.md): 1章にnpm script `sync:playground`（ネットワークを伴うため `check` には含めない）、3章の `// @ts-check` 対象に `scripts/*.mjs`、5章のテストミラー表にルート `scripts/` の行を追加
-- [`../architecture.md`](../architecture.md): 1章のツリーに `plugins/project-gist.mjs`、10章のテスト対象にルート `scripts/` を追加
+- [`../spec/playground-project.md`](../../spec/playground-project.md): R-1 に「ファイルは直下のコードブロックのみ」を追記、R-8 に「R-7 (a)〜(d) 違反はNG報告してGist作成をスキップ・exit 1」「判定はビルド側と別実装になる」を追記
+- [`../implementation-rules.md`](../../implementation-rules.md): 1章にnpm script `sync:playground`（ネットワークを伴うため `check` には含めない）、3章の `// @ts-check` 対象に `scripts/*.mjs`、5章のテストミラー表にルート `scripts/` の行を追加
+- [`../architecture.md`](../../architecture.md): 1章のツリーに `plugins/project-gist.mjs`、10章のテスト対象にルート `scripts/` を追加
 
 **実装**:
 
@@ -132,4 +159,4 @@
 - `e0f8921` feat: :::projectのハッシュ共有モジュールとGist同期スクリプトを追加
 - `6a204c7` test: :::project のハッシュ・Gist同期スクリプトのAC-5/AC-8/AC-9テストを追加
 
-**レビュー指摘対応**（`推奨` 範囲。詳細は [`../archive/review/PG1-2.md`](../archive/review/PG1-2.md) の対応記録）: 要修正0件・推奨1件（`import.meta.main` のNodeバージョン要件）に対応し、`package.json` の `engines.node` と implementation-rules 1章へ実行前提を明記した（`50ec59f`）。軽微2・4はPG1-3実装時の判断事項として残置。
+**レビュー指摘対応**（`推奨` 範囲。詳細は [`../archive/review/PG1-2.md`](../review/PG1-2.md) の対応記録）: 要修正0件・推奨1件（`import.meta.main` のNodeバージョン要件）に対応し、`package.json` の `engines.node` と implementation-rules 1章へ実行前提を明記した（`50ec59f`）。軽微2・4はPG1-3実装時の判断事項として残置。

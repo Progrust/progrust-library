@@ -39,7 +39,7 @@ Astro v7（2026-06-22リリース）でMarkdownパイプラインが`unified`か
 | 実装ルール（ツールチェーン・コーディング規約・テストの書き方・完了チェックリスト） | [`docs/implementation-rules.md`](docs/implementation-rules.md) |
 | ワークフロー運用（タスク・モデル・レビュー） | [`docs/implementation-rules.md`](docs/implementation-rules.md) 8章 |
 | 進行中の機能追加の実装計画 | [`docs/plan/`](docs/plan/README.md) |
-| 初期実装計画（全フェーズ完了・凍結済み） | [`docs/archive/plan/`](docs/archive/plan/README.md) |
+| 完了・凍結済みの実装計画（初期実装計画の全フェーズ + クローズ済みの機能追加計画） | [`docs/archive/plan/`](docs/archive/plan/README.md) |
 | 執筆者向けMarkdown記法一覧 | [`docs/markdown-notation/rule.md`](docs/markdown-notation/rule.md) |
 | コンテンツのfrontmatter定義 | [`docs/markdown-notation/frontmatter.md`](docs/markdown-notation/frontmatter.md) |
 | 辞書コンテンツの執筆規約（テンプレート・文体・タグ運用。執筆は `/dict-write`） | [`docs/markdown-notation/dict-style.md`](docs/markdown-notation/dict-style.md) |
