@@ -28,6 +28,7 @@ npm scripts は以下に固定する（セッション間で呼び方を変え�
 | `typecheck` | astro check |
 | `test` | vitest run |
 | `check` | format:check + lint + typecheck + test を一括実行（タスク完了時のゲート。7章） |
+| `sync:playground` | `:::project` のGistマッピングを同期する（`scripts/sync-playground-gists.mjs`。[spec/playground-project.md](spec/playground-project.md) R-8〜R-11）。ネットワークアクセスを伴うため `check` には**含めない**（実行は執筆者が明示的に行う） |
 
 実行タイミング: コミット前に必ず `npm run check`。実装中は随時 `npm run test`。
 
@@ -48,7 +49,7 @@ npm scripts は以下に固定する（セッション間で呼び方を変え�
 - `any` 禁止（strict準拠）。やむを得ない場合は `unknown` + 型の絞り込み
 - コメントは「なぜ」を書く（「何を」はコードで表現する）。`src/lib/` の export 関数には日本語1行JSDocを付ける
 - コメント・JSDocでspecのR/AC番号を参照するときは**必ずspec文書名を付ける**（`content-model R-10`・`wikilink-ui R-17` 形式）。R/AC番号はspec文書ごとの独立採番で衝突するため、無修飾の `R-17` は禁止
-- `plugins/*.mjs` は先頭に `// @ts-check` を付け、JSDoc型注釈で型を効かせる
+- `plugins/*.mjs`・`scripts/*.mjs` は先頭に `// @ts-check` を付け、JSDoc型注釈で型を効かせる（テストからTSでimportする経路があるため型情報が要る）
 - ビルド時検証のエラーはthrow方式・メッセージ形式（絶対パス:行:列）を含め [markdown-pipeline/satteri-plugin-api.md](markdown-pipeline/satteri-plugin-api.md) を正とする（本書では再掲しない）
 
 ## 4. Astroコンポーネント規約
@@ -70,6 +71,9 @@ npm scripts は以下に固定する（セッション間で呼び方を変え�
   | `plugins/wikilink.mjs` | `tests/plugins/wikilink.test.ts` |
   | `src/lib/content.ts` | `tests/lib/content.test.ts` |
   | `src/scripts/search.ts` | `tests/scripts/search.test.ts` |
+  | `scripts/sync-playground-gists.mjs` | `tests/scripts/sync-playground-gists.test.ts` |
+
+  `tests/scripts/` はクライアントJS（`src/scripts/`）とルートの開発スクリプト（`scripts/`）**両方**のミラーを兼ねる（ファイル名が衝突しない限り分けない）。
 
 - **describe/it**: `describe` は対象モジュール・機能名、`it` は日本語の振る舞い文（例: `it('リンク切れのwikilinkがあるとビルドエラーになる')`）
 - **AC対応付け**: specの受入基準に由来するテストは it名の先頭に AC番号を付ける — `it('[AC-9] 存在しないslugへのwikilinkでビルドが失敗する')`。specとテストの対応をgrepで追跡できるようにする

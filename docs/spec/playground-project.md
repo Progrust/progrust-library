@@ -41,6 +41,8 @@ Gistは**執筆時にローカルの同期スクリプトが1回だけ作成**�
 ### 同期スクリプト
 
 - **R-8**: `npm run sync:playground`（`scripts/sync-playground-gists.mjs`）は、全mdコンテンツ（辞書・記事・本）の `:::project` を走査し、**マッピングに未登録のハッシュのみ** Playgroundの内部API `POST https://play.rust-lang.org/meta/gist`（ボディ `{"code": [{"name": <ファイル名>, "content": <stripCodeNotation適用後コード>}, ...]}`）でGistを作成してマッピングへ追記する。登録済みハッシュはスキップし、再実行してもGistを作らない（冪等）。
+  - R-7 (a)〜(d) に違反する `:::project` を見つけた場合は、**NG行で報告してそのプロジェクトのGist作成をスキップする**（内容が欠けた・誤ったGistを作らないため）。1件でもあれば exit code 1 で終了する（R-11）。R-7(e) はビルド側だけの検証のためスクリプトでは扱わない（未登録＝作成対象そのもの）
+  - 上記の判定はビルド側プラグインとは**別実装**になる（スクリプトは素のmdastを走査し、ビルド側は `codeFilename` 変換後のノードを走査するため入力形状が異なる）。両者の判定条件がずれないよう、R-7 の条件を変更するときは双方を同時に直す
 - **R-9**: 同期スクリプトはマッピングの**旧エントリを削除しない**（コードをrevertした際に既存Gistを再利用するため。マッピングは追記のみで単調増加する）。
 - **R-10**: `npm run sync:playground -- --verify` で、マッピング内の**全エントリ**のGist生存確認（`GET https://play.rust-lang.org/meta/gist/<id>` が成功すること）を行う。1件でも失敗があれば失敗一覧を報告して exit code 1 で終了する（Gist作成は行わない）。
 - **R-11**: 出力・終了コードの形式は `scripts/check-dict-code.mjs`（[`../markdown-notation/dict-style.md`](../markdown-notation/dict-style.md)「コード例の規則」）に準拠する: ブロックごとの `OK / SKIP / NG` 行 + 末尾サマリ、成功で 0・失敗で 1。

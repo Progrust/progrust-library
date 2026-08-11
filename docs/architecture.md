@@ -20,6 +20,7 @@
 │   ├ dict-index.mjs      … 辞書一覧のconfig時直読み + ファイル名一意性検証
 │   ├ wikilink.mjs / directives.mjs / link-card.mjs / code-filename.mjs / mermaid.mjs / table-wrap.mjs
 │   ├ code-notation.mjs   … Shikiのコード記法（[!code ++]等）除去の共有関数（プラグインではない。playground-link.mjs と scripts/check-dict-code.mjs が使う）
+│   ├ project-gist.mjs    … :::project のハッシュ・Gistペイロード・マッピングファイル入出力の共有関数（プラグインではない。ビルド側の :::project 変換と scripts/sync-playground-gists.mjs が使う。spec/playground-project.md R-12）
 ├ src/
 │   ├ content.config.ts   … 4コレクション定義（下記2章）
 │   ├ pages/              … ルーティング（下記5章）
@@ -173,6 +174,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 - `plugins/`の自作プラグイン: mdast/hast in/outのユニットテスト（正常系+ビルドエラー系）
 - `src/lib/`: wikilinkグラフ構築・検索インデックス変換・並び順/公開フィルタ
 - `src/scripts/search.ts`: クエリパース+フィルタの純関数
+- ルート `scripts/` の開発スクリプト: 純関数（抽出・ハッシュ）と、fetchを`vi.stubGlobal`でスタブした実行系（`sync-playground-gists.mjs`）
 
 ページ・UIは自動テストせず、ビルド成功（=全検証パス）と開発サーバでの目視で確認する。E2Eは導入しない。
 
