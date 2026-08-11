@@ -610,7 +610,10 @@ html.dark .code-project .playground-open:focus-visible {
 }
 .code-project-tree .tree-branch {
   color: #bfb7aa;
-  user-select: none; /* 枝記号は装飾のためコピー対象から外す */
+  /* 枝記号は装飾のためコピー対象から外す。無プレフィックスのSafari対応は18.4からのため
+     それ未満向けに -webkit- を併記する */
+  -webkit-user-select: none;
+  user-select: none;
 }
 html.dark .code-project-tree .tree-branch {
   color: #57504a;
