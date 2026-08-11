@@ -146,6 +146,34 @@ describe("sync-playground-gists（:::project のGist同期・playground-project 
     expect(Object.keys(map)).toHaveLength(2);
   });
 
+  it("入れ子ディレクティブ内の :::project も走査対象になる（spec R-1。ビルド側と両翼の回帰ガード）", async () => {
+    const fetchMock = stubCreateOk("nested1");
+    const source = [
+      "---",
+      "title: テスト",
+      "---",
+      "",
+      "::::details[補足]",
+      ":::project[入れ子]",
+      `${FENCE}rust:src/main.rs`,
+      "fn main() {}",
+      FENCE,
+      ":::",
+      "::::",
+      "",
+    ].join("\n");
+    const targets = [writeMd("a.md", source)];
+
+    const code = await syncPlaygroundGists({ targets, ...io() });
+
+    expect(code).toBe(0);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const map = JSON.parse(readFileSync(mapPath, "utf8"));
+    expect(Object.values(map)).toEqual([
+      { id: "nested1", url: "https://gist.github.com/rust-play/nested1" },
+    ]);
+  });
+
   it("Gist作成APIが失敗するとNG行を出して exit code 1 を返す", async () => {
     vi.stubGlobal(
       "fetch",
