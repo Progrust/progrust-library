@@ -33,7 +33,15 @@ export const codeFilename = defineMdastPlugin({
     // 任意のブロックノード型 + data.hName でラップ要素を作れる（ここでは paragraph→div/span）。
     const wrapper = {
       type: "paragraph",
-      data: { hName: "div", hProperties: { class: "code-block" } },
+      data: {
+        hName: "div",
+        hProperties: { class: "code-block" },
+        // 元codeノードの位置。新規リテラルのトップレベルpositionはarenaへ引き継がれない
+        // （後段passでは undefined。実測）ため、後段からも読める data に退避する。
+        // :::project 変換（plugins/project.mjs）がR-7(c)/(d)違反を「ファイル:行:列」で
+        // 報告するのに使う（playground-project AC-6）。
+        sourcePosition: node.position,
+      },
       children: [
         {
           type: "paragraph",

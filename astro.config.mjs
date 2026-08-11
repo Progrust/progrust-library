@@ -1,4 +1,6 @@
 // @ts-check
+import { fileURLToPath } from "node:url";
+
 import { defineConfig, fontProviders } from "astro/config";
 import { satteri } from "@astrojs/markdown-satteri";
 import sitemap from "@astrojs/sitemap";
@@ -15,6 +17,9 @@ import { externalLinks } from "./plugins/external-links.mjs";
 import { softBreaks } from "./plugins/soft-breaks.mjs";
 import { validateChapters } from "./plugins/chapter-order.mjs";
 import { validateWikilinks } from "./plugins/validate-wikilinks.mjs";
+import { project } from "./plugins/project.mjs";
+import { GIST_MAP_PATH, readGistMap } from "./plugins/project-gist.mjs";
+import { validateProjects } from "./plugins/validate-projects.mjs";
 import { mermaid } from "./plugins/mermaid.mjs";
 import { tableWrap } from "./plugins/table-wrap.mjs";
 import {
@@ -22,7 +27,8 @@ import {
   transformerCodeBg,
 } from "./plugins/shiki-theme.mjs";
 
-// ビルド時検証3種はconfig評価時に実行する（content-model AC-2/AC-5/AC-9/AC-10）。
+// ビルド時検証4種はconfig評価時に実行する（content-model AC-2/AC-5/AC-9/AC-10・
+// playground-project AC-6/AC-7）。
 // コレクション経由のvisitor throwはglob loaderに握り潰されexit 0になるため、
 // レンダリングとは別にconfig評価時のthrowで確実にビルドを失敗させる
 // （[markdown-pipeline/wikilink.md] の検証結果を参照）。
@@ -33,6 +39,13 @@ const dictIndex = loadDictIndex(new URL("./content/dict/", import.meta.url));
 validateChapters(new URL("./content/books/", import.meta.url));
 // wikilinkのリンク切れ・公開非対称（content-model R-13/R-14）を全コンテンツで検証する。
 validateWikilinks(dictIndex, new URL("./content/", import.meta.url));
+// :::project のGistマッピングはconfig評価時に1回読む（devサーバー起動中に
+// sync:playground でマッピングを更新した場合は再起動が必要）。
+const gistMap = readGistMap(
+  fileURLToPath(new URL(`./${GIST_MAP_PATH}`, import.meta.url)),
+);
+// :::project の内容・マッピング未登録（playground-project R-7 a〜e）を全コンテンツで検証する。
+validateProjects(gistMap, new URL("./content/", import.meta.url));
 
 // directive: true は本文中の「x:y」等をtextDirective化して消す副作用があるため、
 // directivesプラグインに同梱した復元visitorとセットで有効化する（directives.md）。
@@ -125,12 +138,15 @@ export default defineConfig({
     processor: satteri({
       features: { directive: true },
       // codeFilename は ```lang:file のlang補正のため他プラグインより前に置く（shiki.md）。
-      // playgroundLink はlang補正後のmetaを読むため codeFilename の直後（playground.md）。
+      // project は codeFilename の後（.code-block ラッパ形状で走査）・playgroundLink の前
+      // （R-7(d)のplaygroundメタ検出）・directives の前（未知名throw回避）に置く（project.md）。
+      // playgroundLink はlang補正後のmetaを読むため codeFilename 系の直後（playground.md）。
       // externalLinks は後方（linkCardが段落ごとrawHtml化した後の残りのテキストリンクだけが対象）。
       // softBreaks は末尾（wikilink等のtext内容前提の処理が済んだ後にtextノードを分割する。soft-breaks.md）。
-      // 順序: codeFilename → playgroundLink → wikilink → directives → linkCard → externalLinks → softBreaks。architecture.md §4）。
+      // 順序: codeFilename → project → playgroundLink → wikilink → directives → linkCard → externalLinks → softBreaks。architecture.md §4）。
       mdastPlugins: [
         codeFilename,
+        project(gistMap),
         playgroundLink,
         wikilink(dictIndex),
         directives,

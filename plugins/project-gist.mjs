@@ -62,13 +62,34 @@ export const projectHash = (files) =>
  * @returns {GistMap}
  */
 export const readGistMap = (path) => {
+  /** @type {unknown} */
+  let parsed;
   try {
-    return JSON.parse(readFileSync(path, "utf8"));
+    parsed = JSON.parse(readFileSync(path, "utf8"));
   } catch (error) {
     if (/** @type {NodeJS.ErrnoException} */ (error).code === "ENOENT")
       return {};
     throw error;
   }
+  // ビルド側（astro.config.mjs → plugins/project.mjs）からも読む共有関数のため、
+  // 形状違いのJSONで後段が不可解に壊れないよう最低限の形状ガードを置く。
+  if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+    throw new Error(
+      `${path} が不正です（ハッシュ→Gist情報のオブジェクトではありません）`,
+    );
+  }
+  for (const [hash, entry] of Object.entries(parsed)) {
+    if (
+      entry === null ||
+      typeof entry !== "object" ||
+      typeof (/** @type {{ id?: unknown }} */ (entry).id) !== "string"
+    ) {
+      throw new Error(
+        `${path} のエントリ ${hash} が不正です（id が文字列ではありません）`,
+      );
+    }
+  }
+  return /** @type {GistMap} */ (parsed);
 };
 
 /**
