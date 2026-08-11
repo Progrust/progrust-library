@@ -2,6 +2,9 @@ import type { MermaidRenderer } from "mermaid-isomorphic";
 import { markdownToHtml } from "satteri";
 
 import { codeFilename } from "../../plugins/code-filename.mjs";
+import { project } from "../../plugins/project.mjs";
+import type { GistMap } from "../../plugins/project-gist.mjs";
+import { playgroundLink } from "../../plugins/playground-link.mjs";
 import { wikilink } from "../../plugins/wikilink.mjs";
 import type { DictIndexEntry } from "../../plugins/dict-index.mjs";
 import { directives } from "../../plugins/directives.mjs";
@@ -23,6 +26,7 @@ import { tableWrap } from "../../plugins/table-wrap.mjs";
  * - wikilink: インライン dictIndex + fileURL（公開判定は fileURL の frontmatter で決まる）
  * - linkCard: scratch cacheDir + `vi.stubGlobal('fetch', …)`（呼び出し側で用意）
  * - mermaid: fake レンダラ注入（tests/helpers/mermaid.ts）で Chromium 非起動
+ * - project: インライン gistMap（省略時は空マッピング）
  *
  * linkCard の paragraph visitor が async のため await して解決する。
  */
@@ -33,11 +37,14 @@ export async function compileWithAllPlugins(
     fileURL: URL;
     cacheDir: URL;
     renderer: unknown;
+    gistMap?: GistMap;
   },
 ): Promise<string> {
   const result = await markdownToHtml(source, {
     mdastPlugins: [
       codeFilename,
+      project(options.gistMap ?? {}),
+      playgroundLink,
       wikilink(options.dictIndex),
       directives,
       linkCard({ cacheDir: options.cacheDir }),

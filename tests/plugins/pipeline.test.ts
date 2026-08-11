@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 
 import type { DictIndexEntry } from "../../plugins/dict-index.mjs";
+import { projectHash } from "../../plugins/project-gist.mjs";
 import { compileWithAllPlugins } from "../helpers/pipeline";
 import { fakeRenderer } from "../helpers/mermaid";
 
@@ -130,6 +131,44 @@ describe("pipeline（全プラグイン同時登録の相互作用・markdown-pi
     expect(html).toContain('data-theme="dark"');
     // codeFilename 前処理が併存してもmermaidブロックを巻き込まない（rustブロックは素通り）。
     expect(html).toContain("code-filename");
+  });
+
+  it(":::projectが全登録構成で変換され、解説文中のwikilinkとネストしたfigureも変換される", async () => {
+    stubFetchOk();
+    const gistMap = {
+      [projectHash([{ name: "src/main.rs", code: "fn main() {}" }])]: {
+        id: "abc123",
+        url: "https://gist.github.com/rust-play/abc123",
+      },
+    };
+    const source = [
+      "::::project",
+      "```rust:src/main.rs",
+      "fn main() {}",
+      "```",
+      "",
+      "[[ownership]]を参照。",
+      "",
+      ":::figure[図1]",
+      "![alt](/img.png)",
+      ":::",
+      "::::",
+    ].join("\n");
+    const html = await compileWithAllPlugins(source, {
+      dictIndex,
+      fileURL: PUBLIC_PAGE,
+      cacheDir,
+      renderer,
+      gistMap,
+    });
+    expect(html).toContain('<div class="code-project">');
+    expect(html).toContain("gist=abc123");
+    // 本文中のwikilink・ネストしたfigureが後段プラグインで通常どおり変換される。
+    expect(html).toContain('href="/dict/ownership"');
+    expect(html).toContain("<figcaption>図1</figcaption>");
+    // ツリーのファイルリンクはlinkCard・externalLinksに巻き込まれない（素のアンカーのまま）。
+    expect(html).toContain('href="#project-1-src-main-rs"');
+    expect(html).not.toContain("link-card");
   });
 
   it("[pages AC-9] details内のテーブルも全登録構成でラップされ、セル内のwikilinkが変換される", async () => {

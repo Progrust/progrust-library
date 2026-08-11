@@ -126,5 +126,19 @@ describe("project-gist（:::project のハッシュ・Gistペイロード・play
 
       expect(() => readGistMap(mapPath)).toThrow();
     });
+
+    it("オブジェクトでないJSON（配列）は形状エラーとしてthrowする", () => {
+      writeFileSync(mapPath, "[]\n");
+
+      expect(() => readGistMap(mapPath)).toThrow(/オブジェクトではありません/);
+    });
+
+    it("idが文字列でないエントリは形状エラーとしてthrowする", () => {
+      writeFileSync(mapPath, '{\n  "abc": { "url": "https://x" }\n}\n');
+
+      expect(() => readGistMap(mapPath)).toThrow(
+        /エントリ abc が不正です（id が文字列ではありません）/,
+      );
+    });
   });
 });

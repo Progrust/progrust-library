@@ -167,6 +167,16 @@ describe("directives（:::記法のHTML変換・docs/markdown-pipeline/directive
       const call = () => compileWithDirectives(":::unknown\n本文。\n:::");
       expect(call).toThrow(/未知のディレクティブ/);
     });
+
+    it(":::projectはdirectives単体では未知扱いになる（projectプラグインを前段に登録する順序契約）", () => {
+      // 実運用では project（plugins/project.mjs）が directives より前に登録され、
+      // containerDirective を消費するためここへは届かない（docs/markdown-pipeline/project.md）。
+      const call = () =>
+        compileWithDirectives(
+          ":::project\n```rust:src/main.rs\nfn main() {}\n```\n:::",
+        );
+      expect(call).toThrow(/未知のディレクティブ :::project/);
+    });
   });
 
   describe("textDirective復元（directive: trueの副作用対策）", () => {
