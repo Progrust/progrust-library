@@ -102,7 +102,7 @@ tailwind.config = {
 - **罫線**: 構造の境界は `border-line/70 dark:border-nline/70`（薄め）、コンテンツの枠は `border-line dark:border-nline`
 - **ホバー**: リンク文字・枠が `accent`/`naccent` に変わる。リスト行は `hover:bg-card dark:hover:bg-ncard`。`transition-colors motion-reduce:transition-none` を併記
 - **eyebrow**: `<p class="font-mono text-xs text-accent dark:text-naccent">// dictionary</p>` の形式で統一（`// toc`、`// dictionary pane`、`// linked dictionaries` など）
-- **スクロールバー**: 全域で細幅（WebKit 6px / Firefox `thin`）・トラック透明。サムは `line`（hover で `sub`）・角丸は幅の半分。コードブロックはダーク面のためサムをライト `#4a4238` / ダーク `line` に切替（枠線色と同じペア。hover は共通どおり `sub` で明るくなる）。辞書サイドペイン・ホバープレビューは表示幅が狭いため WebKit 4px に上書き
+- **スクロールバー**: 全域で細幅（WebKit 6px / Firefox `thin`）・トラック透明。サムは `line`（hover で `sub`）・角丸は幅の半分。コードブロックはダーク面のためサムをライト `#4a4238` / ダーク `line` に切替（枠線色と同じペア。hover は共通どおり `sub` で明るくなる）。辞書サイドペイン・ホバープレビュー・左右サイドレール（`[data-side-rail]`）は表示幅が狭いため WebKit 4px に上書き
 
 ## テーマ切替
 
@@ -132,7 +132,7 @@ tailwind.config = {
 
 - ヘッダー/フッターの内側コンテナ幅はページの `<main>` 幅に追従する（既定 `max-w-6xl`。辞書/記事/章詳細では `max-w-[96rem]`。本トップは `max-w-6xl` のまま）
 - 辞書一覧のカードグリッド: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`
-- 両サイドバーは `sticky top-24`。目次は `xl` 未満・辞書ペインは `lg` 未満で非表示にしてフローティングボタン（後述）に切替
+- 両サイドバーは `sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto`（上限 = ビューポート − sticky top 6rem − 下余白 2rem。縦幅超過分はレール内で縦スクロール。wikilink-ui R-20 / pages R-13）。スクロールコンテナはレイアウト側のラッパ div に付与し、スクロールバー4px化のため `data-side-rail` を付す。目次は `xl` 未満・辞書ペインは `lg` 未満で非表示にしてフローティングボタン（後述）に切替
 - 中央本文は `min-w-0`（truncate用）+ モバイル時 `max-w-2xl mx-auto`
 
 ## コンポーネント仕様
@@ -402,7 +402,7 @@ html.dark .dict-link { color: #D4715A; }
 ### 辞書サイドペイン（詳細ページ右）
 
 - 枠: `rounded border bg-card`、ヘッダー行に `// dictionary pane` + 戻る/進むボタン（`w-7 h-7 rounded border`、`disabled:opacity-40`）
-- 本文: `p-5 max-h-[60vh] overflow-y-auto`
+- 本文: `relative p-5 max-h-[60vh] overflow-y-auto`（レール全体のスクロール（「レイアウト」参照）とは独立の入れ子スクロール。長い辞書の表示中も下の使用辞書一覧へレール側のスクロールで到達できるよう `max-h-[60vh]` は維持する。`relative` は必須: 内容中の positioned 要素のオーバーフローが sticky なレールの scrollHeight に算入され、レール下部に空白スクロール領域が生まれるのを防ぐ）
 - 2状態: デフォルト（本アイコン + 「辞書リンクを押すと、ここに内容が表示されます。」）/ 選択時（後述の「ペイン/プレビューの内容表示」）
 - 履歴はペイン単体でJS配列管理（ページ遷移でリセット）。ペイン内の辞書リンククリックで内容を差し替え
 
@@ -418,7 +418,7 @@ html.dark .dict-link { color: #D4715A; }
 
 ### 目次（詳細ページ左）
 
-`// toc` + 縦罫線リスト。現在地は `border-l-2 border-accent` + `text-strong`、それ以外は `text-sub` + ホバーでアクセント。h3はインデント（`pl-6`）。
+`// toc` + 縦罫線リスト。現在地は `border-l-2 border-accent` + `text-strong`、それ以外は `text-sub` + ホバーでアクセント。h3はインデント（`pl-6`）。縦幅超過時は目次カラム（`data-side-rail` ラッパ）内で縦スクロールする（「レイアウト」参照）。
 
 ### モバイル・中間幅（目次: xl未満 / 辞書: lg未満）
 
@@ -431,12 +431,12 @@ html.dark .dict-link { color: #D4715A; }
 種別バッジは表示しない（eyebrow `// book` が種別を示す）。
 
 - **ヒーロー**: eyebrow `// book` → タイトル（h1）→ 書影を全幅表示（`aspect-[1200/630] w-full object-cover rounded border border-line`。記事カード・OGPと同じ標準比率 1.91:1。カバー画像はOGP兼用の1200×630で作成する）→ description（sub色）・タグチップ（詳細ページヘッダーと同型のチップ。「タグチップ（絞込UI）」の節を参照）・`created / updated` 日付（mono）を縦積み。下端 `border-b` で本文と区切る
-- **章目次サイドバー（lg以上）**: `sticky top-24`。eyebrow `// chapters` → 本タイトル（`font-display font-bold text-sm`、本トップへのリンク、ホバーでアクセント色）→ 台帳リスト（`border-t` 起点、各行 = 章タイトル `text-[13px]`、行ホバーで `bg-card` + タイトルがアクセント色）。「目次」の見出し文字は置かない（eyebrowと重複するため）
+- **章目次サイドバー（lg以上）**: `sticky top-24`（縦幅超過時はカラム内スクロール。「レイアウト」参照）。eyebrow `// chapters` → 本タイトル（`font-display font-bold text-sm`、本トップへのリンク、ホバーでアクセント色）→ 台帳リスト（`border-t` 起点、各行 = 章タイトル `text-[13px]`、行ホバーで `bg-card` + タイトルがアクセント色）。「目次」の見出し文字は置かない（eyebrowと重複するため）
 - **モバイル（lg未満）**: サイドバーは非表示にし、本文の後ろに章目次セクション（`// chapters` + 見出し「目次」+ `N chapters` 件数 + 台帳リスト行）を表示
 
 ### 章詳細（★book-chapter.htmlで確定）
 
-- **左サイドバー＝複合目次**（`sticky top-24`）: 本トップのサイドバーと同じ「`// chapters` eyebrow → 本タイトルリンク → 章の台帳リスト」に、**現在章だけアクセント色で強調しリンクなし（`aria-current="page"`）、その直下に章本文の見出し目次をネスト**する。ネスト部は辞書詳細の目次と同じ文法（`ml-[1.75rem] border-l` の縦罫線リスト、現在位置 `border-l-2 border-accent` + `text-strong`、h3は `pl-6` インデント）
+- **左サイドバー＝複合目次**（`sticky top-24`。縦幅超過時はカラム内スクロール。「レイアウト」参照）: 本トップのサイドバーと同じ「`// chapters` eyebrow → 本タイトルリンク → 章の台帳リスト」に、**現在章だけアクセント色で強調しリンクなし（`aria-current="page"`）、その直下に章本文の見出し目次をネスト**する。ネスト部は辞書詳細の目次と同じ文法（`ml-[1.75rem] border-l` の縦罫線リスト、現在位置 `border-l-2 border-accent` + `text-strong`、h3は `pl-6` インデント）
 - **本文ヘッダー**: eyebrow `// book chapter` → mono補助行「`本タイトル`」→ 章タイトル（h1）→ `created / updated` 日付。章frontmatterに画像はないためヒーロー画像なし、タグも表示しない
 - **前後章ナビ**（本文末尾、pages R-16）: `grid sm:grid-cols-2 gap-3` のカード型リンク（`rounded border bg-card px-4 py-3`、ホバーで枠アクセント色）。mono補助行 `← prev` / `next →` + 章タイトル。先頭章はprev側・最終章はnext側を空にする
 - **右カラム・モバイル**: 辞書詳細と同一（辞書ペイン+使用辞書一覧 / フローティングボタン+ボトムシート）。モバイルの目次ボトムシートには複合目次をそのまま表示する
@@ -564,6 +564,7 @@ details[open] > summary::before { transform: rotate(45deg); } /* シェブロン
 12. テーブルは旧実装（全セル罫線グリッド）が淡白との判断から4案 + ゼブラオプションを比較（`table-compare.html`）→ **案C（カード面フレーム）・ゼブラなし**を採用。縦罫線を消して水平罫線のみとし、ヘッダー背景はインラインコードbg（light）/ npaper（dark）の一段濃い面に
 13. 本トップの書影は縦長（`600/850`・実際の本の比率）→ **OGP標準比率 `1200/630` に変更**（2026-08確定）。実カバー画像をOGP兼用の1200×630で作成する運用にしたため、縦長クロップでは絵柄が見切れる。ヒーローも横並び2カラム（書影左・テキスト右）→ 書影全幅+テキスト縦積みに変更
 14. `:::project` は囲い5案（A / B / C-0〜C-2）・ツリー2案・ボタン3種を比較（`project-compare.html`）→ **案A（カード面フレーム・3段罫線区切り）+ box-drawingツリー + アクセントアウトラインボタン**で確定（2026-08）。ボタンのアクセント化に伴い、プロジェクト版は単一ブロック版チップ（R-23）と別スタイルになった
+15. サイドレールの縦スクロール（GitHub issue #2）は**左右とも「レール全体を1コンテナ」方式**を採用（DictPane / LinkedDictList へ縦予算を配分する個別 max-h 案は、常時スクロールバー2本になり配分も恣意的なため不採用）。DictPane 本文の `max-h-[60vh]` 内部スクロールは、長い辞書でも使用辞書一覧へ到達できるよう入れ子のまま維持。上限は `max-h-[calc(100vh-8rem)]`（sticky top 6rem + 下余白 2rem）で左右統一（2026-08）
 
 ## 未確定・本実装時の課題
 
