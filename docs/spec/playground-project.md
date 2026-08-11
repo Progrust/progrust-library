@@ -22,6 +22,7 @@ Gistは**執筆時にローカルの同期スクリプトが1回だけ作成**�
   - 子には**ファイル名記法付きコードブロック**（` ```rust:src/main.rs ` 等。[`pages.md`](pages.md) R-23と同じ `lang:ファイル名` 記法）を1つ以上置く。ファイル名がプロジェクト内の相対パス（＝Gistのファイル名）になる
   - `rust` 以外の言語のファイル（` ```txt:src/data.txt ` 等）も置ける
   - コードブロックの間に解説文・`:::figure` 等の通常のブロック要素を挟んでよい（通常どおり表示される）
+  - プロジェクトのファイルとして扱うのは **`:::project` の直下に置かれたコードブロックのみ**とする。入れ子のディレクティブ（`::::details` 等）の中のコードブロックは通常のコードブロックとして表示され、ファイルツリー・Gistには含まれない
   - `:::project[タイトル]` のlabel記法で任意のプロジェクト名を指定できる。指定時はプロジェクト表示内にタイトルを表示する（省略時はタイトルなし）
 - **R-2**: `:::project` 全体に「Playgroundで開く」リンクボタンを**1つ**表示する。押下で `https://play.rust-lang.org/?version=stable&edition=2024&gist=<Gist ID>` を新規タブ（`target="_blank" rel="noopener noreferrer"`）で開く。Gist IDはマッピングファイル（§3）から解決し、URLはビルド時に静的生成する（クライアントJSなし）。ボタンのclass名は既存と同じ `playground-open` とし、見た目は `.code-project` 配下でアクセント色アウトライン型に上書きする（[`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定。単一ブロック版 R-23 のチップは従来のまま）。
 - **R-3**: `:::project` 内の全ファイル名から**ファイルツリー**（ディレクトリ階層のツリー表示）を生成して表示する。ツリー内の各ファイル名はページ内アンカーリンクとし、クリックで対応するコードブロックへジャンプする（各コードブロックのラッパに一意なidを付与する。クライアントJSなし）。ツリーの視覚デザイン（box-drawing・並び順等）は [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」で確定済み。
