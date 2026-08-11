@@ -2,7 +2,7 @@
 title: Option型
 description: 値の有無を表す標準ライブラリの列挙型。SomeとNoneの2バリアントを持ち、nullを使わず欠損値をコンパイル時に検出できる型。
 created_at: 2026-07-26
-updated_at: 2026-08-10
+updated_at: 2026-08-11
 tags: ["型システム", "複合型", "標準ライブラリ"]
 public: true
 ---
@@ -48,7 +48,7 @@ fn main() {
 ## 補足
 
 :::details[core/stdどちらに定義されているか]
-`Option<T>`は`core::option`で定義されており、OSにも依存しない[[standard-library]]の最下層である`core`クレートの一部です。`std`はこれを再エクスポートしており、さらにプレリュードに含まれるため、`use`なしで`Option`・`Some`・`None`をそのまま書けます[^1]。
+`Option<T>`は`core::option`で定義されており、OSにも依存しない[[standard-library]]の最下層である`core`クレートの一部です。`std`はこれを[[re-export]]しており、さらにプレリュードに含まれるため、`use`なしで`Option`・`Some`・`None`をそのまま書けます[^1]。
 :::
 
 [^1]: [std::option::Option](https://doc.rust-lang.org/std/option/enum.Option.html) — `pub enum Option<T> { None, Some(T) }`として定義されています。

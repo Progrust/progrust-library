@@ -116,7 +116,7 @@ The Rust Programming Languageは、列挙型は「バリアントが公開され
 :::
 
 :::details[公開APIの形は内部構造と切り離せる]
-`pub use`で項目を再エクスポートすると、内部のモジュール構造をそのまま外に見せずに済みます。非公開の項目を再エクスポートした場合は、通常の階層をたどる代わりに、その再エクスポートを経由して「プライバシーの連鎖が短絡される」と考えられます[^1]。<!-- TODO: [[re-export]] 作成後にリンク -->
+`pub use`で項目を[[re-export]]すると、内部のモジュール構造をそのまま外に見せずに済みます。非公開の項目を再エクスポートした場合は、通常の階層をたどる代わりに、その再エクスポートを経由して「プライバシーの連鎖が短絡される」と考えられます[^1]。
 :::
 
 [^1]: [Visibility and Privacy — The Rust Reference](https://doc.rust-lang.org/reference/visibility-and-privacy.html)
