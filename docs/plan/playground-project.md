@@ -66,6 +66,8 @@
 - `961bdd1` test: :::projectのAC-1〜AC-7・AC-10テストとヘルパを追加
 - `b08bc25` docs: markdown-pipelineに:::projectの実装リファレンスを追加しREADME・APIを更新
 
+**レビュー指摘対応**（`推奨` 範囲。詳細は [`../archive/review/PG1-3.md`](../archive/review/PG1-3.md) の対応記録）: 要修正0件・推奨1件（入れ子 `:::project` のsync側回帰テスト）に対応した（`5e4ad6e`）。軽微1・2はレビュー判定どおり対応不要として残置。
+
 ### PG1-2
 
 `:::project` のハッシュ共有モジュールと同期スクリプトを実装した（ビルド側プラグイン＝PG1-3には未依存）。
