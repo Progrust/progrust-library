@@ -6,9 +6,11 @@ GitHub issue #2 への対応。目次や辞書コンテンツ、使用辞書一�
 
 ## 設計方針（確定）
 
-- 左右とも**レール全体を1つのスクロールコンテナ**とする。レイアウト側のラッパ div に `sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto` + `data-side-rail` を付与（8rem = sticky top 6rem + 下余白 2rem）
-- 左ペイン（`Toc` / `ChapterToc`）は class prop で `sticky top-24` を渡す現行方式をやめ、右レールと同じラッパ div 方式に統一する（コンポーネントは無変更。「sticky 等はレイアウト側で付与」の規約は維持）
-- `DictPane` 内部の `max-h-[60vh]` は維持（入れ子スクロール）。長い辞書を表示中もレールのスクロールで使用辞書一覧に到達できることを優先する
+- 上限は左右とも `max-h-[calc(100vh-8rem)]`（8rem = sticky top 6rem + 下余白 2rem）。ラッパ div はレイアウト側に置く
+- **左（目次カラム）**: ラッパ div `sticky top-24 max-h-… overflow-y-auto` + `data-side-rail` でカラム全体をスクロールコンテナにする
+- **右（辞書ペイン+使用辞書一覧）**: SP1-1 の「レール全体1コンテナ」はペイン本文の内部スクロールと二重になるため SP1-2 で改訂。ラッパ div は `sticky top-24 flex max-h-… flex-col`（スクロールさせない）とし、ペインは `shrink-0` ラッパで位置固定、**使用辞書一覧のラッパ（`mt-8 min-h-0 overflow-y-auto` + `data-side-rail`）のみ**が残り縦幅でスクロールする
+- 左ペイン（`Toc` / `ChapterToc`）は class prop で `sticky top-24` を渡す現行方式をやめ、ラッパ div 方式に統一する（「sticky 等はレイアウト側で付与」の規約は維持）
+- `DictPane` 内部の `max-h-[60vh]` は維持。ペインのスクロールはこの内部スクロールのみ
 - スクロールバーは既存の狭幅カラム用 4px 上書き（`global.css` の `:is()` リスト）に `[data-side-rail]` を追加
 - スコープ外: 目次スクロール時のアクティブ項目自動追従（`toc.ts` への scrollIntoView 相当）。見切れ解消とは別工数のためフォローアップ issue として扱う
 
@@ -17,8 +19,31 @@ GitHub issue #2 への対応。目次や辞書コンテンツ、使用辞書一�
 - [x] **SP1-1: サイドレールの縦スクロール対応** 〔Fable 5〕
   spec 3文書（wikilink-ui / pages / ui-design-spec）へ縦スクロール要件を追記したうえで、`DetailLayout.astro` / `ChapterLayout.astro` / `books/[slug].astro` の左右レールをスクロールコンテナ化し、`global.css` のスクロールバー4px対象へ `[data-side-rail]` を追加する。
   完了条件: wikilink-ui AC-9 / pages AC-7（追記分）を目視で満たす。`npm run check` green・`npx astro build` 成功。ライト/ダーク両テーマで表示崩れなし（目視）。完了後に issue #2 をクローズする。
+- [x] **SP1-2: 右レールのスクロールを使用辞書一覧のみに限定** 〔Fable 5〕
+  SP1-1 のレール全体スクロールがペイン本文の内部スクロールと重なるとのフィードバックを受けた改訂。spec（wikilink-ui R-20 / AC-9・ui-design-spec）を先に改訂し、`DetailLayout.astro` / `ChapterLayout.astro` の右レールを flex 構成（ペイン固定 + 一覧のみスクロール）へ変更する。左（目次カラム）は変更しない。
+  完了条件: 改訂後の wikilink-ui AC-9 を目視で満たす（一覧スクロールでペインが動かない・二重スクロールが生じない）。`npm run check` green・`npx astro build` 成功。
 
 ## 実施履歴
+
+### SP1-2
+
+SP1-1 の右レール全体スクロールを「使用辞書一覧のみスクロール」へ改訂した（ペイン本文の内部スクロールとレールのスクロールが重なるとのフィードバック対応）。
+
+**先行したドキュメント更新**（仕様駆動）:
+
+- [`../spec/wikilink-ui.md`](../spec/wikilink-ui.md): R-20 / AC-9 を「ペインは位置固定・超過分は使用辞書一覧のみスクロール」へ改訂
+- [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md): 「レイアウト」を左右で分けて記述し直し、「辞書サイドペイン」の本文注記を更新、意思決定の履歴に 16 を追加
+
+**実装**:
+
+- `DetailLayout.astro` / `ChapterLayout.astro`: 右レールのラッパを `sticky top-24 flex max-h-[calc(100vh-8rem)] flex-col`（非スクロール）にし、`DictPane` は `shrink-0` ラッパで位置固定、`LinkedDictList` は `mt-8 min-h-0 overflow-y-auto` + `data-side-rail` のラッパ内でのみスクロールする構成へ変更。左（目次カラム）は変更なし
+- `DictPane.astro`: `relative` の理由コメントを一般化（右レールが非スクロールになったため。positioned なスクロール祖先＝モバイルのボトムシート等への言及に変更。`relative` 自体は維持）
+
+**検証結果**: `npm run check` green（vitest 255 passed）、`npx astro build` 成功（167ページ）。Playwright（1440×620）で目視確認:
+
+- 右レールのラッパは overflow visible・スクロール不可。一覧のスクロールで末尾まで到達でき、その間ペインの位置（top 96px）は不動（改訂後 AC-9）
+- 長い辞書（Option型）を表示した状態でも、ペイン本文の内部スクロールと一覧のスクロールが独立して動作し、ラッパ下端はビューポート内（588px < 620px）に収まる
+- 縦620pxで長い辞書を開くと一覧の表示高は約37pxまで縮む（ペイン位置固定を優先する本方式の織り込み済みトレードオフ。スクロールで全項目に到達可能）
 
 ### SP1-1
 
