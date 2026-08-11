@@ -524,6 +524,179 @@ html.dark .code-playground .playground-open {
 }
 
 /* =========================================================================
+   :::project（ui-design-spec「:::project」・案A: カード面フレーム + box-drawing
+   ツリー + アクセントアウトラインボタン）。HTML構造は plugins/project.mjs が出力する
+   .code-project >（.code-project-header / .code-project-tree / .code-project-body）。
+   ========================================================================= */
+.code-project {
+  border: 1px solid var(--color-line);
+  border-radius: 4px;
+  background: var(--color-card);
+  overflow: hidden; /* 角丸の内側にヘッダー罫線・ツリーを収める */
+}
+/* ヘッダー行: eyebrow → タイトル → ファイル数 → ボタン（右端）。狭幅では折り返す */
+.code-project-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.35rem;
+  padding: 0.625rem 1.25rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 70%, transparent);
+}
+/* eyebrow の `// project` は markup 側のリテラルテキスト（project.mjs）。
+   .message-title の ::before 方式と違い、ここで `//` を足すと二重になる */
+.code-project-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--color-accent);
+}
+.code-project-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--color-strong);
+}
+.code-project-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-sub);
+}
+/* プロジェクト版のボタンはアクセント色アウトライン型（単一ブロック版 .code-playground の
+   ダーク面チップとは別スタイル。playground-project R-2）。hover / focus で塗り反転する */
+.code-project .playground-open {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--color-accent);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+.code-project .playground-open:hover,
+.code-project .playground-open:focus-visible {
+  background: var(--color-accent);
+  /* 反転時の文字色は面の色（ライト card / ダーク paper）。--color-* はテーマで
+     値が入れ替わるため、ここは実色で書き分ける */
+  color: #fbf9f6;
+}
+html.dark .code-project .playground-open:hover,
+html.dark .code-project .playground-open:focus-visible {
+  color: #1e1b18;
+}
+/* ファイルツリー（tree コマンド風の box-drawing）。枝記号の連続空白を保持するため
+   white-space: pre が必須（1行 = .tree-row の div。docs/markdown-pipeline/project.md） */
+.code-project-tree {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 70%, transparent);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  line-height: 2;
+  white-space: pre;
+  overflow-x: auto;
+}
+.code-project-tree .tree-branch {
+  color: #bfb7aa;
+  user-select: none; /* 枝記号は装飾のためコピー対象から外す */
+}
+html.dark .code-project-tree .tree-branch {
+  color: #57504a;
+}
+.code-project-tree .tree-dir {
+  color: var(--color-sub);
+}
+/* ツリーのファイルリンク。汎用リンク規則（.prose a:not(.wikilink):not(.link-card)
+   :not(.playground-open)）が詳細度 (0,4,1) を持つため、同じ :not() 連鎖を付けないと
+   アクセント色+実線下線に負ける */
+.prose
+  .code-project-tree
+  a:not(.wikilink):not(.link-card):not(.playground-open) {
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.prose
+  .code-project-tree
+  a:not(.wikilink):not(.link-card):not(.playground-open):hover {
+  color: var(--color-accent);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+/* 本文（ファイル名タブ付きコードブロック・解説文が通常の prose と同じ体裁で並ぶ） */
+.code-project-body {
+  padding: 1.25rem;
+}
+.code-project-body > * + * {
+  margin-top: 1.25rem;
+}
+/* ツリーからのアンカージャンプ（id は project-{n}-{slug}）。sticky ヘッダー分を
+   確保し、着地したブロックはファイル名タブの文字色で示す */
+.code-project-body .code-block {
+  scroll-margin-top: 5rem;
+}
+.code-project-body .code-block:target .code-filename {
+  color: #d4715a;
+}
+/* card 面の上（::::details 内・辞書ペイン内・ホバープレビュー内）は面の重なりを避け
+   背景を paper に落とす（.message と同じ扱い） */
+.prose details .code-project,
+[data-dict-pane-content] .code-project,
+[data-dict-preview] .code-project {
+  background: var(--color-paper);
+}
+/* 辞書ペイン・ホバープレビュー内はコンパクト表示にする
+   （ui-design-spec「:::project」のコンパクト表示） */
+:is([data-dict-pane-content], [data-dict-preview]) .code-project-header {
+  padding: 0.375rem 0.75rem;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .code-project-eyebrow {
+  font-size: 11px;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .code-project-count {
+  font-size: 10px;
+}
+:is([data-dict-pane-content], [data-dict-preview])
+  .code-project
+  .playground-open {
+  padding: 0.25rem 0.55rem;
+  font-size: 11px;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .code-project-tree {
+  padding: 0.625rem 0.75rem;
+  font-size: 11.5px;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .code-project-body {
+  padding: 0.75rem;
+}
+:is([data-dict-pane-content], [data-dict-preview]) .code-project .astro-code {
+  padding: 0.75rem 0;
+  font-size: 12px;
+}
+:is([data-dict-pane-content], [data-dict-preview])
+  .code-project
+  .astro-code
+  .line {
+  padding: 0 0.75rem;
+}
+:is([data-dict-pane-content], [data-dict-preview])
+  .code-project
+  .code-filename {
+  font-size: 10px;
+}
+
+/* =========================================================================
    :::message（ui-design-spec「:::message の変換後スタイル」）。左ボーダー・eyebrow・
    種別色だけを種別で変え、背景は card 面で統一。通常はニュートラル（sub 色）。
    ========================================================================= */
@@ -735,6 +908,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .astro-code,
     .code-block,
     .code-playground,
+    .code-project,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -759,6 +933,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .astro-code,
     .code-block,
     .code-playground,
+    .code-project,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -774,6 +949,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .astro-code,
     .code-block,
     .code-playground,
+    .code-project,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -793,6 +969,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .astro-code,
     .code-block,
     .code-playground,
+    .code-project,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -808,6 +985,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .astro-code,
     .code-block,
     .code-playground,
+    .code-project,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -822,6 +1000,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
     .astro-code,
     .code-block,
     .code-playground,
+    .code-project,
     .link-card-wrap,
     blockquote,
     .table-wrap
@@ -912,6 +1091,7 @@ html.dark [data-dict-preview] .message :not(pre) > code {
 
 @media (prefers-reduced-motion: reduce) {
   .prose details > summary::before,
+  .code-project .playground-open,
   .link-card {
     transition: none;
   }
