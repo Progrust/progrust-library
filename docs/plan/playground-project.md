@@ -60,3 +60,5 @@
 - `c3159d3` docs: :::project同期スクリプトの不正project扱いをspecへ追記しrules/architectureを更新
 - `e0f8921` feat: :::projectのハッシュ共有モジュールとGist同期スクリプトを追加
 - `6a204c7` test: :::project のハッシュ・Gist同期スクリプトのAC-5/AC-8/AC-9テストを追加
+
+**レビュー指摘対応**（`推奨` 範囲。詳細は [`../archive/review/PG1-2.md`](../archive/review/PG1-2.md) の対応記録）: 要修正0件・推奨1件（`import.meta.main` のNodeバージョン要件）に対応し、`package.json` の `engines.node` と implementation-rules 1章へ実行前提を明記した（`50ec59f`）。軽微2・4はPG1-3実装時の判断事項として残置。
