@@ -82,14 +82,18 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
     >
       {/* 左: 複合目次（章リスト + 現在章の見出し・xl 以上・sticky） */}
       <aside class="hidden xl:block">
-        <ChapterToc
-          bookTitle={bookTitle}
-          bookHref={bookHref}
-          chapters={chapters}
-          currentSlug={currentSlug}
-          headings={headings}
-          class="sticky top-24"
-        />
+        <div
+          class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+          data-side-rail
+        >
+          <ChapterToc
+            bookTitle={bookTitle}
+            bookHref={bookHref}
+            chapters={chapters}
+            currentSlug={currentSlug}
+            headings={headings}
+          />
+        </div>
       </aside>
 
       {/* 中央: 章ヘッダー / 本文 / 前後章ナビ */}
@@ -134,7 +138,10 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
 
       {/* 右: 辞書ペイン + 使用辞書一覧（wikilink-ui R-17・ペイン下） */}
       <aside class="hidden lg:block">
-        <div class="sticky top-24">
+        <div
+          class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+          data-side-rail
+        >
           <DictPane />
           <LinkedDictList dicts={linkedDicts} class="mt-8" />
         </div>

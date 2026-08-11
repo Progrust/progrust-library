@@ -8,11 +8,9 @@ import { tocHeadings } from "../lib/content";
 
 interface Props {
   headings: MarkdownHeading[];
-  /** 配置調整用の追加クラス（sticky 等はレイアウト側で付与） */
-  class?: string;
 }
 
-const { headings, class: className = "" } = Astro.props;
+const { headings } = Astro.props;
 // 目次対象（h2〜h4・h1/脚注ラベル除外）の定義は content.ts に集約（pages R-13）
 const items = tocHeadings(headings);
 // 見出し深さに応じたインデント（h3・h4 を段下げ。Tailwind の padding は加算されないため絶対値で指定）
@@ -21,7 +19,7 @@ const indent: Record<number, string> = { 2: "pl-4", 3: "pl-8", 4: "pl-12" };
 
 {
   items.length > 0 && (
-    <nav class={className} aria-label="目次">
+    <nav aria-label="目次">
       <p class="mb-3 font-mono text-xs text-accent">// toc</p>
       <ul class="border-l border-line text-sm">
         {items.map((h) => (

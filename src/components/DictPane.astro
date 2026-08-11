@@ -77,8 +77,14 @@
   </div>
 
   {
-    /* 選択状態のコンテナ（初期は空・非表示）。dict-pane.ts が embed 内容を挿入する。 */
+    /* 選択状態のコンテナ（初期は空・非表示）。dict-pane.ts が embed 内容を挿入する。
+      relative 必須: 内容中の positioned 要素（脚注 sup・.code-playground 等）のオーバーフローは
+      最近接の positioned 祖先に算入されるため、無指定だと sticky なレール（[data-side-rail]）の
+      scrollHeight を膨張させ、レール下部に空白スクロール領域が生まれる。 */
   }
-  <div data-dict-pane-content class="hidden max-h-[60vh] overflow-y-auto p-5">
+  <div
+    data-dict-pane-content
+    class="relative hidden max-h-[60vh] overflow-y-auto p-5"
+  >
   </div>
 </div>

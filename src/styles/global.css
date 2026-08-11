@@ -72,19 +72,21 @@
     scrollbar-color: var(--color-line) transparent;
   }
 }
-/* 辞書サイドペイン/ホバープレビューは表示幅自体が狭いため、さらに細くして
-   本文の横幅を確保する（ui-design-spec「共通ルール」） */
+/* 辞書サイドペイン/ホバープレビュー/左右サイドレールは表示幅自体が狭いため、
+   さらに細くして本文の横幅を確保する（ui-design-spec「共通ルール」） */
 :is(
   [data-dict-pane-default],
   [data-dict-pane-content],
-  [data-dict-preview]
+  [data-dict-preview],
+  [data-side-rail]
 )::-webkit-scrollbar {
   width: 4px;
 }
 :is(
   [data-dict-pane-default],
   [data-dict-pane-content],
-  [data-dict-preview]
+  [data-dict-preview],
+  [data-side-rail]
 )::-webkit-scrollbar-thumb {
   border-radius: 2px;
 }

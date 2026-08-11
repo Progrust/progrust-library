@@ -62,7 +62,12 @@ const gridCols = hasToc
       {
         hasToc && (
           <aside class="hidden xl:block">
-            <Toc headings={headings} class="sticky top-24" />
+            <div
+              class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+              data-side-rail
+            >
+              <Toc headings={headings} />
+            </div>
           </aside>
         )
       }
@@ -128,7 +133,10 @@ const gridCols = hasToc
 
       {/* 右: 辞書ペイン + 使用辞書一覧（wikilink-ui R-17・ペイン下） */}
       <aside class="hidden lg:block">
-        <div class="sticky top-24">
+        <div
+          class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+          data-side-rail
+        >
           <DictPane />
           <LinkedDictList dicts={linkedDicts} class="mt-8" />
         </div>

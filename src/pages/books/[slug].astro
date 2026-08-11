@@ -56,12 +56,16 @@ const updatedIso = book.data.updated_at.toISOString().slice(0, 10);
     <div class="lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
       {/* 左: 章目次サイドバー（lg 以上・sticky） */}
       <aside class="hidden lg:block">
-        <ChapterToc
-          bookTitle={book.data.title}
-          bookHref={`/books/${book.id}`}
-          chapters={ledger}
-          class="sticky top-24"
-        />
+        <div
+          class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
+          data-side-rail
+        >
+          <ChapterToc
+            bookTitle={book.data.title}
+            bookHref={`/books/${book.id}`}
+            chapters={ledger}
+          />
+        </div>
       </aside>
 
       {/* 右: ヒーロー + 本文（本文列は max-w-3xl） */}
