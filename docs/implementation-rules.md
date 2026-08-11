@@ -28,7 +28,7 @@ npm scripts は以下に固定する（セッション間で呼び方を変え�
 | `typecheck` | astro check |
 | `test` | vitest run |
 | `check` | format:check + lint + typecheck + test を一括実行（タスク完了時のゲート。7章） |
-| `sync:playground` | `:::project` のGistマッピングを同期する（`scripts/sync-playground-gists.mjs`。[spec/playground-project.md](spec/playground-project.md) R-8〜R-11）。ネットワークアクセスを伴うため `check` には**含めない**（実行は執筆者が明示的に行う） |
+| `sync:playground` | `:::project` のGistマッピングを同期する（`scripts/sync-playground-gists.mjs`。[spec/playground-project.md](spec/playground-project.md) R-8〜R-11）。ネットワークアクセスを伴うため `check` には**含めない**（実行は執筆者が明示的に行う）。実行には **Node 24.2 以上**が必要（`import.meta.main` を使うため。それ未満では黙って何もせず終了する。`package.json` の `engines.node` を正とする） |
 
 実行タイミング: コミット前に必ず `npm run check`。実装中は随時 `npm run test`。
 
