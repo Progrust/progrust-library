@@ -29,6 +29,8 @@ public: true
 
 Cargoプロジェクトと同じモジュール解決が効いているか検証。
 
+:::project[通常のモジュール分割]
+
 ```rust:src/greetings.rs
 pub fn hello(name: &str) -> String {
     format!("こんにちは、{}さん", name)
@@ -46,6 +48,8 @@ fn main() {
 }
 ```
 
+:::
+
 できる！
 :::figure[実行結果]
 ![通常のモジュール分割の検証結果スクリーンショット](../../src/assets/articles/rust-playground-multifile-release/image2.png)
@@ -54,6 +58,8 @@ fn main() {
 ### 2. サブディレクトリ
 
 ファイル作成時に`src/utils/math.rs`のようなパス付きの名前でディレクトリが作れるかどうか検証。
+
+:::project[サブディレクトリ構成]
 
 ```rust:src/utils.rs
 pub mod math;
@@ -77,6 +83,8 @@ fn main() {
 }
 ```
 
+:::
+
 できる！
 :::figure[実行結果]
 ![サブディレクトリの検証結果スクリーンショット](../../src/assets/articles/rust-playground-multifile-release/image3.png)
@@ -85,6 +93,8 @@ fn main() {
 ### 3. lib.rsとの共存
 
 `src/lib.rs`を作ると、バイナリ側からライブラリクレートとして参照できるはず。Playgroundのクレート名は`playground`なので`use playground::...`で解決されるか？
+
+:::project[lib.rsとバイナリの共存]
 
 ```rust:src/lib.rs
 pub struct Counter {
@@ -114,6 +124,8 @@ fn main() {
 }
 ```
 
+:::
+
 できる！
 :::figure[実行結果]
 ![lib.rsとの共存の検証結果スクリーンショット](../../src/assets/articles/rust-playground-multifile-release/image4.png)
@@ -122,6 +134,8 @@ fn main() {
 ### 4. lib側でユニットテスト実行
 
 lib側だけに`#[cfg(test)] mod tests`を書いてTOOLSの「Test」でユニットテストを回すことができるか検証。
+
+:::project[lib側のユニットテスト]
 
 ```rust:src/lib.rs
 pub struct Counter {
@@ -152,6 +166,8 @@ mod tests { // [!code ++]
 } // [!code ++]
 ```
 
+:::
+
 できる！
 :::figure[実行結果]
 ![lib側でユニットテスト実行の検証結果スクリーンショット](../../src/assets/articles/rust-playground-multifile-release/image5.png)
@@ -160,6 +176,8 @@ mod tests { // [!code ++]
 ### 5. Rustコード以外のファイルを作成
 
 `data.txt`のような`.rs`以外の拡張子を作成して読み込めるか検証。
+
+:::project[Rust以外のファイルの読み込み]
 
 ```txt:src/data.txt
 Hello from data file!
@@ -171,6 +189,8 @@ fn main() {
     println!("読み込んだ内容: {}", data);
 }
 ```
+
+:::
 
 できる！
 :::figure[実行結果]
