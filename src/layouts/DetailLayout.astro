@@ -141,7 +141,12 @@ const gridCols = hasToc
           <div class="shrink-0">
             <DictPane />
           </div>
-          <div class="mt-8 min-h-0 overflow-y-auto" data-side-rail>
+          {
+            /* pb-1 必須: 丸ゴの字面（約1.6em）が text-sm の行ボックス（20px）を上下に
+              はみ出し、Firefox は末行のインラインはみ出し分を scrollHeight に算入するため、
+              パディングで吸収しないと超過なしでも 1px 分のスクロールバーが出る */
+          }
+          <div class="mt-8 min-h-0 overflow-y-auto pb-1" data-side-rail>
             <LinkedDictList dicts={linkedDicts} />
           </div>
         </div>

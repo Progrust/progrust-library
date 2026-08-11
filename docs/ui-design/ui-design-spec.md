@@ -134,7 +134,7 @@ tailwind.config = {
 - 辞書一覧のカードグリッド: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`
 - 両サイドバーは `sticky top-24` で上限 `max-h-[calc(100vh-8rem)]`（= ビューポート − sticky top 6rem − 下余白 2rem）
   - **左（目次カラム）**: ラッパ div を `overflow-y-auto` のスクロールコンテナにし、縦幅超過分はカラム全体で縦スクロール（pages R-13）
-  - **右（辞書ペイン+使用辞書一覧）**: ラッパ div は `flex flex-col`（スクロールさせない）。ペインは `shrink-0` ラッパで位置固定とし、使用辞書一覧のラッパ（`mt-8 min-h-0 overflow-y-auto`）だけが残り縦幅で縦スクロールする（wikilink-ui R-20。ペイン本文の内部スクロールと重なる二重スクロールを作らない）
+  - **右（辞書ペイン+使用辞書一覧）**: ラッパ div は `flex flex-col`（スクロールさせない）。ペインは `shrink-0` ラッパで位置固定とし、使用辞書一覧のラッパ（`mt-8 min-h-0 overflow-y-auto pb-1`）だけが残り縦幅で縦スクロールする（wikilink-ui R-20。ペイン本文の内部スクロールと重なる二重スクロールを作らない）。`pb-1` は必須: 丸ゴの字面が `text-sm` の行ボックスをはみ出し、Firefox は末行のインラインはみ出しを scrollHeight に算入するため、パディングで吸収しないと超過なしでも 1px 分のスクロールバーが出る
   - スクロールコンテナにはスクロールバー4px化のため `data-side-rail` を付す（付与はレイアウト側のラッパ div）。目次は `xl` 未満・辞書ペインは `lg` 未満で非表示にしてフローティングボタン（後述）に切替
 - 中央本文は `min-w-0`（truncate用）+ モバイル時 `max-w-2xl mx-auto`
 
