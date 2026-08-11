@@ -22,8 +22,25 @@ GitHub issue #2 への対応。目次や辞書コンテンツ、使用辞書一�
 - [x] **SP1-2: 右レールのスクロールを使用辞書一覧のみに限定** 〔Fable 5〕
   SP1-1 のレール全体スクロールがペイン本文の内部スクロールと重なるとのフィードバックを受けた改訂。spec（wikilink-ui R-20 / AC-9・ui-design-spec）を先に改訂し、`DetailLayout.astro` / `ChapterLayout.astro` の右レールを flex 構成（ペイン固定 + 一覧のみスクロール）へ変更する。左（目次カラム）は変更しない。
   完了条件: 改訂後の wikilink-ui AC-9 を目視で満たす（一覧スクロールでペインが動かない・二重スクロールが生じない）。`npm run check` green・`npx astro build` 成功。
+- [ ] **SP1-3: サイドレールのスクロールバーをホバー時のみ表示** 〔Fable 5〕
+  左右サイドレール（`data-side-rail`）のスクロールバーのサムをデフォルト透明にし、レールにホバーしている間のみ表示する（WebKit はサム背景の切替、Firefox は `scrollbar-color` の切替）。辞書ペイン内部・ホバープレビューのスクロールバーは対象外（常時表示のまま）。
+  完了条件: 非ホバー時にサムが不可視・ホバー中に表示されることを両エンジンで目視確認。`npm run check` green・`npx astro build` 成功。
 
 ## 実施履歴
+
+### SP1-3（実装済み・Chrome実機確認待ち）
+
+左右サイドレール（`data-side-rail`）のスクロールバーのサムをホバー中のみ表示にした。
+
+**実装**（`src/styles/global.css`）:
+
+- WebKit: `[data-side-rail]::-webkit-scrollbar-thumb` をデフォルト `background: transparent` にし、`[data-side-rail]:hover` 配下でサム色（`line`、サム自体のhoverで `sub`）を復元
+- Firefox: `@supports not selector(::-webkit-scrollbar)` ガード内（Chrome 121+ が `scrollbar-color` 指定時にWebKit疑似要素を無視する既存対策と同じ理由）で `scrollbar-color: transparent transparent` ⇔ ホバー時 `var(--color-line) transparent` を切替
+- 辞書ペイン内部・ホバープレビューのスクロールバーは対象外（常時表示のまま）
+
+**検証結果**: `npm run check` green・`npx astro build` 成功（167ページ）。Firefox は Playwright で computed `scrollbar-color` が非ホバー時 transparent / ホバー時 line 色に切り替わることを確認。**Chrome はヘッドレス/CDP撮影でスクロールバー自体が描画されない**（`--hide-scrollbars` 無効化・headed・常時着色サムのいずれでも写らない）ため自動目視ができず、実ブラウザでの確認は利用者に依頼中。確認が取れたらチェックを付けてクローズする。
+
+**知見**: Playwright/CDP のスクリーンショットは要素内スクロールバーの描画を含まないことがあり、スクロールバーの見た目検証には使えない。Firefox側は computed style（`scrollbar-color`）で代替検証できる。
 
 ### SP1-2
 
