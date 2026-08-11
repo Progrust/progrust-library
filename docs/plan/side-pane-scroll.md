@@ -22,25 +22,27 @@ GitHub issue #2 への対応。目次や辞書コンテンツ、使用辞書一�
 - [x] **SP1-2: 右レールのスクロールを使用辞書一覧のみに限定** 〔Fable 5〕
   SP1-1 のレール全体スクロールがペイン本文の内部スクロールと重なるとのフィードバックを受けた改訂。spec（wikilink-ui R-20 / AC-9・ui-design-spec）を先に改訂し、`DetailLayout.astro` / `ChapterLayout.astro` の右レールを flex 構成（ペイン固定 + 一覧のみスクロール）へ変更する。左（目次カラム）は変更しない。
   完了条件: 改訂後の wikilink-ui AC-9 を目視で満たす（一覧スクロールでペインが動かない・二重スクロールが生じない）。`npm run check` green・`npx astro build` 成功。
-- [ ] **SP1-3: サイドレールのスクロールバーをホバー時のみ表示** 〔Fable 5〕
-  左右サイドレール（`data-side-rail`）のスクロールバーのサムをデフォルト透明にし、レールにホバーしている間のみ表示する（WebKit はサム背景の切替、Firefox は `scrollbar-color` の切替）。辞書ペイン内部・ホバープレビューのスクロールバーは対象外（常時表示のまま）。
-  完了条件: 非ホバー時にサムが不可視・ホバー中に表示されることを両エンジンで目視確認。`npm run check` green・`npx astro build` 成功。
+- [x] **SP1-3: サイドレールのスクロールバーをホバー時のみ表示** 〔Fable 5〕
+  左右サイドレール（`data-side-rail`）のスクロールバーを、レールにホバーしている間のみ表示する。辞書ペイン内部・ホバープレビューのスクロールバーは対象外（常時表示のまま）。
+  完了条件: 非ホバー時にスクロールバーが不可視・ホバー中に表示されることを両エンジンで確認。`npm run check` green・`npx astro build` 成功。
 
 ## 実施履歴
 
-### SP1-3（実装済み・Chrome実機確認待ち）
+### SP1-3
 
-左右サイドレール（`data-side-rail`）のスクロールバーのサムをホバー中のみ表示にした。
+左右サイドレール（`data-side-rail`）のスクロールバーをホバー中のみ表示にした。
+
+**初回実装の失敗と方式変更**: 最初はサム色の切替（WebKit はサム背景を透明⇔`line`、Firefox は `scrollbar-color` 切替）で実装したが、実機確認で **WebKit カスタムスクロールバーは祖先の `:hover` 変化では再描画されない既知バグ**に該当（スクロールバー自体にポインタが乗った時だけ表示が変わり、離しても消え残ることがある）。色ではなく **`overflow-y` 自体を非ホバー時 `hidden` ⇔ ホバー時 `auto` で切り替える方式**へ変更した（overflow の切替はレイアウト変更として確実に再描画される）。
 
 **実装**（`src/styles/global.css`）:
 
-- WebKit: `[data-side-rail]::-webkit-scrollbar-thumb` をデフォルト `background: transparent` にし、`[data-side-rail]:hover` 配下でサム色（`line`、サム自体のhoverで `sub`）を復元
-- Firefox: `@supports not selector(::-webkit-scrollbar)` ガード内（Chrome 121+ が `scrollbar-color` 指定時にWebKit疑似要素を無視する既存対策と同じ理由）で `scrollbar-color: transparent transparent` ⇔ ホバー時 `var(--color-line) transparent` を切替
-- 辞書ペイン内部・ホバープレビューのスクロールバーは対象外（常時表示のまま）
+- `[data-side-rail] { scrollbar-gutter: stable }` + `[data-side-rail]:not(:hover) { overflow-y: hidden }`（`:not(:hover)` の詳細度 (0,2,0) で Tailwind の `overflow-y-auto` ユーティリティに勝つ。ガター常時確保で切替時のレイアウトシフトなし）
+- スクロール位置は `hidden` 中も保持される。辞書ペイン内部・ホバープレビューは対象外（常時表示のまま）
+- 制約（織り込み済み）: サムのドラッグ中にポインタがレール外へ出るとホバーが外れてドラッグが中断される（4px サムのドラッグ操作自体が稀なため許容）。ホバー到達不能な操作（キーボード等）ではバーが出ないが、`hidden` でもプログラムスクロール（フォーカス移動の自動スクロール等）は機能する
 
-**検証結果**: `npm run check` green・`npx astro build` 成功（167ページ）。Firefox は Playwright で computed `scrollbar-color` が非ホバー時 transparent / ホバー時 line 色に切り替わることを確認。**Chrome はヘッドレス/CDP撮影でスクロールバー自体が描画されない**（`--hide-scrollbars` 無効化・headed・常時着色サムのいずれでも写らない）ため自動目視ができず、実ブラウザでの確認は利用者に依頼中。確認が取れたらチェックを付けてクローズする。
+**検証結果**: `npm run check` green・`npx astro build` 成功。Playwright の Chrome（実チャンネル）/ Firefox 両方で、非ホバー時 `overflowY: hidden` ⇔ ホバー時 `auto`・ホバー中のホイールスクロール動作・ホバー解除後の scrollTop 保持・行幅不変（レイアウトシフトなし）を確認。さらに chrome-devtools MCP で**利用者の実 Chrome** に接続し、目次ホバーで左レールが `auto`、使用辞書一覧ホバーで右レールが `auto`（他方は `hidden` に復帰）となることを確認した。
 
-**知見**: Playwright/CDP のスクリーンショットは要素内スクロールバーの描画を含まないことがあり、スクロールバーの見た目検証には使えない。Firefox側は computed style（`scrollbar-color`）で代替検証できる。
+**知見**: Playwright/CDP のスクリーンショットは要素内スクロールバーの描画を含まない（常時着色したサムすら写らない）ため、スクロールバーの見た目検証には使えない。computed style（`overflow-y` / `scrollbar-color`）での検証か、chrome-devtools MCP 経由の実ブラウザ確認を使う。
 
 ### SP1-2
 

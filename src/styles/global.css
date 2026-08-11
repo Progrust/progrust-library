@@ -90,25 +90,17 @@
 )::-webkit-scrollbar-thumb {
   border-radius: 2px;
 }
-/* 左右サイドレールのサムはレールにホバーしている間のみ表示（ui-design-spec「共通ルール」）。
-   Firefox 向けの scrollbar-color 切替は、上の共通ガードと同じ理由で
-   @supports not selector(::-webkit-scrollbar) の中に置く。 */
-[data-side-rail]::-webkit-scrollbar-thumb {
-  background: transparent;
+/* 左右サイドレールのスクロールバーはレールにホバーしている間のみ表示
+   （ui-design-spec「共通ルール」）。サム色を :hover で切り替える方式は、WebKit カスタム
+   スクロールバーが祖先の :hover 変化で再描画されない既知バグ（スクロールバー自体に
+   ポインタが乗るまで反映されない）のため使えない。代わりに overflow-y 自体を
+   hidden⇔auto で切り替えて確実に再描画させる。scrollbar-gutter: stable でガター幅を
+   常に確保して切替時のレイアウトシフトを防ぐ。スクロール位置は hidden 中も保持される。 */
+[data-side-rail] {
+  scrollbar-gutter: stable;
 }
-[data-side-rail]:hover::-webkit-scrollbar-thumb {
-  background: var(--color-line);
-}
-[data-side-rail]:hover::-webkit-scrollbar-thumb:hover {
-  background: var(--color-sub);
-}
-@supports not selector(::-webkit-scrollbar) {
-  [data-side-rail] {
-    scrollbar-color: transparent transparent;
-  }
-  [data-side-rail]:hover {
-    scrollbar-color: var(--color-line) transparent;
-  }
+[data-side-rail]:not(:hover) {
+  overflow-y: hidden;
 }
 
 /* =========================================================================
