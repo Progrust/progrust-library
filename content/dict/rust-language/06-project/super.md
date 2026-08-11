@@ -105,7 +105,7 @@ fn main() {
 :::
 
 :::details[可視性を指定する pub(super)]
-`super`という語は、可視性の指定にも現れます。`pub(super)`は項目を親モジュールにだけ見せる指定で、`pub(in super)`と同じ意味です[^4]。パスの先頭に書く`super`とは文法上の位置が異なるため、混同しないよう注意してください。<!-- TODO: [[pub]] 作成後にリンク -->
+`super`という語は、可視性の指定にも現れます。[[pub]]に丸括弧を添えた`pub(super)`は項目を親モジュールにだけ見せる指定で、`pub(in super)`と同じ意味です[^4]。パスの先頭に書く`super`とは文法上の位置が異なるため、混同しないよう注意してください。
 :::
 
 [^1]: [Paths — The Rust Reference](https://doc.rust-lang.org/reference/paths.html)
