@@ -21,3 +21,7 @@
 - [ ] **PG1-5: 追従文書の更新とクローズ**
   実装を反映して [`../architecture.md`](../architecture.md)（1章プロジェクト構成ツリー・3章ビルド時検証テーブル・4章プラグイン順序）を更新する。実装中に得た知見を `../markdown-pipeline/project.md` へ還流し、残課題を整理する。全タスクのレビュー完了を確認し、本計画をクローズして [`../archive/`](../archive/plan/README.md) へ凍結・移動する（README一覧の更新含む）。
   完了条件: architecture.md が実装と一致し、[`../implementation-rules.md`](../implementation-rules.md) 7章のDefinition of Doneを全タスクが満たし、本計画がアーカイブされている。
+
+## 申し送り事項
+
+## 実施履歴
