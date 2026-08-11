@@ -104,6 +104,11 @@ export function project(gistMap) {
 
 - devサーバー起動中に `npm run sync:playground` でマッピングを更新しても反映されない（gistMapはconfig評価時に1回読むため。再起動が必要）
 - ファイル数表示は単数形対応（`1 file` / `N files`）。表記は実装決定でspecの規定はない
-- eyebrow `// project` はmarkup側のリテラルテキスト。**PG1-4のCSSは `::before` で `//` を二重付与しないこと**（messageのeyebrowとは方式が異なる）
-- ツリーの枝記号スパン（`.tree-branch`）の色・`user-select: none`、行内の連続空白の保持（`white-space: pre`）、`:target` の着地スタイルはCSS側（PG1-4）の担当。id契約は `project-{n}-{slug}`
+- eyebrow `// project` はmarkup側のリテラルテキスト。CSSで `::before` の `//` を足さない（messageのeyebrowとは方式が異なる）
+- スタイル実体は `src/styles/global.css` の `:::project` セクション（PG1-4で実装済み）。CSS側が本プラグインの出力に依存している点:
+  - id契約 `project-{n}-{slug}`（`scroll-margin-top` と `:target` の着地スタイルの適用先）
+  - ツリーは `.tree-row` / `.tree-branch` / `.tree-dir` の3クラスで、枝記号の連続空白は `white-space: pre` が保持する
+  - **ツリーのファイルリンクは素の `<a>`** のため、汎用リンク規則 `.prose a:not(.wikilink):not(.link-card):not(.playground-open)`（詳細度 (0,4,1)）に負ける。CSS側は同じ `:not()` 連鎖を付けて上回っている（クラスを付けない設計＝後段プラグインに巻き込まれないための選択とのトレードオフ）
+- マーカーだけで中身が空白の行（` // [!code ++]` のみの行）は、Shikiの記法除去後に表示から消える。Gist側（`stripCodeNotation`）でも同様に消えるため両者は一致する
 - version / edition は `stable` / `2024` 固定（spec R-5）
+- Playgroundを初めて開くと「single file mode のエディタを multiple file mode に切り替えた」旨の案内バナーが出る（モード自体は `?gist=` から自動で切り替わる。実測）

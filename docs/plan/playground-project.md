@@ -15,7 +15,7 @@
 - [x] **PG1-3: `:::project` mdastプラグイン + markdown-pipeline文書** 〔Fable 5〕
   `:::project` の変換プラグインを実装する（containerDirective の捕捉方式・`codeFilename` 変換後の子ノード走査・`directives.mjs` の未知名throwとの順序関係、という一次検証を含むため技術検証込み）。ビルドエラー5系統（playground-project R-7）、ボタン（R-2）、ファイルツリー生成とアンカーid付与（R-3）、マッピング参照（R-7e）を実装。`tests/helpers/pipeline.ts` への登録と `tests/plugins/directives.test.ts` の「未知のディレクティブ」テスト更新を含む。検証済みの実装方式・雛形・落とし穴を `../markdown-pipeline/project.md` として新規作成し、README対応表・全体像スニペットも更新する。
   完了条件: playground-project AC-1〜AC-4・AC-6・AC-7・AC-10 のテストが通る。`npm run check` green・`astro build` 成功。
-- [ ] **PG1-4: スタイル適用と表示統合**
+- [x] **PG1-4: スタイル適用と表示統合**
   PG1-1で確定したデザインを `src/styles/global.css` に実装する（`.code-project` 等の新セレクタ + 既存のフルブリード/幅制御系セレクタ列への追加）。実記事（`content/articles/rust-playground-multifile-release.md` の検証コード等）に `:::project` を適用し、`npm run sync:playground` を実運用して初回マッピングをコミットする。
   完了条件: 実記事のプロジェクトがビルドされ、ボタン押下でPlaygroundが複数ファイルモードで開く（playground-project AC-11 目視）。ライト/ダーク両テーマで表示崩れがない（目視）。
 - [ ] **PG1-5: 追従文書の更新とクローズ**
@@ -26,11 +26,44 @@
 
 - ~~**PG1-3へ**: `:::project` のファイルとして扱うのは**直下のコードブロックのみ**（入れ子ディレクティブ内は対象外）と [`../spec/playground-project.md`](../spec/playground-project.md) R-1 に明記した。R-7 (a)〜(d) の判定は同期スクリプト側にも別実装があり（走査対象のmdastが `codeFilename` 変換前後で異なるため）、条件を変えるときは `scripts/sync-playground-gists.mjs` の `readProject` と同時に直す（spec R-8 の但し書き）。ハッシュ計算とマッピング読み込みは `plugins/project-gist.mjs`（`projectHash` / `readGistMap` / `GIST_MAP_PATH`）をそのまま使うこと（R-12）~~（PG1-3で対応済み。二重実装の同期義務は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md) に恒久記載）
 - ~~**PG1-3へ**: AC-5 の「表示側の `<pre>` にはマーカー付きコードが渡る」半分は未検証（PG1-2ではGistへ送る側のみ検証した）。PG1-3のプラグインテストで担保する~~（PG1-3のプラグインテストで担保済み）
-- **PG1-4へ**: `playground-gists.json` はルート直下のJSONで `prettier --check .` の対象。`writeGistMap` はPrettier既定（2スペース + 末尾改行）で書くため、生成物をそのままコミットしてよい
-- **PG1-4へ**: CSS実装の前提（id契約 `project-{n}-{slug}`・ツリーのHTML構造 `.tree-row`/`.tree-branch`/`.tree-dir` と `white-space: pre` の必要性・eyebrow `// project` はmarkupリテラルのため `::before` で二重付与しない・ファイル数の単数形 `1 file`・ルート行なし）は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」を参照。ツリー見た目の最終確認はPG1-4の目視で行う
-- **PG1-4へ**: gistMapはconfig評価時に1回読むため、devサーバー起動中に `npm run sync:playground` を実行したら再起動が必要
+- ~~**PG1-4へ**: `playground-gists.json` はルート直下のJSONで `prettier --check .` の対象。`writeGistMap` はPrettier既定（2スペース + 末尾改行）で書くため、生成物をそのままコミットしてよい~~（PG1-4で生成物をそのままコミットし `format:check` green を確認）
+- ~~**PG1-4へ**: CSS実装の前提（id契約 `project-{n}-{slug}`・ツリーのHTML構造 `.tree-row`/`.tree-branch`/`.tree-dir` と `white-space: pre` の必要性・eyebrow `// project` はmarkupリテラルのため `::before` で二重付与しない・ファイル数の単数形 `1 file`・ルート行なし）は [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」を参照。ツリー見た目の最終確認はPG1-4の目視で行う~~（PG1-4でCSS実装・目視確認とも完了）
+- ~~**PG1-4へ**: gistMapはconfig評価時に1回読むため、devサーバー起動中に `npm run sync:playground` を実行したら再起動が必要~~（恒久的な制約として [`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」に記載済み）
+- **PG1-5へ**: `playground-gists.json`（ルート直下・コミット対象）は [`../architecture.md`](../architecture.md) 1章のプロジェクト構成ツリーに未記載。3章のビルド時検証テーブル・4章のプラグイン順序（`codeFilename → project → playgroundLink → …`）とあわせて追記する
 
 ## 実施履歴
+
+### PG1-4
+
+`:::project` のCSSを実装し、実記事へ適用して初回のGistマッピングを作成した。見た目の仕様は [`../ui-design/ui-design-spec.md`](../ui-design/ui-design-spec.md)「`:::project`」を正とし、本節では実装・検証結果のみ記載する。
+
+**実装**:
+
+- `src/styles/global.css`: `:::project` セクションを新設（`.code-playground` の直後）。カード面フレーム + 3段罫線区切り・ヘッダー行・アクセント色アウトラインの `playground-open`・box-drawingツリー（`white-space: pre`／枝記号色と `user-select: none`／ディレクトリ・ファイルリンク）・本文の余白・アンカー着地（`scroll-margin-top: 5rem` と `:target` のファイル名タブ色）・ネスト時の paper 背景・ペイン/プレビューのコンパクト表示。あわせて `.prose details >` の6セレクタ列と `prefers-reduced-motion` のリストに `.code-project` を追加
+- `content/articles/rust-playground-multifile-release.md`: 検証1〜5の各コードブロック群を `:::project[タイトル]` で囲った（「できる！」と `:::figure[実行結果]` は従来どおりプロジェクトの外）
+- `playground-gists.json`（新規）: `npm run sync:playground` の実行結果（5エントリ）をそのままコミット
+
+**満たした完了条件 / AC**: AC-11（実Playgroundでの復元・目視）と、ライト/ダーク両テーマでの表示崩れなし（目視）。あわせてAC-2（ツリーからのアンカージャンプ）・AC-5（表示はマーカーあり / Gistはマーカー除去）を実データで確認した。
+
+**検証結果**: `npm run check` green（format:check / lint / typecheck 0 errors / vitest 255 passed）、`npx astro build` 成功（143ページ）。`npm run sync:playground` の2回目は全SKIP（冪等）、`-- --verify` は5件OKで exit 0。
+
+目視はChrome拡張が未接続だったため、リポジトリに入っている Playwright（chromium headless shell）でdevサーバのページを撮影して行った:
+
+- ライト/ダーク両テーマでプロジェクト1・2・4を撮影。フレーム・3段罫線・ツリーの階層表示（`utils/`）・コード面との重なりに崩れなし。狭幅（420px）ではボタンだけが2行目へ折り返して右寄せになる
+- ツリーのファイル名クリックで対応ブロックの上端が y=80px（`scroll-margin-top: 5rem`）に着地し、`:target` のファイル名タブが `rgb(212,113,90)` になることを確認。ツリーリンクの通常色 = ink・hoverでaccent + 点線下線
+- `::::details` 内・辞書ペイン内は実コンテンツが無いため、DOMを組み替えた擬似再現で背景 paper とコンパクト表示を確認
+- 「Playgroundで開く」のURL（プロジェクト1・2・5）を開き、Files欄に全ファイルが階層どおり復元され複数ファイルモードに切り替わることを確認（AC-11）。プロジェクト4のGistはマーカー除去済みで、表示側はdiffのtint付き（AC-5）
+
+**実装中に得た知見**（[`../markdown-pipeline/project.md`](../markdown-pipeline/project.md)「制約・残課題」へ反映済み）:
+
+- ツリーのファイルリンクは素の `<a>` のため、汎用リンク規則 `.prose a:not(.wikilink):not(.link-card):not(.playground-open)`（詳細度 (0,4,1)）に負ける。同じ `:not()` 連鎖を付けて詳細度で上回る必要がある
+- 単一ファイル + `[!code ++]` だけの行（マーカーのみで中身が空白の行）は、Shikiの記法除去後に表示・Gistとも行ごと消える（両者は一致するため実害なし）
+- Playgroundの初回訪問時は「single file mode の編集画面を multiple file mode に切り替えた」旨の案内バナーが出る（モード自体は自動で切り替わる）
+
+**コミット**:
+
+- `46c5778` feat: :::projectのスタイルをglobal.cssに実装
+- `2488103` content: Playground複数ファイル記事の検証コードを:::project化しGistマッピングを追加
 
 ### PG1-3
 
