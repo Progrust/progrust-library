@@ -14,13 +14,16 @@
 /
 ├ astro.config.mjs        … Sätteriパイプライン設定（markdown-pipeline/README.md の骨格に従う）
 ├ package.json / tsconfig.json / tailwind設定
+├ playground-gists.json   … :::project のハッシュ → Gist ID マッピング（形式は spec/playground-project.md §3）。npm run sync:playground が生成・追記してコミットする成果物で、ビルドは読み取り専用で参照する
 ├ content/                … mdコンテンツ（構成は spec/content-model.md R-3）
 ├ public/                 … OGP画像・favicon・_headers等（最適化不要な静的ファイルのみ）
+├ scripts/                … 開発用CLIスクリプト（sync-playground-gists.mjs・check-dict-code.mjs・list-dict-tags.mjs・list-dict-todo.mjs。npm scriptsの一覧は implementation-rules.md 1章）
 ├ plugins/                … Sätteri用自作プラグイン（.mjs、astro.config.mjsから参照）
-│   ├ dict-index.mjs      … 辞書一覧のconfig時直読み + ファイル名一意性検証
-│   ├ wikilink.mjs / directives.mjs / link-card.mjs / code-filename.mjs / mermaid.mjs / table-wrap.mjs
+│   ├ 変換プラグイン       … code-filename.mjs / project.mjs / playground-link.mjs / wikilink.mjs / directives.mjs / link-card.mjs / external-links.mjs / soft-breaks.mjs（mdast）・mermaid.mjs / table-wrap.mjs（hast）。登録順は下記4章
+│   ├ config評価時検証     … dict-index.mjs（辞書索引のconfig時直読み + ファイル名一意性検証）/ chapter-order.mjs / validate-wikilinks.mjs / validate-projects.mjs（下記3章）
 │   ├ code-notation.mjs   … Shikiのコード記法（[!code ++]等）除去の共有関数（プラグインではない。playground-link.mjs と scripts/check-dict-code.mjs が使う）
 │   ├ project-gist.mjs    … :::project のハッシュ・Gistペイロード・マッピングファイル入出力の共有関数（プラグインではない。ビルド側の :::project 変換と scripts/sync-playground-gists.mjs が使う。spec/playground-project.md R-12）
+│   └ shiki-theme.mjs     … カスタムsingle theme + transformerCodeBg（下記9章）
 ├ src/
 │   ├ content.config.ts   … 4コレクション定義（下記2章）
 │   ├ pages/              … ルーティング（下記5章）
@@ -67,13 +70,16 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | 辞書ファイル名一意性 | content-model R-6 | `plugins/dict-index.mjs`（config時にcontent/dict/を直読みして索引構築。[wikilink.md](markdown-pipeline/wikilink.md)） | 重複検出でthrow |
 | 章連番形式・重複 | content-model R-9 | `content.config.ts`（ローダー/generateId） | throw |
 | wikilinkリンク切れ・公開非対称 | content-model R-13〜R-15 | config評価時の検証パス（`markdownToHtml`直呼びで全コンテンツを`plugins/wikilink.mjs`に通す。T1-4で実装） | 検証パス内でthrow（visitor内throwはコレクション経由ではビルドを失敗させないため。[wikilink.md](markdown-pipeline/wikilink.md)） |
+| `:::project` の内容不正・Gistマッピング未登録 | playground-project R-7 (a)〜(e) | `plugins/validate-projects.mjs`（同じくconfig評価時の検証パス。`:::project`を含むmdのみ`codeFilename`+`project`で単体コンパイルする。[project.md](markdown-pipeline/project.md)） | 検証パス内でthrow（同上） |
 
 > [!note] 既知リスクの検証結果（T1-3で解消）
 > `ctx.fileURL`はContent Layer API経由の実ビルドでも実ファイルを指す（OK・公開非対称判定の前提成立）。一方、**visitor内throwによるビルドエラー化はコレクション経由では不成立**（glob loaderが握りつぶしexit 0・本文空出力・キャッシュで不可視化）と判明したため、ビルド時検証は上表のとおり「レンダリング外の検証パス」方式に変更した。詳細: [markdown-pipeline/wikilink.md](markdown-pipeline/wikilink.md)。
 
 ## 4. Markdownパイプライン構成
 
-`astro.config.mjs`は [`markdown-pipeline/README.md`](markdown-pipeline/README.md) の「astro.config.mjs の全体像」に従う（Shiki設定は`markdown`直下、`features: { directive: true }`+textDirective復元、プラグイン順序: codeFilename → playgroundLink → wikilink → directives → linkCard → externalLinks → softBreaks（mdast）/ mermaid → tableWrap（hast））。詳細・落とし穴は同文書と各機能文書を正とする。
+`astro.config.mjs`は [`markdown-pipeline/README.md`](markdown-pipeline/README.md) の「astro.config.mjs の全体像」に従う（Shiki設定は`markdown`直下、`features: { directive: true }`+textDirective復元、プラグイン順序: codeFilename → project → playgroundLink → wikilink → directives → linkCard → externalLinks → softBreaks（mdast）/ mermaid → tableWrap（hast））。詳細・落とし穴は同文書と各機能文書を正とする。
+
+- `project`の位置は「codeFilenameの後・playgroundLinkの前・directivesの前」の3制約で確定している（理由は [`markdown-pipeline/project.md`](markdown-pipeline/project.md)）
 
 ## 5. ルーティングとページ生成（src/pages/）
 
