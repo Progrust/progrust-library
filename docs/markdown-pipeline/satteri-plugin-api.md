@@ -55,7 +55,7 @@ setProperty: node has no arena id — it was built in JS, not read from this tre
 Pass plugin-built nodes as new content (e.g. the second argument of insertAfter).
 ```
 
-`setProperty`はSätteriのRust側アリーナに割り当て済み（＝元のmdツリーから読み込まれた）ノードにしか使えない。`insertBefore`で挿入した後でも、JS側オブジェクトはアリーナに登録されない。
+`setProperty`はSätteriのRust側アリーナに割り当て済み（＝元のmdツリーから読み込まれた）ノードにしか使えない。`insertBefore`で挿入した後でも、JS側オブジェクトはアリーナに登録されない。**ただしこれは同一パス内の話**: パス完了時に挿入ノードはアリーナへ登録されるため、**前段プラグインが生成したノードへの後段パスからの`setProperty`は成立する**（T2後、projectプラグイン実装時に実測。[project.md](project.md)）。
 
 **回避策**: 新規生成ノードには`data`（`hProperties`含む）を**ノードリテラル作成時点で直接持たせる**:
 
@@ -147,6 +147,7 @@ export const counterPlugin = () => {
   →「親を消したら子は触らない」前提のロジックは書かない
 - `ctx.source`で処理中mdの全ソース文字列が取れる。**`node.position`の`offset`はUTF-8バイトオフセット**（JSの文字indexではない）。スライスは`Buffer.from(source, 'utf8').subarray(start, end)`で行う（`String.prototype.slice`だと日本語でズレる）
 - `ctx.data`（文書レベル共有バッグ）はmdast→hast間でも共有される（型定義で確認）
+- **JS側で新規生成したノードのトップレベル`position`はアリーナへ引き継がれない**（後段パスからは`undefined`。実測）。一方**`data`の任意キーは後段パスからそのまま読める**ため、位置情報を後段へ渡したい場合は`data`へ退避する（`codeFilename`の`data.sourcePosition` → projectプラグインのエラー位置報告で使用。[project.md](project.md)）
 - `g`フラグ付き正規表現をモジュールレベルで使い回すと`lastIndex`が呼び出しをまたいで残り誤検出する（定番の罠）。visitor内でリテラルとして都度書く
 
 ## 制約・残課題

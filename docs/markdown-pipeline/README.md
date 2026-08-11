@@ -17,6 +17,7 @@
 | コードハイライト（diff・ファイル名・dual theme） | [shiki.md](shiki.md) | **Shiki設定は`markdown.shikiConfig`直下**、transformerNotationDiff、ファイル名のmdast前処理 |
 | テーブルの横スクロールラッパ | [table-wrap.md](table-wrap.md) | hast層`wrapNode`で`<table>`を`.table-wrap`divに包むだけ、生HTMLテーブルは対象外 |
 | Rust Playgroundリンクボタン | [playground.md](playground.md) | ` ```rust playground `メタ判定のmdast前処理、URLはビルド時静的生成、**codeFilenameの後置必須** |
+| Playgroundプロジェクト `:::project` | [project.md](project.md) | containerDirective捕捉でヘッダー+ツリー+本文へ変換、Gistマッピング参照、**登録は codeFilename後・playgroundLink前・directives前**、エラー化はconfig評価時検証パス |
 | 外部リンクの別タブ化 | [external-links.md](external-links.md) | `link` visitorで`http(s)://`のみ`target="_blank"`+`rel`付与、wikilink/内部リンクはガードで素通り |
 | 本文中の改行の`<br>`反映 | [soft-breaks.md](soft-breaks.md) | `text` visitorで`\n`を`break`ノードに分割、コード内は購読モデルで無傷、**登録は末尾** |
 
@@ -37,6 +38,7 @@
 
 ```js
 // @ts-check
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import { satteri } from '@astrojs/markdown-satteri';
 import { transformerNotationDiff } from '@shikijs/transformers';
@@ -45,6 +47,9 @@ import { wikilink } from './plugins/wikilink.mjs';
 import { directives } from './plugins/directives.mjs';
 import { linkCard } from './plugins/link-card.mjs';
 import { codeFilename } from './plugins/code-filename.mjs';
+import { project } from './plugins/project.mjs';
+import { GIST_MAP_PATH, readGistMap } from './plugins/project-gist.mjs';
+import { validateProjects } from './plugins/validate-projects.mjs';
 import { playgroundLink } from './plugins/playground-link.mjs';
 import { externalLinks } from './plugins/external-links.mjs';
 import { softBreaks } from './plugins/soft-breaks.mjs';
@@ -52,6 +57,8 @@ import { mermaid } from './plugins/mermaid.mjs';
 import { tableWrap } from './plugins/table-wrap.mjs';
 
 const dictIndex = loadDictIndex(new URL('./content/dict/', import.meta.url));
+const gistMap = readGistMap(fileURLToPath(new URL(`./${GIST_MAP_PATH}`, import.meta.url)));
+validateProjects(gistMap, new URL('./content/', import.meta.url)); // :::project のビルド時検証（project.md）
 
 export default defineConfig({
   markdown: {
@@ -64,7 +71,7 @@ export default defineConfig({
     },
     processor: satteri({
       features: { directive: true }, // ← 有効化したら textDirective 復元プラグイン（directives.md）が必須
-      mdastPlugins: [codeFilename, playgroundLink, wikilink(dictIndex), directives, linkCard(), externalLinks, softBreaks],
+      mdastPlugins: [codeFilename, project(gistMap), playgroundLink, wikilink(dictIndex), directives, linkCard(), externalLinks, softBreaks],
       hastPlugins: [mermaid(), tableWrap],
     }),
   },
@@ -75,6 +82,7 @@ export default defineConfig({
 
 - プラグインは**登録順の直列パイプライン**。前段が生成したノードを後段は訪問できる
 - **ファイル名前処理（codeFilename）はmdastの早い位置**に置く（hast段階ではShiki実行後で手遅れ。詳細: [shiki.md](shiki.md)）
+- **project は codeFilename の後・playgroundLink の前・directives の前**（.code-blockラッパ走査 / playgroundメタ検出 / 未知名throw回避の3制約。詳細: [project.md](project.md)）
 - **wikilink → linkCard の順**を推奨。wikilinkが生成する`link`（`/dict/…`、テキスト=title）は「テキスト===URL」条件を満たさないためカード化されない。同一パイプラインでの同時動作はT2-5で検証済み（統合テスト `tests/plugins/pipeline.test.ts` + 実ビルドdist。wikilinkはカード化されず、`/dict/…`へのfetchも発生しない）。内部リンク（`/`始まり）をfetch対象から除外するガードも入れること（詳細: [link-card.md](link-card.md)）
 - Astro側のShikiハイライトはユーザーhastPluginsより**前**に実行される。ハイライト済みコードブロックはhastでは`element`ではなく`raw`ノードになる
 
