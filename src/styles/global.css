@@ -90,6 +90,26 @@
 )::-webkit-scrollbar-thumb {
   border-radius: 2px;
 }
+/* 左右サイドレールのサムはレールにホバーしている間のみ表示（ui-design-spec「共通ルール」）。
+   Firefox 向けの scrollbar-color 切替は、上の共通ガードと同じ理由で
+   @supports not selector(::-webkit-scrollbar) の中に置く。 */
+[data-side-rail]::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+[data-side-rail]:hover::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+}
+[data-side-rail]:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sub);
+}
+@supports not selector(::-webkit-scrollbar) {
+  [data-side-rail] {
+    scrollbar-color: transparent transparent;
+  }
+  [data-side-rail]:hover {
+    scrollbar-color: var(--color-line) transparent;
+  }
+}
 
 /* =========================================================================
    詳細ページ本文（prose）のスタイル。
