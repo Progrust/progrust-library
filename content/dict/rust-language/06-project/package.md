@@ -57,7 +57,7 @@ edition = "2024"
 [dependencies]
 ```
 
-`edition`の既定値は2024です（Rust 1.93で確認）[^2]。外部のパッケージを使うときは`[dependencies]`への追記が必要ですが、[[standard-library]]は追記なしで使えます。
+`edition`の既定値は2024です（Rust 1.93で確認）[^2]。[[external-package]]を使うときは`[dependencies]`への追記が必要ですが、[[standard-library]]は追記なしで使えます。
 :::
 
 :::details[パッケージ名とクレート名がずれることがある]
