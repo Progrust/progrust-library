@@ -86,6 +86,9 @@ export function initDictDrawer(): void {
     // 属性除去でレール（display: none）が同期的に復帰し、直後にペインへ書き戻せる（R-26）。
     document.documentElement.removeAttribute(OPEN_ATTR);
     if (paneContent && drawerContent) syncScroll(drawerContent, paneContent);
+    // xl 以上の目次シートはドロワー表示中だけ有効（R-23）。開いたまま閉じると hidden
+    // クラスが外れたまま残り、次回のドロワー表示でシートが不意に再出現するため畳んでおく。
+    document.querySelector("[data-toc-sheet]")?.classList.add("hidden");
     lastTrigger?.focus();
     lastTrigger = null;
   };

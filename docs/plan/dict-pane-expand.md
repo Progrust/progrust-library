@@ -26,8 +26,26 @@ issue原要件（モーダル・枠外クリックで終了・拡大中は背景
 - [x] **DP1-3: スクロール比率同期と横断検証** 〔Fable 5〕
   `dict-drawer.ts` に `mapScrollTop` 純関数を追加して開閉フローに配線し、`tests/scripts/dict-drawer.test.ts` に `[AC-13]` テストを書く。回帰目視（ホバープレビューがドロワー内でも動作・モバイルシート無変更・R-20のレール挙動・reduced-motion）。
   完了条件: `[AC-13]` テスト green + AC-13 目視。`npm run check` green・`npx astro build` 成功。完了後に issue #1 へ完了報告コメントを添えてクローズする。
+- [x] **DP1-4: 拡大表示中の目次をフローティングボタンに切替** 〔Fable 5〕
+  DP1-2 の「目次カラム維持」へのフィードバック対応（ui-design-spec 意思決定の履歴18）。spec（wikilink-ui R-23 / AC-10・pages R-13・ui-design-spec）を先に改訂し、拡大中は目次カラムも非表示にして本文のみの1カラム構成へ変更。目次はモバイル同様のフローティングボタン+ボトムシートを xl 以上でも表示して提供する。
+  完了条件: 改訂後の AC-10 を目視で満たす。`npm run check` green・`npx astro build` 成功。
 
 ## 実施履歴
+
+### DP1-4
+
+拡大表示中の目次を「カラム維持」から「モバイル同様のフローティングボタン+ボトムシート」へ変更した。
+
+**先行したドキュメント更新**（仕様駆動）: wikilink-ui R-23 / AC-10（目次カラムも非表示・本文のみの構成・目次ボタン切替）、pages R-13（フローティングボタン化の条件に拡大表示中を追加）、ui-design-spec（「レイアウト」「辞書ペインの拡大表示」の切替記述・`data-*` コントラクト表の `data-toc-rail` / `data-mobile-nav` 追加と `data-has-toc` 削除・意思決定の履歴18）。
+
+**実装**:
+
+- レイアウト2種: 目次カラム aside に `data-toc-rail` を追加。グリッドの `data-has-toc` / `--toc-col` は不要になったため削除
+- `MobileNav.astro`: フローティングボタンのコンテナに `data-mobile-nav` を追加
+- `global.css`: レール非表示ルールを `:is([data-dict-rail], [data-toc-rail])` に拡張し、xl の目次列2カラムルール（`data-has-toc`）を削除。xl 以上向けに `[data-mobile-nav]`（表示）と `[data-toc-sheet]:not(.hidden)`（`xl:hidden` 上書き。`:not(.hidden)` で toc.ts の開閉フラグを効かせる）を追加
+- `dict-drawer.ts`: 閉時に目次シートへ `hidden` を付与する後始末を追加（xl でシートを開いたままドロワーを閉じると、次回拡大時に閉じ忘れのシートが再出現するため）
+
+**検証結果**: `npm run check` green（vitest 261 passed）・`npx astro build` 成功（167ページ）。chrome-devtools MCP（`/dict/module`・1440×900）で目視: 拡大で目次カラム非表示・グリッド1列・目次ボタン表示、ボタンでシート開閉、閉で目次カラム復帰・ボタン非表示、シート開きっぱなしで閉じた場合の `hidden` 付与、をすべて確認（改訂後 AC-10）。
 
 ### DP1-3
 

@@ -23,8 +23,15 @@ const hasToc = hasSheetSlot || tocHeadings(headings).length > 0;
 ---
 
 <div>
-  {/* 右下フローティングボタン（xl 以上は両ボタンとも不要） */}
-  <div class="fixed bottom-5 right-5 z-30 flex flex-col gap-3 xl:hidden">
+  {
+    /* 右下フローティングボタン（xl 以上は両ボタンとも不要。ただし辞書ドロワー表示中は
+      目次カラムが消えるため、global.css が xl 以上でもコンテナを表示する（wikilink-ui R-23。
+      辞書ボタンは lg:hidden のため出ない）） */
+  }
+  <div
+    class="fixed bottom-5 right-5 z-30 flex flex-col gap-3 xl:hidden"
+    data-mobile-nav
+  >
     {
       hasToc && (
         <button

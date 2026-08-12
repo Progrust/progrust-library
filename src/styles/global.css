@@ -142,12 +142,12 @@ html[data-dict-drawer-open] [data-dict-drawer] {
     transition: none;
   }
 }
-/* ドロワー表示中: 右レール（ペイン+使用辞書一覧）を隠し、グリッドを目次+本文に
-   切り替えて本文をドロワー幅+gap（2.5rem）ぶん左へ寄せる（wikilink-ui R-23）。
-   margin-right の減算項は中央寄せコンテナ（max-w-96rem）の左右余白ぶんの補正で、
-   超ワイド画面で本文が過剰に左へ寄るのを防ぐ。 */
+/* ドロワー表示中: 右レール（ペイン+使用辞書一覧）と目次カラムを隠し、グリッドを
+   本文のみの1列に切り替えて本文をドロワー幅+gap（2.5rem）ぶん左へ寄せる
+   （wikilink-ui R-23）。margin-right の減算項は中央寄せコンテナ（max-w-96rem）の
+   左右余白ぶんの補正で、超ワイド画面で本文が過剰に左へ寄るのを防ぐ。 */
 @media (min-width: 1024px) {
-  html[data-dict-drawer-open] [data-dict-rail] {
+  html[data-dict-drawer-open] :is([data-dict-rail], [data-toc-rail]) {
     display: none;
   }
   html[data-dict-drawer-open] [data-detail-grid] {
@@ -158,9 +158,16 @@ html[data-dict-drawer-open] [data-dict-drawer] {
     );
   }
 }
+/* ドロワー表示中の目次はモバイルと同じフローティングボタン+ボトムシートに切り替える
+   （pages R-13）。コンテナ・シートは通常 xl:hidden のため、xl 以上でだけ上書きが要る
+   （辞書ボタン・辞書シートは lg:hidden のままなので出ない）。シート側の :not(.hidden) は
+   toc.ts の開閉フラグ（hidden クラス）を効かせるための条件。 */
 @media (min-width: 1280px) {
-  html[data-dict-drawer-open] [data-detail-grid][data-has-toc] {
-    grid-template-columns: var(--toc-col) minmax(0, 1fr);
+  html[data-dict-drawer-open] [data-mobile-nav] {
+    display: flex;
+  }
+  html[data-dict-drawer-open] [data-toc-sheet]:not(.hidden) {
+    display: block;
   }
 }
 

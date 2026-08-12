@@ -79,16 +79,15 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
       左右カラム幅は clamp() で画面幅に連続追従（1536px で最大値・1280px で最小値） */
     }
     {
-      /* data-detail-grid / data-has-toc / --toc-col: 辞書ドロワー表示中のグリッド切替フック
+      /* data-detail-grid: 辞書ドロワー表示中のグリッド切替フック
         （wikilink-ui R-23。global.css の html[data-dict-drawer-open] ルールが参照） */
     }
     <div
-      class="lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)] lg:gap-10 xl:grid-cols-[clamp(220px,17.1875vw,264px)_minmax(0,1fr)_clamp(320px,25vw,384px)] [--toc-col:clamp(220px,17.1875vw,264px)]"
+      class="lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)] lg:gap-10 xl:grid-cols-[clamp(220px,17.1875vw,264px)_minmax(0,1fr)_clamp(320px,25vw,384px)]"
       data-detail-grid
-      data-has-toc=""
     >
       {/* 左: 複合目次（章リスト + 現在章の見出し・xl 以上・sticky） */}
-      <aside class="hidden xl:block">
+      <aside class="hidden xl:block" data-toc-rail>
         <div
           class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
           data-side-rail

@@ -59,18 +59,14 @@ const gridCols = hasToc
 >
   <main class="mx-auto max-w-[96rem] px-4 py-10 sm:px-8">
     {
-      /* data-detail-grid / data-has-toc / --toc-col: 辞書ドロワー表示中のグリッド切替フック
+      /* data-detail-grid: 辞書ドロワー表示中のグリッド切替フック
         （wikilink-ui R-23。global.css の html[data-dict-drawer-open] ルールが参照） */
     }
-    <div
-      class={`lg:grid lg:gap-10 [--toc-col:clamp(200px,15.625vw,240px)] ${gridCols}`}
-      data-detail-grid
-      data-has-toc={hasToc ? "" : undefined}
-    >
+    <div class={`lg:grid lg:gap-10 ${gridCols}`} data-detail-grid>
       {/* 左: 目次（xl 以上・sticky）。目次が無いページではカラムごと省略 */}
       {
         hasToc && (
-          <aside class="hidden xl:block">
+          <aside class="hidden xl:block" data-toc-rail>
             <div
               class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto"
               data-side-rail
