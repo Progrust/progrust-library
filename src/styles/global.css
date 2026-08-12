@@ -104,6 +104,67 @@
 }
 
 /* =========================================================================
+   辞書ペインの拡大表示（右ドロワー・wikilink-ui R-21〜R-26 /
+   ui-design-spec「辞書ペインの拡大表示」）。開状態は html[data-dict-drawer-open] が
+   唯一のフラグで、dict-drawer.ts はこの属性の付け外しのみを行う。
+   ========================================================================= */
+:root {
+  /* ドロワー幅（DictDrawer.astro の w-[var(--dict-drawer-w)] と本文の押し出し量で共有） */
+  --dict-drawer-w: min(42rem, 45vw);
+}
+/* 閉状態は display ではなく visibility で隠す: 閉じている間もスクロール量
+   （scrollHeight / clientHeight）を測れるようにするため（スクロール比率同期の前提）。
+   visibility の遅延はフェードアウト完了まで表示を保つためのもの。 */
+[data-dict-drawer] {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateX(1.5rem);
+  pointer-events: none;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease,
+    visibility 0s linear 180ms;
+}
+html[data-dict-drawer-open] [data-dict-drawer] {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+/* 本文の押し出しもドロワーのスライドインと同時に遷移させる */
+[data-detail-grid] {
+  transition: margin-right 180ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-dict-drawer],
+  [data-detail-grid] {
+    transition: none;
+  }
+}
+/* ドロワー表示中: 右レール（ペイン+使用辞書一覧）を隠し、グリッドを目次+本文に
+   切り替えて本文をドロワー幅+gap（2.5rem）ぶん左へ寄せる（wikilink-ui R-23）。
+   margin-right の減算項は中央寄せコンテナ（max-w-96rem）の左右余白ぶんの補正で、
+   超ワイド画面で本文が過剰に左へ寄るのを防ぐ。 */
+@media (min-width: 1024px) {
+  html[data-dict-drawer-open] [data-dict-rail] {
+    display: none;
+  }
+  html[data-dict-drawer-open] [data-detail-grid] {
+    grid-template-columns: minmax(0, 1fr);
+    margin-right: max(
+      0px,
+      calc(var(--dict-drawer-w) + 2.5rem - max(0px, (100vw - 96rem) / 2))
+    );
+  }
+}
+@media (min-width: 1280px) {
+  html[data-dict-drawer-open] [data-detail-grid][data-has-toc] {
+    grid-template-columns: var(--toc-col) minmax(0, 1fr);
+  }
+}
+
+/* =========================================================================
    詳細ページ本文（prose）のスタイル。
    architecture.md §9: Markdown 変換結果（コードブロック・diff・メッセージ・
    辞書リンク等）へのスタイルは global.css に集約する（変換 HTML には Tailwind
@@ -666,10 +727,11 @@ html.dark .code-project-tree .tree-branch {
 .code-project-body .code-block:target .code-filename {
   color: #d4715a;
 }
-/* card 面の上（::::details 内・辞書ペイン内・ホバープレビュー内）は面の重なりを避け
-   背景を paper に落とす（.message と同じ扱い） */
+/* card 面の上（::::details 内・辞書ペイン内・拡大ドロワー内・ホバープレビュー内）は
+   面の重なりを避け背景を paper に落とす（.message と同じ扱い） */
 .prose details .code-project,
 [data-dict-pane-content] .code-project,
+[data-dict-drawer-content] .code-project,
 [data-dict-preview] .code-project {
   background: var(--color-paper);
 }
@@ -850,10 +912,11 @@ html.dark .message-warning .message-title {
 .message-danger .message-title {
   color: var(--color-accent);
 }
-/* card 面の上（::::details 内・辞書ペイン内・ホバープレビュー内）は面の重なりを避け
-   背景を paper に落とす */
+/* card 面の上（::::details 内・辞書ペイン内・拡大ドロワー内・ホバープレビュー内）は
+   面の重なりを避け背景を paper に落とす */
 .prose details .message,
 [data-dict-pane-content] .message,
+[data-dict-drawer-content] .message,
 [data-dict-preview] .message {
   background: var(--color-paper);
 }
@@ -861,11 +924,13 @@ html.dark .message-warning .message-title {
    埋没するため、一段深い面に調整する */
 .prose details .message :not(pre) > code,
 [data-dict-pane-content] .message :not(pre) > code,
+[data-dict-drawer-content] .message :not(pre) > code,
 [data-dict-preview] .message :not(pre) > code {
   background: #e2dcd1;
 }
 html.dark .prose details .message :not(pre) > code,
 html.dark [data-dict-pane-content] .message :not(pre) > code,
+html.dark [data-dict-drawer-content] .message :not(pre) > code,
 html.dark [data-dict-preview] .message :not(pre) > code {
   background: #110e0b;
 }

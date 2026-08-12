@@ -130,7 +130,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 主要コンポーネント（ui-design-spec.mdのコンポーネント仕様と1:1対応）:
 
-`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterToc`（本トップ・章詳細の章目次／複合目次で共用）/ `ChapterNav`（前後章ナビ）/ `DictPane`（サイドペイン）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileNav`（モバイルの目次・辞書フローティングボタン + 目次ボトムシート。既定は `Toc`、slot 差し替えで章詳細は複合目次を表示）
+`Header` / `Footer` / `ThemeToggle` / `SearchBox` / `TypeBadge` / `LedgerRow`（台帳リスト行）/ `DictCard` / `EntryCard`（記事・本一覧で共用）/ `ListFilter`（絞込UI・タグチップを内包）/ `Toc` / `ChapterToc`（本トップ・章詳細の章目次／複合目次で共用）/ `ChapterNav`（前後章ナビ）/ `DictPane`（サイドペイン。`expandable` prop でデスクトップ右レールのみ拡大トリガーを表示）/ `DictDrawer`（辞書ペインの拡大表示ドロワー。wikilink-ui R-21〜R-26）/ `LinkedDictList`（使用辞書一覧）/ `Backlinks`（逆リンク）/ `MobileNav`（モバイルの目次・辞書フローティングボタン + 目次ボトムシート。既定は `Toc`、slot 差し替えで章詳細は複合目次を表示）
 
 ## 7. 検索インデックス生成
 
@@ -153,6 +153,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 | `search-box.ts` | ヘッダー検索UI（遅延ロード・ドロップダウン） | search R-2, R-7 |
 | `list-filter.ts` | 一覧絞込（タグチップ+キーワード、`data-title`/`data-description`/`data-tags`参照。keywordは search R-4 どおりdescriptionも対象・判定は`search.ts`の`entryMatches`を再利用） | search R-9〜R-11 |
 | `dict-pane.ts` | サイドペイン（embedフェッチ・履歴配列・ボトムシート） | [spec/wikilink-ui.md](spec/wikilink-ui.md) R-10〜R-14 |
+| `dict-drawer.ts` | 辞書ペインの拡大表示（`html[data-dict-drawer-open]` の開閉・スクロール比率同期。レイアウト切替は global.css・内容同期は dict-pane.ts） | wikilink-ui R-21〜R-26 |
 | `dict-preview.ts` | ホバープレビュー（フェッチ結果はペインと共有キャッシュ） | wikilink-ui R-7〜R-9 |
 | `toc.ts` | モバイル目次ボトムシート（+現在地追従を入れる場合） | [spec/pages.md](spec/pages.md) R-13 |
 
@@ -161,7 +162,7 @@ Content Layer APIのglobローダーで4コレクションを定義する。
 
 #### embedフェッチの共有（T4-2で確定）
 
-`dict-pane.ts` は `fetchDictEmbed(slug): Promise<DictEmbed | null>` を named export し、slug単位の module-level Map でfetch結果をキャッシュする。`dict-preview.ts`（T4-3）はこの関数を import して**ホバープレビューとサイドペインでフェッチ結果を共有**する（同一辞書を二重fetchしない）。fetch失敗時は `null` を返し、呼び出し側は素の `/dict/[slug]` 遷移にフォールバックする（wikilink-ui R-16）。辞書リンク（本文・ペイン内とも `a.wikilink[data-dict-link]`）のクリックは `document` への単一委譲ハンドラで捕捉し、R-11/R-12 を1経路で処理する。デスクトップ右ペインとモバイルボトムシート内の `DictPane` は同一 `data-dict-pane-*` フックの複製で、`querySelectorAll` でまとめて状態同期する（`toc.ts` の複数DOM同期と同方式）。
+`dict-pane.ts` は `fetchDictEmbed(slug): Promise<DictEmbed | null>` を named export し、slug単位の module-level Map でfetch結果をキャッシュする。`dict-preview.ts`（T4-3）はこの関数を import して**ホバープレビューとサイドペインでフェッチ結果を共有**する（同一辞書を二重fetchしない）。fetch失敗時は `null` を返し、呼び出し側は素の `/dict/[slug]` 遷移にフォールバックする（wikilink-ui R-16）。辞書リンク（本文・ペイン内とも `a.wikilink[data-dict-link]`）のクリックは `document` への単一委譲ハンドラで捕捉し、R-11/R-12 を1経路で処理する。デスクトップ右ペインとモバイルボトムシート内の `DictPane`、および拡大ドロワー（`DictDrawer` の `data-dict-drawer-content` / `-default`。コンパクト表示を継がないため属性名のみ分ける）は同一内容の複製で、`querySelectorAll` でまとめて状態同期する（`toc.ts` の複数DOM同期と同方式）。戻る/進むボタンはドロワー側も同一の `data-dict-pane-prev` / `-next` フックで一括同期に乗る。
 
 非同期fetch後の描画は**世代トークン**で後勝ちを保証する（T4-3で確定）。`dict-pane.ts`（クリック・戻る/進む）と `dict-preview.ts`（ホバー）はそれぞれモジュールスコープのカウンタを持ち、描画要求ごとに採番して解決時に最新要求のみを描画する。これにより「辞書Aのfetch中にBを操作するとAの解決が後勝ちでBを上書きし、ペイン履歴もクリック順と逆になる」競合を防ぐ。
 

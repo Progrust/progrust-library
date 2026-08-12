@@ -10,6 +10,7 @@ import type { DictTarget } from "../lib/wikilink-graph";
 import BaseLayout from "./BaseLayout.astro";
 import ChapterToc from "../components/ChapterToc.astro";
 import ChapterNav from "../components/ChapterNav.astro";
+import DictDrawer from "../components/DictDrawer.astro";
 import DictPane from "../components/DictPane.astro";
 import LinkedDictList from "../components/LinkedDictList.astro";
 import MobileNav from "../components/MobileNav.astro";
@@ -77,8 +78,14 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
       lg〜xl 未満=複合目次カラムを省略した2カラム / lg 未満=1カラム。
       左右カラム幅は clamp() で画面幅に連続追従（1536px で最大値・1280px で最小値） */
     }
+    {
+      /* data-detail-grid / data-has-toc / --toc-col: 辞書ドロワー表示中のグリッド切替フック
+        （wikilink-ui R-23。global.css の html[data-dict-drawer-open] ルールが参照） */
+    }
     <div
-      class="lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)] lg:gap-10 xl:grid-cols-[clamp(220px,17.1875vw,264px)_minmax(0,1fr)_clamp(320px,25vw,384px)]"
+      class="lg:grid lg:grid-cols-[minmax(0,1fr)_clamp(320px,25vw,384px)] lg:gap-10 xl:grid-cols-[clamp(220px,17.1875vw,264px)_minmax(0,1fr)_clamp(320px,25vw,384px)] [--toc-col:clamp(220px,17.1875vw,264px)]"
+      data-detail-grid
+      data-has-toc=""
     >
       {/* 左: 複合目次（章リスト + 現在章の見出し・xl 以上・sticky） */}
       <aside class="hidden xl:block">
@@ -141,10 +148,10 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
           ペインは位置固定（スクロールは本文の内部スクロールのみ）とし、縦幅超過分は
           使用辞書一覧のラッパだけがスクロールする（wikilink-ui R-20・二重スクロール回避） */
       }
-      <aside class="hidden lg:block">
+      <aside class="hidden lg:block" data-dict-rail>
         <div class="sticky top-24 flex max-h-[calc(100vh-8rem)] flex-col">
           <div class="shrink-0">
-            <DictPane />
+            <DictPane expandable />
           </div>
           {
             /* pb-1 必須: 丸ゴの字面（約1.6em）が text-sm の行ボックス（20px）を上下に
@@ -172,12 +179,17 @@ const updatedIso = updatedAt.toISOString().slice(0, 10);
     />
   </MobileNav>
 
+  {/* 辞書ペインの拡大表示ドロワー（lg 以上・wikilink-ui R-21〜R-26） */}
+  <DictDrawer />
+
   <script>
     import { initToc } from "../scripts/toc";
     import { initDictPane } from "../scripts/dict-pane";
+    import { initDictDrawer } from "../scripts/dict-drawer";
     import { initDictPreview } from "../scripts/dict-preview";
     initToc();
     initDictPane();
+    initDictDrawer();
     initDictPreview();
   </script>
 </BaseLayout>

@@ -1,0 +1,120 @@
+---
+// 辞書ペインの拡大表示ドロワー（wikilink-ui R-21〜R-26 / ui-design-spec「辞書ペインの拡大表示」）。
+// 非モーダル: バックドロップ・背景スクロールロックを持たず、lg 以上でペインの拡大トリガー
+// （data-dict-expand）から開く。開閉・レイアウト切替（html[data-dict-drawer-open]）・
+// スクロール同期は src/scripts/dict-drawer.ts、内容・履歴の同期は dict-pane.ts が
+// ペイン複製フック（data-dict-drawer-content / -default / data-dict-pane-prev / -next）で行う。
+// 開閉の見た目（visibility/opacity/transform の遷移）は global.css の
+// [data-dict-drawer] ルールが持つ（閉状態でも scrollHeight を測るため display は切り替えない）。
+---
+
+<div
+  data-dict-drawer
+  role="complementary"
+  aria-label="辞書の拡大表示"
+  class="fixed bottom-0 right-0 top-14 z-20 hidden w-[var(--dict-drawer-w)] flex-col border-l border-line bg-card lg:flex"
+>
+  <div
+    class="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-line/70 px-4"
+  >
+    <p class="font-mono text-xs text-accent">// dictionary pane</p>
+    <div class="flex shrink-0 gap-1.5">
+      <button
+        type="button"
+        disabled
+        data-dict-pane-prev
+        aria-label="前の辞書へ戻る"
+        class="grid h-7 w-7 place-items-center rounded border border-line text-sub disabled:opacity-40"
+      >
+        <svg
+          class="h-3.5 w-3.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M15 18l-6-6 6-6"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        disabled
+        data-dict-pane-next
+        aria-label="次の辞書へ進む"
+        class="grid h-7 w-7 place-items-center rounded border border-line text-sub disabled:opacity-40"
+      >
+        <svg
+          class="h-3.5 w-3.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M9 18l6-6-6-6"></path>
+        </svg>
+      </button>
+      <button
+        type="button"
+        data-dict-drawer-close
+        aria-label="拡大表示を閉じる"
+        class="grid h-7 w-7 place-items-center rounded border border-line text-sub transition-colors hover:border-accent hover:text-accent motion-reduce:transition-none"
+      >
+        <svg
+          class="h-3.5 w-3.5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M18 6 6 18M6 6l12 12"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {
+    /* デフォルト状態（案内）。ペインと同様に dict-pane.ts が表示を切り替える。 */
+  }
+  <div
+    data-dict-drawer-default
+    class="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto p-6 text-center"
+  >
+    <svg
+      class="h-8 w-8 text-line"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22H20v-2.5H6.5a1 1 0 0 1 0-2H20"
+      ></path>
+    </svg>
+    <p class="text-sm text-sub">
+      辞書リンクを押すと、ここに内容が表示されます。
+    </p>
+  </div>
+
+  {
+    /* 選択状態のコンテナ。ペインのコンパクト表示（13px）は継がず通常 prose サイズで表示する
+      （フックを data-dict-pane-content と分けているのはそのため）。relative はペインと同じく
+      positioned 要素のオーバーフローによる scrollHeight 膨張対策で必須。 */
+  }
+  <div
+    data-dict-drawer-content
+    class="relative hidden min-h-0 flex-1 overflow-y-auto p-6"
+  >
+  </div>
+</div>

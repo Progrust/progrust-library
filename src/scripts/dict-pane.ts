@@ -172,18 +172,22 @@ function syncNav(): void {
   }
 }
 
+// ペインの複製 DOM（デスクトップ右レール・モバイルシート・拡大ドロワー）をまとめて
+// 更新するセレクタ。ドロワー（DictDrawer.astro）は同一内容・履歴の複製として
+// この一括更新に乗る（wikilink-ui R-24）。
+const CONTENT_SELECTOR = "[data-dict-pane-content], [data-dict-drawer-content]";
+const DEFAULT_SELECTOR = "[data-dict-pane-default], [data-dict-drawer-default]";
+
 /** 選択状態を全ペインに描画する（デフォルトブロックは隠す）。 */
 function renderEmbed(embed: DictEmbed): void {
   const markup = dictMarkup(embed, false);
   for (const content of document.querySelectorAll<HTMLElement>(
-    "[data-dict-pane-content]",
+    CONTENT_SELECTOR,
   )) {
     content.innerHTML = markup;
     content.classList.remove("hidden");
   }
-  for (const def of document.querySelectorAll<HTMLElement>(
-    "[data-dict-pane-default]",
-  )) {
+  for (const def of document.querySelectorAll<HTMLElement>(DEFAULT_SELECTOR)) {
     def.classList.add("hidden");
   }
 }
@@ -191,14 +195,12 @@ function renderEmbed(embed: DictEmbed): void {
 /** デフォルト状態（案内メッセージ）を全ペインに表示する。 */
 function renderDefault(): void {
   for (const content of document.querySelectorAll<HTMLElement>(
-    "[data-dict-pane-content]",
+    CONTENT_SELECTOR,
   )) {
     content.innerHTML = "";
     content.classList.add("hidden");
   }
-  for (const def of document.querySelectorAll<HTMLElement>(
-    "[data-dict-pane-default]",
-  )) {
+  for (const def of document.querySelectorAll<HTMLElement>(DEFAULT_SELECTOR)) {
     def.classList.remove("hidden");
   }
 }

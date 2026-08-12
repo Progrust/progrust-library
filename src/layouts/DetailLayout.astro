@@ -8,6 +8,7 @@ import type { DictTarget } from "../lib/wikilink-graph";
 import { tocHeadings } from "../lib/content";
 import BaseLayout from "./BaseLayout.astro";
 import Toc from "../components/Toc.astro";
+import DictDrawer from "../components/DictDrawer.astro";
 import DictPane from "../components/DictPane.astro";
 import LinkedDictList from "../components/LinkedDictList.astro";
 import MobileNav from "../components/MobileNav.astro";
@@ -57,7 +58,15 @@ const gridCols = hasToc
   maxWidthClass="max-w-[96rem]"
 >
   <main class="mx-auto max-w-[96rem] px-4 py-10 sm:px-8">
-    <div class={`lg:grid lg:gap-10 ${gridCols}`}>
+    {
+      /* data-detail-grid / data-has-toc / --toc-col: 辞書ドロワー表示中のグリッド切替フック
+        （wikilink-ui R-23。global.css の html[data-dict-drawer-open] ルールが参照） */
+    }
+    <div
+      class={`lg:grid lg:gap-10 [--toc-col:clamp(200px,15.625vw,240px)] ${gridCols}`}
+      data-detail-grid
+      data-has-toc={hasToc ? "" : undefined}
+    >
       {/* 左: 目次（xl 以上・sticky）。目次が無いページではカラムごと省略 */}
       {
         hasToc && (
@@ -136,10 +145,10 @@ const gridCols = hasToc
           ペインは位置固定（スクロールは本文の内部スクロールのみ）とし、縦幅超過分は
           使用辞書一覧のラッパだけがスクロールする（wikilink-ui R-20・二重スクロール回避） */
       }
-      <aside class="hidden lg:block">
+      <aside class="hidden lg:block" data-dict-rail>
         <div class="sticky top-24 flex max-h-[calc(100vh-8rem)] flex-col">
           <div class="shrink-0">
-            <DictPane />
+            <DictPane expandable />
           </div>
           {
             /* pb-1 必須: 丸ゴの字面（約1.6em）が text-sm の行ボックス（20px）を上下に
@@ -157,12 +166,17 @@ const gridCols = hasToc
   {/* フローティングボタン + ボトムシート（目次: xl 未満 / 辞書: lg 未満） */}
   <MobileNav headings={headings} />
 
+  {/* 辞書ペインの拡大表示ドロワー（lg 以上・wikilink-ui R-21〜R-26） */}
+  <DictDrawer />
+
   <script>
     import { initToc } from "../scripts/toc";
     import { initDictPane } from "../scripts/dict-pane";
+    import { initDictDrawer } from "../scripts/dict-drawer";
     import { initDictPreview } from "../scripts/dict-preview";
     initToc();
     initDictPane();
+    initDictDrawer();
     initDictPreview();
   </script>
 </BaseLayout>

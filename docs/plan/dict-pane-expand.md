@@ -20,7 +20,7 @@ issue原要件（モーダル・枠外クリックで終了・拡大中は背景
 - [x] **DP1-1: spec・デザイン文書の改訂と issue #1 への設計コメント** 〔Fable 5〕
   wikilink-ui.md（R-21〜R-26 / AC-10〜AC-13）、ui-design-spec.md（確定モック一覧・レイアウト・辞書サイドペイン節・新節「辞書ペインの拡大表示」・意思決定の履歴17）、本計画の登録（plan/README.md の DP1 行）。issue #1 に採用デザインの説明コメントを投稿し、原要件（モーダル・枠外クリックで終了・操作不可）からの変更と理由を明記する。
   完了条件: R/AC採番の整合（重複なし・相互参照が解決する）。issueコメント投稿済み。`npm run check` green。
-- [ ] **DP1-2: ドロワー本体と開閉・レイアウト切替** 〔Fable 5〕
+- [x] **DP1-2: ドロワー本体と開閉・レイアウト切替** 〔Fable 5〕
   `DictPane.astro` に `expandable` prop と拡大トリガー（eyebrowボタン+常設拡大ボタン。右レールのみ有効化）、`DictDrawer.astro` 新設と両レイアウトへの配線（`data-dict-rail` / `data-detail-grid` フック追加）、`global.css`（レイアウト切替ルール・面落とし3ルールへのドロワー追加）、`dict-drawer.ts` の開閉（Esc・トランジション・lg未満縮小時クローズ・フォーカス移動）、`dict-pane.ts` のセレクタ定数化+ドロワー追加、`architecture.md` §6/§8 への追記。スクロール同期はDP1-3。
   完了条件: AC-10〜AC-12 を目視で満たす（辞書詳細・記事・章詳細、ライト/ダーク、xl / lg〜xl帯）。`npm run check` green・`npx astro build` 成功。
 - [ ] **DP1-3: スクロール比率同期と横断検証** 〔Fable 5〕
@@ -28,6 +28,28 @@ issue原要件（モーダル・枠外クリックで終了・拡大中は背景
   完了条件: `[AC-13]` テスト green + AC-13 目視。`npm run check` green・`npx astro build` 成功。完了後に issue #1 へ完了報告コメントを添えてクローズする。
 
 ## 実施履歴
+
+### DP1-2
+
+ドロワー本体・開閉・レイアウト切替を実装した（スクロール同期は DP1-3）。
+
+**実装**:
+
+- `DictPane.astro`: `expandable` prop（デフォルト false）を追加。有効時はヘッダーの eyebrow を拡大ボタン化（ホバーで拡大アイコン表示）し、ナビボタン群右端に常設拡大ボタン（いずれも `data-dict-expand`）を追加。右レール（`DetailLayout` / `ChapterLayout`）のみ有効化し、モバイルシート複製は無指定のまま
+- `DictDrawer.astro`（新規）: `data-dict-drawer` ルート + ヘッダー行（eyebrow・`data-dict-pane-prev`/`-next` の複製・`data-dict-drawer-close`）+ 本文 `data-dict-drawer-content` / 案内 `data-dict-drawer-default`。両レイアウトの `MobileNav` 隣に配置
+- `global.css`: `--dict-drawer-w: min(42rem, 45vw)`、ドロワーの開閉遷移（閉状態は `visibility: hidden`＝スクロール量測定のため display は切り替えない。opacity+translateX 180ms・reduced-motion 対応）、`html[data-dict-drawer-open]` 起点のレイアウト切替（右レール `display: none`・グリッド列切替・`margin-right` の中央寄せ補正付き押し出し）、面落とし3ルール（`.code-project` / `.message` / message 内インラインコード）へ `[data-dict-drawer-content]` を追加
+- `dict-drawer.ts`（新規）: `initDictDrawer`。トリガー/×/Esc の開閉、閉時のトリガーへのフォーカス返還、lg 未満への縮小で自動クローズ
+- `dict-pane.ts`: 一括更新セレクタを定数化しドロワーの複製フックを追加（`renderEmbed` / `renderDefault` のみの変更）
+- レイアウト2種: グリッドに `data-detail-grid` / `data-has-toc` / `--toc-col`（Detail は 200〜240px・Chapter は 220〜264px）、右レール aside に `data-dict-rail`
+- `architecture.md`: §6 に `DictDrawer`、§8 に `dict-drawer.ts` 行と複製同期の記述を追記
+
+**検証結果**: `npm run check` green（vitest 255 passed）・`npx astro build` 成功（167ページ）。chrome-devtools MCP（dev サーバ・`/dict/module`）で目視:
+
+- AC-10: 拡大トリガー2箇所で開き、ペインと同一辞書を通常 prose サイズ（15px）で表示。レール `display: none`・グリッド「目次+本文」化・`margin-right` 押し出し（1440px で 688px）を確認
+- AC-11: 表示中に本文の別 wikilink クリックでドロワー内容が切替・prev が活性化し、ドロワー内の戻るで前の辞書に戻る（ペインと同一履歴）
+- AC-12: 本文側クリックでは閉じず、Esc・×のそれぞれで閉じてレール復帰・ペインに同内容。閉状態の `visibility: hidden` を確認
+- 1100px（lg〜xl帯）: 1カラム+ドロワー（45vw=495px）。目次フローティングボタンの重なりは設計どおり許容
+- 800px: ドロワー `display: none`・拡大フラグ自動解除・ボトムシートは従来どおり動作しシート内に拡大トリガーが出ないことを確認。ライト/ダーク両テーマで崩れなし
 
 ### DP1-1
 
