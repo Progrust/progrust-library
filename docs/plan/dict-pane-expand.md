@@ -29,8 +29,25 @@ issue原要件（モーダル・枠外クリックで終了・拡大中は背景
 - [x] **DP1-4: 拡大表示中の目次をフローティングボタンに切替** 〔Fable 5〕
   DP1-2 の「目次カラム維持」へのフィードバック対応（ui-design-spec 意思決定の履歴18）。spec（wikilink-ui R-23 / AC-10・pages R-13・ui-design-spec）を先に改訂し、拡大中は目次カラムも非表示にして本文のみの1カラム構成へ変更。目次はモバイル同様のフローティングボタン+ボトムシートを xl 以上でも表示して提供する。
   完了条件: 改訂後の AC-10 を目視で満たす。`npm run check` green・`npx astro build` 成功。
+- [x] **DP1-5: eyebrow の cursor: pointer 化とドロワー側クリックでのクローズ** 〔Fable 5〕
+  ヘッダーの `// dictionary pane` エリアがクリック可能に見えない・拡大中に同じ場所で閉じられないというフィードバック対応。spec（wikilink-ui R-25 / AC-12・ui-design-spec）を先に改訂し、ペイン/ドロワー両方の eyebrow ボタンに `cursor-pointer` を付与、ドロワー側 eyebrow をクローズボタン化してペインの拡大トリガーと対の開閉トグルにする。
+  完了条件: 改訂後の AC-12 を目視で満たす（eyebrow ホバーでポインター・ドロワー側 eyebrow クリックで閉じる）。`npm run check` green・`npx astro build` 成功。
 
 ## 実施履歴
+
+### DP1-5
+
+ヘッダー（`// dictionary pane`）エリアの操作性を改善した。
+
+**先行したドキュメント更新**（仕様駆動）: wikilink-ui R-25（クローズ手段にヘッダー領域クリックを追加し、ペイン/ドロワーのヘッダーを開閉トグルとして対にする）/ AC-12、ui-design-spec（サイドペイン節・拡大表示節に `cursor-pointer` とドロワー側クローズトリガーを追記、`data-*` コントラクト表の `data-dict-drawer-close` 付与先を更新）。
+
+**実装**:
+
+- `DictPane.astro`: eyebrow ボタンに `cursor-pointer` を追加（Tailwind v4 preflight はボタンを `cursor: default` にするため明示が必要）
+- `DictDrawer.astro`: ヘッダーの eyebrow `<p>` をクローズボタン（`data-dict-drawer-close`・`cursor-pointer`・ホバーで縮小アイコン表示）に変更。ペインの拡大トリガーと同型の対称デザイン
+- `dict-drawer.ts`: クローズトリガーを `querySelectorAll` で複数バインドに変更。開時のフォーカス先は×ボタン（DOM 順で最後のトリガー）を維持
+
+**検証結果**: `npm run check` green（vitest 261 passed）・`npx astro build` 成功（167ページ）。chrome-devtools MCP で目視: ペイン/ドロワー両 eyebrow の computed cursor が `pointer`、ドロワー eyebrow クリック・×ボタン・Esc のいずれでも閉じ、開時フォーカスが×ボタンに当たることを確認（改訂後 AC-12）。
 
 ### DP1-4
 

@@ -407,7 +407,7 @@ html.dark .dict-link { color: #D4715A; }
 ### 辞書サイドペイン（詳細ページ右）
 
 - 枠: `rounded border bg-card`、ヘッダー行に `// dictionary pane` + 戻る/進むボタン（`w-7 h-7 rounded border`、`disabled:opacity-40`）
-- 拡大トリガー（★dict-modal-compare.html 案Dで確定・デスクトップ右レールのみ）: eyebrow領域を拡大ボタン化し（ホバーで拡大アイコン `opacity-0 group-hover:opacity-100` が右隣に現れる）、ナビボタン群の右端に常設の拡大アイコンボタン（戻る/進むと同型の `w-7 h-7 rounded border`）を置く。モバイルシート内の複製にはどちらも表示しない
+- 拡大トリガー（★dict-modal-compare.html 案Dで確定・デスクトップ右レールのみ）: eyebrow領域を拡大ボタン化し（`cursor-pointer`。ホバーで拡大アイコン `opacity-0 group-hover:opacity-100` が右隣に現れる）、ナビボタン群の右端に常設の拡大アイコンボタン（戻る/進むと同型の `w-7 h-7 rounded border`）を置く。モバイルシート内の複製にはどちらも表示しない
 - 本文: `relative p-5 max-h-[60vh] overflow-y-auto`（右カラム内でペインの位置は固定され、スクロールはこの内部スクロールのみ。縦幅超過時のスクロールは使用辞書一覧側が担う（「レイアウト」参照）。`relative` は必須: 内容中の positioned 要素のオーバーフローが positioned なスクロール祖先（モバイルの辞書ボトムシート等）の scrollHeight に算入され、下部に空白スクロール領域が生まれるのを防ぐ）
 - 2状態: デフォルト（本アイコン + 「辞書リンクを押すと、ここに内容が表示されます。」）/ 選択時（後述の「ペイン/プレビューの内容表示」）
 - 履歴はペイン単体でJS配列管理（ページ遷移でリセット）。ペイン内の辞書リンククリックで内容を差し替え
@@ -417,7 +417,7 @@ html.dark .dict-link { color: #D4715A; }
 機能仕様は [`../spec/wikilink-ui.md`](../spec/wikilink-ui.md) R-21〜R-26。lg以上のみ。**非モーダル**: バックドロップ・背景スクロールロックを設けず、表示中も本文を操作できるデュアルカラムにする（モバイルのボトムシートとは対照的な設計）。
 
 - **枠**: `fixed` でstickyヘッダー下（`top-14`）〜画面下（`bottom-0`）・右端（`right-0`）。幅は `--dict-drawer-w: min(42rem, 45vw)`（`:root` のCSS変数でSSoT化し、本文の押し出し量と共有）。`bg-card` + `border-l border-line` のみで**影は付けない**（オーバーレイではなくレイアウトの一部に見せる）。z-indexは `z-20`（ヘッダー `z-30` の下・ホバープレビュー `z-50` の下）
-- **ヘッダー行**: ペインと同じ文法（eyebrow `// dictionary pane` + 戻る/進むボタン）+ 右端に×ボタン（`w-7 h-7 rounded border` 同型）。戻る/進むはペインと同一フックの複製で状態同期する
+- **ヘッダー行**: ペインと同じ文法（eyebrow `// dictionary pane` + 戻る/進むボタン）+ 右端に×ボタン（`w-7 h-7 rounded border` 同型）。戻る/進むはペインと同一フックの複製で状態同期する。eyebrow領域はクローズボタン化し（`cursor-pointer`。ホバーで縮小アイコンが現れる）、ペインの拡大トリガーと対の開閉トグルにする
 - **本文**: `relative p-6`・**通常proseサイズ**（ペイン/プレビューのコンパクト13px規則は適用しない）。`relative` はペイン本文と同じ理由で必須（positioned要素のオーバーフロー対策）。スクロールバーはサイト共通の6px（狭幅4pxの対象・`data-side-rail` のホバー時のみ表示の対象に**入れない**）
 - **card面上の面落とし**: message・ネストdetails・`:::project` を `paper` に落とす規則はペイン内表示と同じ（対象セレクタにドロワー本文を追加する）
 - **レイアウト切替**: 開いている間は右カラム（ペイン+使用辞書一覧）と目次カラムを `display: none` にし、グリッドを本文のみの1列に切替。グリッドコンテナに `margin-right: max(0px, calc(var(--dict-drawer-w) + 2.5rem - max(0px, (100vw - 96rem) / 2)))` を与えて本文をドロワー幅+gap 2.5remぶん左へ寄せる（減算項は中央寄せコンテナの余白ぶんの補正。超ワイド画面で本文が過剰に左へ寄るのを防ぐ）
@@ -432,7 +432,7 @@ html.dark .dict-link { color: #D4715A; }
 | `data-dict-expand` | ペインヘッダーのeyebrowボタン / 常設拡大ボタン | 拡大表示を開くトリガー |
 | `data-dict-drawer` | ドロワーのルート | ドロワー本体の目印 |
 | `data-dict-drawer-content` / `data-dict-drawer-default` | ドロワー本文 / 案内表示 | ペインの `data-dict-pane-content` / `-default` と同期更新される複製 |
-| `data-dict-drawer-close` | ×ボタン | ドロワーを閉じる |
+| `data-dict-drawer-close` | ×ボタン / ドロワーヘッダーのeyebrowボタン | ドロワーを閉じる |
 | `data-dict-rail` | 右カラムの `<aside>` | 表示中の非表示化とペイン特定 |
 | `data-toc-rail` | 目次カラムの `<aside>` | 表示中の非表示化 |
 | `data-detail-grid` | 詳細ページのグリッドコンテナ | グリッド列の切替 |

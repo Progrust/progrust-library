@@ -15,9 +15,37 @@
   class="fixed bottom-0 right-0 top-14 z-20 hidden w-[var(--dict-drawer-w)] flex-col border-l border-line bg-card lg:flex"
 >
   <div
-    class="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-line/70 px-4"
+    class="flex h-12 shrink-0 items-center justify-between gap-2 border-b border-line/70 py-0 pl-4 pr-3"
   >
-    <p class="font-mono text-xs text-accent">// dictionary pane</p>
+    {
+      /* eyebrow はクローズボタン（ペインの拡大トリガーと対の開閉トグル。wikilink-ui R-25）。
+        ホバーで縮小アイコンを出して閉じる操作であることを示す。 */
+    }
+    <button
+      type="button"
+      data-dict-drawer-close
+      aria-label="拡大表示を閉じる"
+      class="group -ml-2 flex min-w-0 flex-1 cursor-pointer items-center gap-2 rounded px-2 py-1 text-left"
+    >
+      <span class="truncate font-mono text-xs text-accent">
+        // dictionary pane
+      </span>
+      <svg
+        class="h-3 w-3 shrink-0 text-sub opacity-0 transition-opacity group-hover:opacity-100 motion-reduce:transition-none"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 14h6v6"></path>
+        <path d="M20 10h-6V4"></path>
+        <path d="m14 10 7-7"></path>
+        <path d="m3 21 7-7"></path>
+      </svg>
+    </button>
     <div class="flex shrink-0 gap-1.5">
       <button
         type="button"

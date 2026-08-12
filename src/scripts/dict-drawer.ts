@@ -45,9 +45,13 @@ function syncScroll(from: HTMLElement, to: HTMLElement): void {
 export function initDictDrawer(): void {
   const drawer = document.querySelector<HTMLElement>("[data-dict-drawer]");
   if (!drawer) return;
-  const closeBtn = drawer.querySelector<HTMLButtonElement>(
+  // クローズトリガーはヘッダーの eyebrow ボタンと×ボタンの2つ（wikilink-ui R-25）。
+  // 開時のフォーカス先は×ボタン＝DOM 順で最後のトリガー（eyebrow はヘッダー左端のため、
+  // フォーカスリングが「閉じる操作」より「タイトル」に見えてしまうのを避ける）。
+  const closeButtons = drawer.querySelectorAll<HTMLButtonElement>(
     "[data-dict-drawer-close]",
   );
+  const closeBtn = closeButtons[closeButtons.length - 1] ?? null;
   const drawerContent = drawer.querySelector<HTMLElement>(
     "[data-dict-drawer-content]",
   );
@@ -98,7 +102,9 @@ export function initDictDrawer(): void {
   )) {
     btn.addEventListener("click", () => open(btn));
   }
-  closeBtn?.addEventListener("click", close);
+  for (const btn of closeButtons) {
+    btn.addEventListener("click", close);
+  }
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") close();
   });
