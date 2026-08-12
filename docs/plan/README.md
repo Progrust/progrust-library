@@ -10,3 +10,4 @@
 | --- | --- | --- | --- |
 | PG1 | [playground-project.md](../archive/plan/playground-project.md) | Playgroundプロジェクト連携（`:::project`）のUIデザイン検討〜実装 | 完了（アーカイブ済み） |
 | SP1 | [side-pane-scroll.md](side-pane-scroll.md) | サイドペイン（左右レール）の縦スクロール対応（GitHub issue #2） | 進行中 |
+| DP1 | [dict-pane-expand.md](dict-pane-expand.md) | 辞書ペインの拡大表示（非モーダル右ドロワー。GitHub issue #1） | 進行中 |
