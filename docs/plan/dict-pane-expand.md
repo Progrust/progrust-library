@@ -23,11 +23,27 @@ issue原要件（モーダル・枠外クリックで終了・拡大中は背景
 - [x] **DP1-2: ドロワー本体と開閉・レイアウト切替** 〔Fable 5〕
   `DictPane.astro` に `expandable` prop と拡大トリガー（eyebrowボタン+常設拡大ボタン。右レールのみ有効化）、`DictDrawer.astro` 新設と両レイアウトへの配線（`data-dict-rail` / `data-detail-grid` フック追加）、`global.css`（レイアウト切替ルール・面落とし3ルールへのドロワー追加）、`dict-drawer.ts` の開閉（Esc・トランジション・lg未満縮小時クローズ・フォーカス移動）、`dict-pane.ts` のセレクタ定数化+ドロワー追加、`architecture.md` §6/§8 への追記。スクロール同期はDP1-3。
   完了条件: AC-10〜AC-12 を目視で満たす（辞書詳細・記事・章詳細、ライト/ダーク、xl / lg〜xl帯）。`npm run check` green・`npx astro build` 成功。
-- [ ] **DP1-3: スクロール比率同期と横断検証** 〔Fable 5〕
+- [x] **DP1-3: スクロール比率同期と横断検証** 〔Fable 5〕
   `dict-drawer.ts` に `mapScrollTop` 純関数を追加して開閉フローに配線し、`tests/scripts/dict-drawer.test.ts` に `[AC-13]` テストを書く。回帰目視（ホバープレビューがドロワー内でも動作・モバイルシート無変更・R-20のレール挙動・reduced-motion）。
   完了条件: `[AC-13]` テスト green + AC-13 目視。`npm run check` green・`npx astro build` 成功。完了後に issue #1 へ完了報告コメントを添えてクローズする。
 
 ## 実施履歴
+
+### DP1-3
+
+スクロール比率同期を実装し、機能全体の回帰確認と issue #1 のクローズを行った。
+
+**実装**（`dict-drawer.ts`）:
+
+- 純関数 `mapScrollTop(from: ScrollMetrics, to)` を追加: 可動量（`scrollHeight - clientHeight`）に対する比率で対応づけ、元/先に余地がない場合は 0、比率は [0, 1] にクランプ（ブラウザのバウンス・慣性で可動域を僅かに超える値への防御）
+- 開閉フローへ配線。**開くときはレールが `display: none` になる前にペインの実測値を読み取ってから**フラグを立て、ドロワーへ書き込む（非表示中は scrollHeight が 0 になり比率が取れないため。閉じるときは逆にフラグ除去でレールを復帰させてから書き戻す）
+- `tests/scripts/dict-drawer.test.ts` に `[AC-13]` 6ケース（中間比率・元/先の余地ゼロ・末尾・上下クランプ）
+
+**検証結果**: `npm run check` green（vitest 261 passed）・`npx astro build` 成功（167ページ）。chrome-devtools MCP（`/dict/module`・1440×900）で目視:
+
+- AC-13: ペインを比率 50% にして拡大 → ドロワーが比率 0.500 で表示。ドロワーを 80% にして閉じる → ペインが比率 0.800（誤差なし）
+- 回帰: ドロワー内 wikilink のホバーでプレビュー小窓が表示（z-50 > ドロワー z-20）。`prefers-reduced-motion` でトランジション無効のルール適用を確認。閉状態ではレール構成（R-20）が変更前と同一
+- issue #1 に完了報告コメントを添えてクローズ
 
 ### DP1-2
 
