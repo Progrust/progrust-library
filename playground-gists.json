@@ -42,5 +42,81 @@
   "44d8785ae2d3c3fc2724d913b9cc3d56e350825f352a268750d83568d1b788f8": {
     "id": "d384f2e41f1e8c380e20622327656858",
     "url": "https://gist.github.com/rust-play/d384f2e41f1e8c380e20622327656858"
+  },
+  "a1f9ddb822bfd5b55cb27a24d1571810727b601d714ca2951ecafddc5fec82f8": {
+    "id": "47dcdba8f96285c922d42c8079df0bc0",
+    "url": "https://gist.github.com/rust-play/47dcdba8f96285c922d42c8079df0bc0"
+  },
+  "c50cfce1837358dad614a3e0aafa56a5262e86bbac51d84d56c658775d6baa68": {
+    "id": "d60a1a8104c49366f99af9d1dea88911",
+    "url": "https://gist.github.com/rust-play/d60a1a8104c49366f99af9d1dea88911"
+  },
+  "9476567032226eb83f454bd8420f0d7d1804a394bb57d44bac1fb6c7027c2a0f": {
+    "id": "0d8b91f62511719b9795dfd0649cd1a6",
+    "url": "https://gist.github.com/rust-play/0d8b91f62511719b9795dfd0649cd1a6"
+  },
+  "8aac814197f4645a157af36bd264848abcef01d571d20b548a99511adf47f001": {
+    "id": "0c0f0f73eb71f3bfa60aea6c24c9ed7d",
+    "url": "https://gist.github.com/rust-play/0c0f0f73eb71f3bfa60aea6c24c9ed7d"
+  },
+  "b9324f51f8fd9495e570c424842af9e9a0ff294aec5e3bf48913f07c09508505": {
+    "id": "3597ec2d3b86cc78ef68c429014d8f13",
+    "url": "https://gist.github.com/rust-play/3597ec2d3b86cc78ef68c429014d8f13"
+  },
+  "e128d0dda7b1a3bff1b88ccf2d21f3386f3bcc90a47f040b21ec15691459b532": {
+    "id": "bfb381f1b943ecf61a06302f25c574e5",
+    "url": "https://gist.github.com/rust-play/bfb381f1b943ecf61a06302f25c574e5"
+  },
+  "13fb3a25dcfc99c1428231baa93a7be6b6b9118c9a85903fbbc21d86c8d28e67": {
+    "id": "40b64e6c214fb1e2037e4932e91c3978",
+    "url": "https://gist.github.com/rust-play/40b64e6c214fb1e2037e4932e91c3978"
+  },
+  "ec8249b92327f622701a869e3ce4b12a6b256fb8c66d4639b391045b54dc701b": {
+    "id": "01e14a2f265840d804242ad071e08bb4",
+    "url": "https://gist.github.com/rust-play/01e14a2f265840d804242ad071e08bb4"
+  },
+  "3d2ee71643e520a5f5793a12967ad2b1317341d24e9ad6330488379b5185803b": {
+    "id": "51271b82deaf33f6ef74488aefd1b1d9",
+    "url": "https://gist.github.com/rust-play/51271b82deaf33f6ef74488aefd1b1d9"
+  },
+  "6b851d39d8c87363f24acc84c67561769090207c7962b3958274709a62fa08b5": {
+    "id": "9b21d36737e191c28f64afddb1d90391",
+    "url": "https://gist.github.com/rust-play/9b21d36737e191c28f64afddb1d90391"
+  },
+  "9e04761958161102824d7a71f567178e6a202e7fe88907bbf7a43c6a02eaa6ae": {
+    "id": "6a05364d11ca5f01e1f121aab1d90f3a",
+    "url": "https://gist.github.com/rust-play/6a05364d11ca5f01e1f121aab1d90f3a"
+  },
+  "dc3ad46c7d282a43af6e5cce9e7451507a9cc34656689f32cb3dd4ad0529d8df": {
+    "id": "9b7f14dd2a795b67f804be5738597d7c",
+    "url": "https://gist.github.com/rust-play/9b7f14dd2a795b67f804be5738597d7c"
+  },
+  "c2e345dfbbb2ee65862a602e6d8ea65a1e1a89a56275bdc91a4eb328c99ab77e": {
+    "id": "6a7826ef7267c817899dccfa111a7e17",
+    "url": "https://gist.github.com/rust-play/6a7826ef7267c817899dccfa111a7e17"
+  },
+  "f524dc6a5ae599181b58b61ed50a84590fa2aece564037f590d33a91ddadef6c": {
+    "id": "839c14c0dfa14b0d4fba865dc75e1179",
+    "url": "https://gist.github.com/rust-play/839c14c0dfa14b0d4fba865dc75e1179"
+  },
+  "885a8f6b7c3d424cec3abe267f2f058a367ff53bac615a6594eeefa0f28a2d7f": {
+    "id": "00a3f221d8f0f1922eb5bd3befda6a95",
+    "url": "https://gist.github.com/rust-play/00a3f221d8f0f1922eb5bd3befda6a95"
+  },
+  "65fc9079f38ce4ce90e97151732e19644f27655f0db3a70a5733216754214d55": {
+    "id": "87de01972ffe4934b86d831dac2fc531",
+    "url": "https://gist.github.com/rust-play/87de01972ffe4934b86d831dac2fc531"
+  },
+  "1b74ade482d762d8af59696f0a4c03bddb245c34f9b1c936a2b99fcff83be57d": {
+    "id": "4042d7fc3e646c4ef955d99fdd0cb616",
+    "url": "https://gist.github.com/rust-play/4042d7fc3e646c4ef955d99fdd0cb616"
+  },
+  "fe300086382f4aa8cf13c2ab3035aae16ac7faeb038ad108580674aa85aef9dc": {
+    "id": "0436860383e18b93432cd74668a413e4",
+    "url": "https://gist.github.com/rust-play/0436860383e18b93432cd74668a413e4"
+  },
+  "4c4eaca87ad6092c19d5cbbf058d6ba06155407e889b595c9d47a8b0b0e85f93": {
+    "id": "f5d7da1ef7ea1ab906a3c23eeaf7a6ea",
+    "url": "https://gist.github.com/rust-play/f5d7da1ef7ea1ab906a3c23eeaf7a6ea"
   }
 }
