@@ -2,7 +2,7 @@
 title: 標準ライブラリ
 description: Rustに標準添付されるcore・alloc・stdの3クレートからなるライブラリ群。通常「標準ライブラリ」が指すのはOS機能まで含むstdクレート。
 created_at: 2026-07-19
-updated_at: 2026-08-11
+updated_at: 2026-08-16
 tags: ["標準ライブラリ"]
 public: true
 ---
@@ -48,7 +48,7 @@ OSがない組み込み機器などでは`std`が使えません。クレート�
 :::
 
 :::details[プレリュードと標準マクロ]
-標準ライブラリのうち特によく使う型・トレイトは「プレリュード」として各モジュールに自動でインポートされます。`Option`や`Vec`を`use`なしで書けるのはこのためです。`println!`や`vec!`などの標準マクロも同様に、デフォルトでインポートされます。ただしプレリュードの内訳はeditionによって少し異なり、`#![no_std]`クレートでは`core`のプレリュードに切り替わるため、`Vec`や`println!`はそのままでは使えません。<!-- TODO: [[trait]] 作成後にリンク -->
+標準ライブラリのうち特によく使う型・トレイトは「プレリュード」として各モジュールに自動でインポートされます。`Option`や`Vec`を`use`なしで書けるのはこのためです。`println!`や`vec!`などの標準[[macro]]も同様に、デフォルトでインポートされます。ただしプレリュードの内訳はeditionによって少し異なり、`#![no_std]`クレートでは`core`のプレリュードに切り替わるため、`Vec`や`println!`はそのままでは使えません。<!-- TODO: [[trait]] 作成後にリンク -->
 :::
 
 [^1]: [The Rust Standard Library — std公式ドキュメント](https://doc.rust-lang.org/std/)、[core — Rust公式ドキュメント](https://doc.rust-lang.org/core/)、[alloc — Rust公式ドキュメント](https://doc.rust-lang.org/alloc/)
