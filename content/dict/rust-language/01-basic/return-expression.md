@@ -2,7 +2,7 @@
 title: return式
 description: 関数の実行をその場で打ち切り、値を呼び出し元に返す式。Rustでは本体末尾の式が戻り値になるため、主な用途は途中で抜ける「早期リターン」。
 created_at: 2026-07-19
-updated_at: 2026-07-19
+updated_at: 2026-08-16
 tags: ["基本文法"]
 public: true
 ---
@@ -31,7 +31,7 @@ fn main() {
 ## 補足
 
 :::details[return式自体の型は!（never型）]
-`return`式は決して値を生成せずに制御を移す「発散する式」で、式としての型は`!`（never型）です[^1]<!-- TODO: [[never-type]] 作成後にリンク -->。`!`はどんな型にも合わせられるため、たとえば`let fee = if ok { 500 } else { return 0 };`のように、片方の分岐が`return`でも[[if-expression]]全体の型が壊れません。
+`return`式は決して値を生成せずに制御を移す「発散する式」で、式としての型は`!`（[[never-type]]）です[^1]。`!`はどんな型にも合わせられるため、たとえば`let fee = if ok { 500 } else { return 0 };`のように、片方の分岐が`return`でも[[if-expression]]全体の型が壊れません。
 :::
 
 :::details[クロージャの中のreturnはクロージャだけを抜ける]

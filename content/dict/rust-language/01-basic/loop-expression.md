@@ -2,7 +2,7 @@
 title: loop式
 description: 本体のブロックを無限に繰り返すループ式。breakで脱出でき、渡した値がloop式全体の値になる、3種のループ（loop・while・for）のうち唯一breakで値を返せる構文。
 created_at: 2026-07-19
-updated_at: 2026-07-19
+updated_at: 2026-08-16
 tags: ["基本文法"]
 public: true
 ---
@@ -35,7 +35,7 @@ fn main() {
 ## 補足
 
 :::details[breakしないloop式の型は!（never型）]
-`break`を1つも含まない`loop`式は決して値を返さない「発散する式」で、型は`!`（never型）になります<!-- TODO: [[never-type]] 作成後にリンク -->[^1]。どんな型とも互換になるため、値を返す[[function]]の中に置いてもコンパイルエラーになりません。
+`break`を1つも含まない`loop`式は決して値を返さない「発散する式」で、型は`!`（[[never-type]]）になります[^1]。どんな型とも互換になるため、値を返す[[function]]の中に置いてもコンパイルエラーになりません。
 :::
 
 :::details[ループラベルで外側のループを抜ける]

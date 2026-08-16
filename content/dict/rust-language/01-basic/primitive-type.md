@@ -2,7 +2,7 @@
 title: プリミティブ型
 description: Rustコンパイラに組み込まれた基本型の総称。単一の値のスカラー型と複数の値をまとめる複合型に大別。
 created_at: 2026-07-18
-updated_at: 2026-07-20
+updated_at: 2026-08-16
 tags: ["型システム", "基本文法", "プリミティブ型"]
 public: true
 ---
@@ -28,11 +28,11 @@ public: true
 - [[reference]]`&T` / `&mut T`
 - 生ポインタ`*const T` / `*mut T`
 - 関数ポインタ`fn`、[[unit-type]]`()`
-- never型`!`
+- [[never-type]]`!`
 
 `String`が標準ライブラリの型であるのに対し`str`はプリミティブ型、というように「組み込みかどうか」が両者を分けます。
 
 :::message{warning}
-never型`!`は、Rust 1.94時点ではまだ experimental（不安定）です。
+never型`!`は、Rust 1.93時点ではまだ experimental（不安定）です。
 :::
 ::::

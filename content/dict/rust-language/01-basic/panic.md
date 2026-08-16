@@ -98,7 +98,7 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 :::
 
 :::details[`panic!`が持つ型]
-`panic!`はその場で実行を打ち切るため、値を返しません。型としてはnever型`!`を持ち<!-- TODO: [[never-type]] 作成後にリンク -->、どんな型が期待される位置にも書けます。そのため[[match-expression]]の一部のアームだけを`panic!`にしても、アーム全体の型は残りのアームの型に揃います。
+`panic!`はその場で実行を打ち切るため、値を返しません。型としては[[never-type]]`!`を持ち、どんな型が期待される位置にも書けます。そのため[[match-expression]]の一部のアームだけを`panic!`にしても、アーム全体の型は残りのアームの型に揃います。
 
 ```rust playground
 fn main() {
