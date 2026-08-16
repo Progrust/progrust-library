@@ -2,7 +2,7 @@
 title: for式
 description: イテレータが生み出す要素を順に取り出し、要素ごとに本体のブロックを実行するループ式。範囲・配列・ベクタなどの繰り返しに使う、3種のループで最も使用頻度が高い構文。式としての値は常にユニット型。
 created_at: 2026-07-19
-updated_at: 2026-07-26
+updated_at: 2026-08-16
 tags: ["基本文法"]
 public: true
 ---
@@ -61,7 +61,7 @@ JavaScriptやC言語にある`for (let i = 0; i < 3; i++)`のような「カウ�
 | JavaScript（`for...of`） | `for (const item of items) { ... }` |
 | Rust | `for i in 0..3 { ... }`・`for item in &items { ... }` |
 
-Rustの`for`が相当するのはJavaScriptの`for...of`で、カウンタで回したいときは範囲式を渡します。添字と終了条件を手書きするカウンタ形式は、条件の書き間違いで配列の範囲外を指してパニックしたり要素を取りこぼしたりするバグの温床になるため、Rustではイテレータ形式の`for`が安全かつ簡潔な定番とされています[^2]。
+Rustの`for`が相当するのはJavaScriptの`for...of`で、カウンタで回したいときは範囲式を渡します。添字と終了条件を手書きするカウンタ形式は、条件の書き間違いで配列の範囲外を指して[[panic]]したり要素を取りこぼしたりするバグの温床になるため、Rustではイテレータ形式の`for`が安全かつ簡潔な定番とされています[^2]。
 :::
 
 [^1]: [The Rust Reference: Loops and other breakable expressions](https://doc.rust-lang.org/reference/expressions/loop-expr.html)
