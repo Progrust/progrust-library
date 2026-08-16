@@ -2,7 +2,7 @@
 title: 第1章 コンソール出力と変数
 description: println!によるコンソール出力と、変数・可変性・定数・シャドーイング・文と式の基本を手を動かして学ぶ10問。
 created_at: 2026-07-28
-updated_at: 2026-07-28
+updated_at: 2026-08-16
 tags: ["基本文法", "問題集"]
 public: true
 ---
@@ -19,7 +19,7 @@ public: true
 
 ## 01 - はじめてのRustプログラム
 
-[[console-output]]と[[string-literal]]に関する問題です。
+[[console-output]]・[[string-literal]]・[[macro]]に関する問題です。
 コンソールに「Hello, world!」と出力するコードを記載してください。
 
 ```txt:期待する出力
@@ -40,7 +40,7 @@ fn main() {
     println!("Hello, world!"); // [!code ++]
 }
 ```
-`println!`は渡した文字列をコンソールに出力し、末尾に改行を加えます。名前の最後に`!`が付いているのは、関数ではなくマクロだからです。
+`println!`は渡した文字列をコンソールに出力し、末尾に改行を加えます。名前の最後に`!`が付いているのは、関数ではなく[[macro]]だからです。
 出力する文字列は`"Hello, world!"`のようにダブルクォートで囲んで書きます。これを文字列リテラルと呼びます。
 :::
 

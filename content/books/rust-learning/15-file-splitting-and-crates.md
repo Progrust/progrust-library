@@ -2,7 +2,7 @@
 title: 第15章 ファイル分割とクレート
 description: セミコロンで終えるmod宣言による別ファイルの読み込み、子モジュールとディレクトリの対応、modを書くのは1回だけという規則、ライブラリクレートとバイナリクレートの分担、crate::が指すクレートまで、1つのファイルに収まらなくなったコードを複数ファイルへ分ける方法を手を動かして学ぶ6問。
 created_at: 2026-08-12
-updated_at: 2026-08-12
+updated_at: 2026-08-16
 tags: ["プロジェクト構成", "問題集"]
 public: true
 ---
@@ -369,7 +369,7 @@ pub fn pay(prices: &[u32]) {
 
 ## 04 - ライブラリクレートとバイナリクレート
 
-[[crate]]と[[package]]に関する問題です。
+[[crate]]・[[package]]・[[cargo]]に関する問題です。
 次のプロジェクトには`src/main.rs`と`src/lib.rs`があります。`src/lib.rs`の`total_with_shipping`を`main`から呼び出してください。
 
 Rust Playgroundのパッケージ名は`playground`で固定されています。

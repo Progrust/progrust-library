@@ -770,7 +770,7 @@ let coffee_stock = coffee.unwrap_or(0);
 
 ## 11 - unwrapとexpect
 
-[[unwrap]]と[[result]]に関する問題です。
+[[unwrap]]・[[result]]・[[panic]]に関する問題です。
 次のコードは実行するとパニックして止まります。止まった理由が伝わるように、2つの`unwrap`を`expect`へ書き換えてください。
 
 ```txt:期待する出力
