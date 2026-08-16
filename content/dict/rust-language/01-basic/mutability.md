@@ -115,7 +115,7 @@ fn main() {
 :::
 
 :::details[constとstaticの可変性]
-[[constant]]（`const`）は常に不変で、`mut`を付けることはできません。一方、プログラム全体で1つの実体を持つ`static`だけは`static mut`と書けますが<!-- TODO: [[static]] 作成後にリンク -->、データ競合を防げないため読み書きには`unsafe`が必要です。さらにRust 2024エディションでは`static mut`への参照を作ること自体がエラー（`static_mut_refs`）になるため、実質的に使うべきではありません。
+[[constant]]（`const`）は常に不変で、`mut`を付けることはできません。一方、プログラム全体で1つの実体を持つ[[static]]だけは`static mut`と書けますが、データ競合を防げないため読み書きには`unsafe`が必要です。さらにRust 2024エディションでは`static mut`への参照を作ること自体がエラー（`static_mut_refs`）になるため、実質的に使うべきではありません。
 :::
 
 :::details[共有参照越しに書き換えられる例外]
