@@ -2,7 +2,7 @@
 title: 第12章 OptionとResult
 description: Some・NoneによるOption型、Ok・ErrによるResult型、if let式とlet-else文による簡潔な取り出し、?演算子によるエラー伝播、unwrap系メソッドによる値の取り出しまで、nullも例外も使わずに「値がない」「失敗した」を扱う方法を手を動かして学ぶ13問。
 created_at: 2026-08-08
-updated_at: 2026-08-10
+updated_at: 2026-08-16
 tags: ["複合型", "パターンマッチング", "問題集"]
 public: true
 ---
@@ -822,7 +822,7 @@ fn main() {
     println!("2回目の出荷後: 残り{rest}個");
 }
 ```
-`unwrap`は、`Ok`なら中身を返し、`Err`ならパニックしてプログラムを止めるメソッドです<!-- TODO: [[panic]] 作成後にリンク -->。`Option`に対しても同じで、`Some`なら中身、`None`ならパニックします。
+`unwrap`は、`Ok`なら中身を返し、`Err`なら[[panic]]してプログラムを止めるメソッドです。`Option`に対しても同じで、`Some`なら中身、`None`ならパニックします。
 
 在庫10個から3個、さらに9個を出荷しようとしているので、2回目の`ship`は`Err`を返します。`match`なら`Err`のアームを書かされるところですが、`unwrap`は「`Err`なら止まる」と決め打ちするメソッドなので、コンパイルは通り、実行して初めて止まります。
 
