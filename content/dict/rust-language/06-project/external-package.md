@@ -7,7 +7,7 @@ tags: ["プロジェクト構成", "Cargo"]
 public: true
 ---
 
-自分で書いていない外部の[[package]]を使う手順は2段階です。まず`Cargo.toml`の`[dependencies]`にパッケージ名とバージョンを書いて依存を宣言し、次にコード側で[[use-declaration]]を書いて使いたい項目を[[scope]]に持ち込みます。この宣言を見て、Cargoは既定のレジストリであるcrates.ioからパッケージを取得してコンパイルします[^1]。
+自分で書いていない外部の[[package]]を使う手順は2段階です。まず`Cargo.toml`の`[dependencies]`にパッケージ名とバージョンを書いて依存を宣言し、次にコード側で[[use-declaration]]を書いて使いたい項目を[[scope]]に持ち込みます。この宣言を見て、[[cargo]]は既定のレジストリであるcrates.ioからパッケージを取得してコンパイルします[^1]。
 
 ```toml:Cargo.toml
 [package]

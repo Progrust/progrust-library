@@ -113,7 +113,7 @@ The Rust Programming Language 7章の範囲をメインに扱う。複数ファ�
 - [x] 再エクスポート（`pub use`による再公開、内部のモジュール構造と外部に見せる公開APIを分離できる、使いどころ）
 - [x] 外部パッケージの利用（Cargo.tomlの`[dependencies]`への追加、`use`でスコープに持ち込む、`std`は同様に`use`が必要だがdependencies追加は不要）
 - [x] モジュールのファイル分割（`mod`宣言によるファイル読み込み、`mod`はincludeではなく宣言は1回だけ、`src/garden.rs`方式と旧スタイルの`src/garden/mod.rs`方式、サブモジュールのディレクトリ配置）
-- [ ] Cargo（ビルドシステム兼パッケージマネージャという位置づけ（`rustc`直接実行との違い）、代表コマンド（`new`・`build`・`run`・`check`・`test`・`add`）、`Cargo.toml`と`Cargo.lock`の役割分担、crates.ioとの関係。プロファイル・`cargo publish`・featuresは扱わず概観に絞る。作成後に`package`・`crate`・`external-package`のCargo言及をリンク化する）
+- [x] Cargo（ビルドシステム兼パッケージマネージャという位置づけ（`rustc`直接実行との違い）、代表コマンド（`new`・`build`・`run`・`check`・`test`・`add`）、`Cargo.toml`と`Cargo.lock`の役割分担、crates.ioとの関係。プロファイル・`cargo publish`・featuresは扱わず概観に絞る。作成後に`package`・`crate`・`external-package`のCargo言及をリンク化する）
 - [ ] ワークスペース（複数のパッケージをまとめて管理する単位、`[workspace]`と`members`、`Cargo.lock`と`target`ディレクトリの共有、メンバー間の依存はパスで指定。TRPL 14章の範囲だがパッケージからのリンク待ちのため本章に置く）
 
 ## 07-trait
