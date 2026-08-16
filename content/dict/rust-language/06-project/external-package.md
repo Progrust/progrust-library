@@ -2,12 +2,12 @@
 title: 外部パッケージ
 description: 依存を`Cargo.toml`の`[dependencies]`で宣言し、`use`でスコープに持ち込む2段階の手順。標準ライブラリのみ宣言不要。
 created_at: 2026-08-11
-updated_at: 2026-08-11
+updated_at: 2026-08-16
 tags: ["プロジェクト構成", "Cargo"]
 public: true
 ---
 
-自分で書いていない外部の[[package]]を使う手順は2段階です。まず`Cargo.toml`の`[dependencies]`にパッケージ名とバージョンを書いて依存を宣言し、次にコード側で[[use-declaration]]を書いて使いたい項目をスコープに持ち込みます。この宣言を見て、Cargoは既定のレジストリであるcrates.ioからパッケージを取得してコンパイルします[^1]。<!-- TODO: [[scope]] 作成後にリンク -->
+自分で書いていない外部の[[package]]を使う手順は2段階です。まず`Cargo.toml`の`[dependencies]`にパッケージ名とバージョンを書いて依存を宣言し、次にコード側で[[use-declaration]]を書いて使いたい項目を[[scope]]に持ち込みます。この宣言を見て、Cargoは既定のレジストリであるcrates.ioからパッケージを取得してコンパイルします[^1]。
 
 ```toml:Cargo.toml
 [package]
