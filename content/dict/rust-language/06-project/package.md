@@ -65,7 +65,7 @@ edition = "2024"
 :::
 
 :::details[複数のパッケージをまとめるワークスペース]
-パッケージが増えてきたら、複数のパッケージを一緒に管理する「ワークスペース」を作れます。ワークスペースのメンバーは共通の`Cargo.lock`と出力先の`target`ディレクトリを共有します[^3]。パッケージの外側にもう一段階の単位があるため、パッケージが管理の最大単位とは限りません。<!-- TODO: [[workspace]] 作成後にリンク -->
+パッケージが増えてきたら、複数のパッケージを一緒に管理する[[workspace]]を作れます。そのメンバーは共通の`Cargo.lock`と出力先の`target`ディレクトリを共有します[^3]。パッケージの外側にもう一段階の単位があるため、パッケージが管理の最大単位とは限りません。
 :::
 
 [^1]: [Glossary（Package） — The Cargo Book](https://doc.rust-lang.org/cargo/appendix/glossary.html#package)、[Packages and Crates — The Rust Programming Language](https://doc.rust-lang.org/book/ch07-01-packages-and-crates.html)、[Cargo Targets — The Cargo Book](https://doc.rust-lang.org/cargo/reference/cargo-targets.html)
