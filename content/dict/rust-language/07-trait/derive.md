@@ -44,8 +44,7 @@ fn main() {
 | `Ord` | 同じ順序づけを全順序として定義する |
 | `Hash` | 全フィールドをハッシュ値の計算に混ぜ込む |
 
-各トレイトの詳細は[[clone]]・[[copy]]・[[debug-trait]]・[[comparison-operators]]・[[console-output]]の各項目で扱っています。
-<!-- TODO: [[comparison-traits]] 作成後にリンク -->
+各トレイトの詳細は[[clone]]・[[copy]]・[[debug-trait]]・[[comparison-traits]]・[[console-output]]の各項目で扱っています。
 <!-- TODO: [[default-trait]] 作成後にリンク -->
 
 :::message{warning}

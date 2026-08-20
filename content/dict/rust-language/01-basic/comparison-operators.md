@@ -2,7 +2,7 @@
 title: 比較演算子
 description: 等価性と大小関係を調べる==・!=・<・<=・>・>=の6種類の演算子。結果は必ず論理値型になり、左右は原則として同じ型でなければならないのが特徴。
 created_at: 2026-08-16
-updated_at: 2026-08-20
+updated_at: 2026-08-21
 tags: ["基本文法", "型システム"]
 public: true
 ---
@@ -87,7 +87,7 @@ fn main() {
 }
 ```
 
-<!-- TODO: [[comparison-traits]] 作成後にリンク -->
+4つのトレイトの継承関係や、`Partial`が付く側と付かない側の違いは[[comparison-traits]]で扱っています。
 <!-- TODO: [[operator-overloading]] 作成後にリンク -->
 :::
 
