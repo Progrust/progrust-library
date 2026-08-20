@@ -60,7 +60,7 @@ fn main() {
 
 ジェネリックなコードは、コンパイル時に「実際に使われた具体的な型の組み合わせ」ごとに専用のコードへ展開されます。この処理を**単相化**（monomorphization）と呼びます[^5]。上の例では`swap_pair`が`&str`版として、`Labeled::new`が`u32`版と`String`版として、それぞれ別々に生成されます。
 
-実行時には、型ごとに手書きした関数を呼ぶのと同じコードが動くため、ジェネリクスを使っても**プログラムは遅くなりません**[^5]。型の解決が実行時に行われることはなく、これを**静的ディスパッチ**と呼びます[^6]。実行時に呼び先を決める`dyn Trait`（トレイトオブジェクト）とは対照的です。<!-- TODO: [[trait-object]] 作成後にリンク -->
+実行時には、型ごとに手書きした関数を呼ぶのと同じコードが動くため、ジェネリクスを使っても**プログラムは遅くなりません**[^5]。型の解決が実行時に行われることはなく、これを**静的ディスパッチ**と呼びます[^6]。実行時に呼び先を決める`dyn Trait`（[[trait-object]]）とは対照的です。
 
 :::message{info}
 型引数`T`だけでは、その値に対して「[[move]]する・[[reference]]を取る」程度のことしかできません。`T`の値を足し算したり表示したりするには、`T`が特定のトレイトを実装していることを[[trait-bound]]で要求します。
@@ -91,7 +91,7 @@ fn main() {
 :::
 
 :::details[ジェネリクスでできないこと]
-`Vec<T>`の`T`は1つの型に決まるため、「1つのコレクションに異なる型を混在させる」ことはジェネリクスではできません。そうした用途にはトレイトオブジェクトを使います[^6]。
+`Vec<T>`の`T`は1つの型に決まるため、「1つのコレクションに異なる型を混在させる」ことはジェネリクスではできません。そうした用途には[[trait-object]]を使います[^6]。
 :::
 
 [^1]: [The Rust Reference - Generic parameters](https://doc.rust-lang.org/reference/items/generics.html) "Functions, type aliases, structs, enumerations, unions, traits, and implementations may be parameterized by types, constants, and lifetimes." / "The order of generic parameters is restricted to lifetime parameters and then type and const parameters intermixed."
