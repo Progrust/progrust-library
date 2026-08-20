@@ -68,7 +68,7 @@ fn main() {
 - スーパートレイトもすべてdyn互換であること
 - `Sized`を要求しないこと（`trait T: Sized`ではない）<!-- TODO: [[sized]] 作成後にリンク -->
 - 関連定数を持たず、ジェネリックな関連型も持たないこと<!-- TODO: [[associated-type]] 作成後にリンク -->
-- 各メソッドが、型引数を持たず、レシーバ（`&self`・`&mut self`・`Box<Self>`・`Rc<Self>`・`Arc<Self>`・それらの`Pin`のいずれか）以外で`Self`を使わず、`async fn`や戻り値位置の`impl Trait`でないこと<!-- TODO: [[impl-trait]] 作成後にリンク -->
+- 各メソッドが、型引数を持たず、レシーバ（`&self`・`&mut self`・`Box<Self>`・`Rc<Self>`・`Arc<Self>`・それらの`Pin`のいずれか）以外で`Self`を使わず、`async fn`や戻り値位置の[[impl-trait]]でないこと
 
 条件を満たさないトレイトをトレイトオブジェクトにしようとすると、エラー: E0038になります。
 
