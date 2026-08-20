@@ -52,7 +52,7 @@ argument-hint: <トピック名 or 既存slug> [配置ディレクトリ 例: ru
 
 - モデル指定:
   - 観点1（技術的正確性）のサブエージェントはFableで実行する（Agentツールの `model: "fable"` 指定）
-  - 観点2・3のサブエージェントはOpusで実行する（Agentツールの `model: "opus"` 指定）
+  - 観点2・3のサブエージェントはSonnetで実行する（Agentツールの `model: "sonnet"` 指定）
 
 1. **技術的正確性（敵対的）**: 「この記述は誤りである、という前提で反証を試みよ。The Rust Reference / std公式ドキュメントを根拠に、誤り・誇張・edition依存の記述・古い情報を出典付きで指摘せよ。出典を示せない指摘はしないこと」
 2. **記法・frontmatter準拠**: 「`docs/markdown-notation/` の rule.md / frontmatter.md / dict-style.md に照らして逸脱を列挙せよ。特に: h1使用・`---`使用・`:::details[タイトル]` のlabel記法（スペース区切りはタイトルが黙って消える）・日付形式（yyyy-MM-dd）・タグが既存タグ（`npm run dict:tags` で集計）と意味重複する新タグになっていないか・wikilinkの重複がdict-style.mdの許容条件（リンク先内容への言及・初出から距離がある場合のみ重複可）に収まっているか・**既存エントリに相当する語が本文にあるのにリンクされていない箇所がないか**（`content/dict/` の全slug/titleと突き合わせる）・リンク先slugの実在・TODOコメントの予約slugが既存コンテンツの同一概念の予約（`npm run dict:todo` で集計）と一致しているか」
