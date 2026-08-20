@@ -87,8 +87,7 @@ fn main() {
 }
 ```
 
-4つのトレイトの継承関係や、`Partial`が付く側と付かない側の違いは[[comparison-traits]]で扱っています。
-<!-- TODO: [[operator-overloading]] 作成後にリンク -->
+4つのトレイトの継承関係や、`Partial`が付く側と付かない側の違いは[[comparison-traits]]で扱っています。演算子をトレイトの実装として定義するという仕組み全体は[[operator-overloading]]を参照してください。
 :::
 
 :::details[NaNとの比較]

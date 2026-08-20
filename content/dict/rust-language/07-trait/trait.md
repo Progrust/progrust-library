@@ -114,7 +114,7 @@ fn main() {
 - [[generics]]の型引数に「このトレイトを実装していること」を要求する[[trait-bound]]
 - `dyn トレイト名`で、異なる型の値を同じトレイトの実装として実行時に切り替える（[[trait-object]]）
 - [[derive]]（`#[derive(...)]`）で標準トレイトの実装を自動生成する
-- `+`や`==`などの演算子の振る舞いを、対応するトレイトの実装で定義する<!-- TODO: [[operator-overloading]] 作成後にリンク -->
+- `+`や`==`などの演算子の振る舞いを、対応するトレイトの実装で定義する（[[operator-overloading]]）
 :::
 
 [^1]: [The Rust Reference - Traits](https://doc.rust-lang.org/reference/items/traits.html) "This interface consists of associated items, which come in three varieties: functions, types, constants"
