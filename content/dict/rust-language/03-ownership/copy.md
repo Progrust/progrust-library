@@ -2,7 +2,7 @@
 title: Copyトレイト
 description: 代入や受け渡しでムーブではなくビット単位の複製が起きることを示すマーカートレイト。実装できるのは、全フィールドがCopyかつDropを持たない型。
 created_at: 2026-08-16
-updated_at: 2026-08-20
+updated_at: 2026-08-21
 tags: ["所有権", "標準ライブラリ"]
 public: true
 ---
@@ -37,7 +37,7 @@ fn main() {
 
 ## Cloneとの関係と使い分け
 
-`.clone()`による[[clone]]を提供する`Clone`は、`Copy`のスーパートレイトです（`pub trait Copy: Clone`）。そのため`Copy`を実装する型は必ず`Clone`も実装する必要があり、`#[derive(Copy, Clone)]`とセットで書くのが定型になっています[^1]。<!-- TODO: [[derive]] 作成後にリンク -->
+`.clone()`による[[clone]]を提供する`Clone`は、`Copy`のスーパートレイトです（`pub trait Copy: Clone`）。そのため`Copy`を実装する型は必ず`Clone`も実装する必要があり、[[derive]]では`#[derive(Copy, Clone)]`とセットで書くのが定型になっています[^1]。
 
 | 観点 | `Copy` | `Clone` |
 | --- | --- | --- |
