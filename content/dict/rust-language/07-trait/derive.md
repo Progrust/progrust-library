@@ -44,8 +44,7 @@ fn main() {
 | `Ord` | 同じ順序づけを全順序として定義する |
 | `Hash` | 全フィールドをハッシュ値の計算に混ぜ込む |
 
-各トレイトの詳細は[[clone]]・[[copy]]・[[debug-trait]]・[[comparison-traits]]・[[console-output]]の各項目で扱っています。
-<!-- TODO: [[default-trait]] 作成後にリンク -->
+各トレイトの詳細は[[clone]]・[[copy]]・[[debug-trait]]・[[default-trait]]・[[comparison-traits]]・[[console-output]]の各項目で扱っています。
 
 :::message{warning}
 標準ライブラリが提供する導出はこの9種だけです。利用者向けの表示を担う[[display-trait]]は「何をどう見せるか」を機械的に決められないため導出できず、`impl std::fmt::Display for 型名`を手で書く必要があります[^5]。
