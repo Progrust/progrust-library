@@ -686,7 +686,7 @@ let rest = match ship(stock, first) {
 なお、`let last = ship(rest, second)?; Ok(last)`は`ship(rest, second)`とだけ書いても同じ結果になります。`?`で開けた箱を`Ok`で包み直しているだけだからです。今回は`?`の動きを見せるためにあえて2行に分けています。
 
 :::message{warning}
-`?`は`main`関数の中では、そのままでは使えません。`main`の戻り値が`()`で`Result`ではないためです。`fn main() -> Result<(), String>`のように戻り値を変えれば使えるようになります。
+`?`は[[main-function]]の中では、そのままでは使えません。`main`の戻り値が`()`で`Result`ではないためです。`fn main() -> Result<(), String>`のように戻り値を変えれば使えるようになります。
 :::
 ::::
 
