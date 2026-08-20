@@ -2,7 +2,7 @@
 title: 変換トレイト
 description: From/Into・TryFrom/TryIntoによる型変換。失敗しない変換とResultで失敗を返す変換を型で表現する仕組み。
 created_at: 2026-07-18
-updated_at: 2026-08-20
+updated_at: 2026-08-21
 tags: ["基本文法", "型システム"]
 public: true
 ---
@@ -96,7 +96,7 @@ fn main() {
 ## 補足
 
 :::details[TryFrom/TryIntoも同じ構図]
-`TryFrom`を実装すると`TryInto`が自動的に使えるようになる点、ジェネリック境界には`TryInto`を使う点など、`From`/`Into`とまったく同じ関係です。失敗時のエラー型は関連型`Error`で表現され、[[integer-type]]どうしの縮小変換では`TryFromIntError`が返ります。
+`TryFrom`を実装すると`TryInto`が自動的に使えるようになる点、ジェネリック境界には`TryInto`を使う点など、`From`/`Into`とまったく同じ関係です。失敗時のエラー型は[[associated-type]]`Error`で表現され、[[integer-type]]どうしの縮小変換では`TryFromIntError`が返ります。
 :::
 
 :::details[浮動小数点数から整数への変換で失敗を検出したい場合]
