@@ -59,7 +59,7 @@ fn main() {
 :::
 
 :::details[標準ライブラリでの例]
-`std::marker::PhantomData`は[[standard-library]]のマーカー型で、ジェネリクスを伴うユニット様構造体として`pub struct PhantomData<T> where T: ?Sized;`と宣言されています[^2]。実際に値を持たないまま「この型を使っているつもり」という情報だけをコンパイラに伝える、マーカー型の代表例です。<!-- TODO: [[generics]] 作成後にリンク -->
+`std::marker::PhantomData`は[[standard-library]]のマーカー型で、[[generics]]を伴うユニット様構造体として`pub struct PhantomData<T> where T: ?Sized;`と宣言されています[^2]。実際に値を持たないまま「この型を使っているつもり」という情報だけをコンパイラに伝える、マーカー型の代表例です。
 :::
 
 [^1]: [The Rust Reference: Structs](https://doc.rust-lang.org/reference/items/structs.html) — フィールドリストを完全に省略した構造体をunit-like structと呼び、同名の定数を暗黙に定義すると述べています。
