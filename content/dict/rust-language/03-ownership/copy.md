@@ -2,12 +2,12 @@
 title: Copyトレイト
 description: 代入や受け渡しでムーブではなくビット単位の複製が起きることを示すマーカートレイト。実装できるのは、全フィールドがCopyかつDropを持たない型。
 created_at: 2026-08-16
-updated_at: 2026-08-16
+updated_at: 2026-08-20
 tags: ["所有権", "標準ライブラリ"]
 public: true
 ---
 
-`Copy`は、値をビット単位で複製するだけで複製が成立することを示す、[[method]]を1つも持たない**マーカートレイト**です[^1]。`Copy`を実装した型は、代入や[[function]]への受け渡しで[[move]]ではなくコピーが起き、[[ownership]]は移らないため元の[[variable]]をそのまま使い続けられます。[[integer-type]]や[[boolean-type]]をはじめ、[[primitive-type]]の多くは最初から`Copy`を実装しています。<!-- TODO: [[trait]] 作成後にリンク -->
+`Copy`は、値をビット単位で複製するだけで複製が成立することを示す、[[method]]を1つも持たない[[trait]]（**マーカートレイト**）です[^1]。`Copy`を実装した型は、代入や[[function]]への受け渡しで[[move]]ではなくコピーが起き、[[ownership]]は移らないため元の[[variable]]をそのまま使い続けられます。[[integer-type]]や[[boolean-type]]をはじめ、[[primitive-type]]の多くは最初から`Copy`を実装しています。
 
 ```rust playground
 #[derive(Copy, Clone)]

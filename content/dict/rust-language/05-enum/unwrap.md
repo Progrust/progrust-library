@@ -2,7 +2,7 @@
 title: unwrap
 description: OptionやResultに包まれた値を取り出す標準ライブラリのメソッド群。取り出せないときにパニックするか既定値を返すかで使い分けるのが基本。
 created_at: 2026-08-10
-updated_at: 2026-08-16
+updated_at: 2026-08-20
 tags: ["標準ライブラリ", "型システム"]
 public: true
 ---
@@ -64,7 +64,7 @@ fn main() {
 ## 補足
 
 :::details[`unwrap_or_else`と`unwrap_or_default`の細かい規則]
-`unwrap_or_else`が受け取るのは`FnOnce`を実装する値（通常はクロージャ）で<!-- TODO: [[closure]] 作成後にリンク -->、`Result`版だけはそれが`Err`の中身を引数として受け取ります[^2]。`unwrap_or_default`は`T`が`Default`トレイトを実装している場合にだけ呼べ<!-- TODO: [[trait]] 作成後にリンク -->、数値なら`0`、[[string]]なら空文字列が返ります。
+`unwrap_or_else`が受け取るのは`FnOnce`を実装する値（通常はクロージャ）で<!-- TODO: [[closure]] 作成後にリンク -->、`Result`版だけはそれが`Err`の中身を引数として受け取ります[^2]。`unwrap_or_default`は`T`が`Default`[[trait]]を実装している場合にだけ呼べ、数値なら`0`、[[string]]なら空文字列が返ります。
 :::
 
 :::details[失敗のほうを取り出す`unwrap_err`]

@@ -2,7 +2,7 @@
 title: 範囲式
 description: start..end（終端を含まない）やstart..=end（終端を含む）の記法で範囲を表す値を作る式。forループの反復や、配列・スライスの一部を切り出す添字指定に使うのが代表例。
 created_at: 2026-07-19
-updated_at: 2026-08-16
+updated_at: 2026-08-20
 tags: ["基本文法", "型システム"]
 public: true
 ---
@@ -37,7 +37,7 @@ fn main() {
 ## 補足
 
 :::details[forループで使えるのは開始のある形式だけ]
-`Range`・`RangeFrom`・`RangeInclusive`は、要素が[[integer-type]]のように「次の値」へ順に進められる型（`Step`トレイトの実装型）であれば<!-- TODO: [[trait]] 作成後にリンク -->イテレータとして使え、`for`ループに渡せます。<!-- TODO: [[iterator]] 作成後にリンク -->開始のない`RangeTo`・`RangeToInclusive`・`RangeFull`は、どこから数え始めるか決められないためイテレータにはなりません。
+`Range`・`RangeFrom`・`RangeInclusive`は、要素が[[integer-type]]のように「次の値」へ順に進められる型（`Step`[[trait]]の実装型）であればイテレータとして使え、`for`ループに渡せます。<!-- TODO: [[iterator]] 作成後にリンク -->開始のない`RangeTo`・`RangeToInclusive`・`RangeFull`は、どこから数え始めるか決められないためイテレータにはなりません。
 :::
 
 :::details[開始が終端以上の範囲は空]
