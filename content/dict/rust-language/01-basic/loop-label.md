@@ -2,7 +2,7 @@
 title: ループラベル
 description: ループの前に'名前:の形で付ける名前。ネストした内側からbreak・continueで対象のループを直接指定でき、多重ループをまとめて抜けられる書き方。ループ以外のブロック式にも付けられ、breakで値を返せる点も特徴。
 created_at: 2026-07-19
-updated_at: 2026-07-19
+updated_at: 2026-08-20
 tags: ["基本文法"]
 public: true
 ---
@@ -51,7 +51,7 @@ fn main() {
 :::
 
 :::details[ラベルの命名規則とシャドーイング]
-ラベルはライフタイム<!-- TODO: [[lifetime]] 作成後にリンク -->と同じ`'`始まりの構文で書きますが、別物です（`'_`はラベルに使えません）。ラベルはローカル[[variable]]と同じ[[shadowing]]の規則に従い、同名ラベルがネストした場合は最も内側のラベルが優先されます[^1]。
+ラベルは[[lifetime]]と同じ`'`始まりの構文で書きますが、別物です（`'_`はラベルに使えません）。ラベルはローカル[[variable]]と同じ[[shadowing]]の規則に従い、同名ラベルがネストした場合は最も内側のラベルが優先されます[^1]。
 :::
 
 [^1]: [The Rust Reference: Loops and other breakable expressions](https://doc.rust-lang.org/reference/expressions/loop-expr.html)
