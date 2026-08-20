@@ -122,11 +122,13 @@ const compileBlock = (block, workDir, index) => {
       detail: `コンパイル成功（${block.marker} での失敗を期待）`,
     };
   }
-  return stderr.includes(block.marker)
+  // stderrにはソース行のecho（コード内コメント含む）も混ざるため、
+  // 単純な部分一致ではなく rustc のエラー行 `error[EXXXX]` の形式で照合する
+  return new RegExp(`^error\\[${block.marker}\\]`, "m").test(stderr)
     ? { ok: true, detail: `期待どおり ${block.marker} で失敗` }
     : {
         ok: false,
-        detail: `失敗したが ${block.marker} が出力に含まれない:\n${stderr}`,
+        detail: `失敗したが error[${block.marker}] が出力に含まれない:\n${stderr}`,
       };
 };
 
